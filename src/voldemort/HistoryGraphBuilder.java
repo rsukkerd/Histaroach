@@ -15,12 +15,10 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class HistoryGraphBuilder 
+public final class HistoryGraphBuilder 
 {
-	private static final File DIR = new File("/home/rsukkerd/workspace/github/voldemort");
+	private static final File DIR = new File("/homes/iws/rsukkerd/workspace/github/voldemort");
 	private static final String[] TEST_CMD = {"ant", "junit"};
-//	private static final File DIR = new File("/home/rsukkerd/workspace/sample");
-//	private static final String[] TEST_CMD = {"cat", "number.txt"};
 	
 	public static HistoryGraph buildHistoryGraph() 
 	{
@@ -37,21 +35,15 @@ public class HistoryGraphBuilder
     	while (!q.isEmpty()) 
     	{
     		TestResultNode next = q.poll();
-    		
-    		System.out.println("Commit: " + next.getCommit());
-    		
+    		    		
     		// process next
     		String currCommit = next.getCommit();
     		List<String> parentCommits = getParentCommits(currCommit);
     		
     		List<TestResultNode> parents = new ArrayList<TestResultNode>();
-    		
-    		System.out.println("parents:");
-    		
+    		    		
     		for (String parentCommit : parentCommits) 
-    		{
-    			System.out.println(parentCommit);
-    			
+    		{    			
 				TestResultNode parent = getTestResultNode(parentCommit);
 				parents.add(parent);
 				
@@ -61,15 +53,29 @@ public class HistoryGraphBuilder
     				visited.add(parentCommit);
     			}
     		}
-    		
-    		System.out.println();
-    		
+    		// add node to graph
     		historyGraph.addNode(next, parents);
+    		
+    		// add information about bug fixes
+    		for (TestResultNode parent : parents)
+    		{
+    			for (String test : parent.getTestResult().getFailures())
+    			{
+    				if (!next.getTestResult().getFailures().contains(test) && 
+    						next.getTestResult().getAllTests().contains(test))
+    				{
+    					historyGraph.addBugFix(test, next);
+    				}
+    			}
+    		}
     	}
 		
 		return historyGraph;
 	}
 	
+	/**
+	 * @return list of parent commits of this commit
+	 */
 	private static List<String> getParentCommits(String commit) 
 	{	
 		checkoutCommit(commit);
@@ -114,6 +120,9 @@ public class HistoryGraphBuilder
     	return parentCommits;
     }
 	
+	/**
+	 * @return TestResultNode representing the commit
+	 */
 	private static TestResultNode getTestResultNode(String commit)
 	{
 		TestResult result = getTestResult(commit);
@@ -149,6 +158,9 @@ public class HistoryGraphBuilder
 		}
 	}
 	
+	/**
+	 * @return TestResult of the commit
+	 */
 	private static TestResult getTestResult(String commit)
 	{
 		checkoutCommit(commit);
@@ -183,6 +195,10 @@ public class HistoryGraphBuilder
         return testResult;
 	}
 	
+	/**
+	 * get TestResult from output on screen
+	 * @return TestResult
+	 */
 	private static TestResult getTestResultHelper(Process process)
 	{
 		InputStreamReader tempReader = new InputStreamReader(
@@ -191,8 +207,8 @@ public class HistoryGraphBuilder
 		BufferedReader reader = new BufferedReader(tempReader);
 		
 		String line = new String();
-		List<String> allTests = new ArrayList<String>();
-    	List<String> failures = new ArrayList<String>();
+		Set<String> allTests = new HashSet<String>();
+		Set<String> failures = new HashSet<String>();
     	
 		try 
 		{

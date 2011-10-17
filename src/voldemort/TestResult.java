@@ -1,18 +1,17 @@
 package voldemort;
 
-import java.util.List;
+import java.util.Set;
 
 /**
- * TestResult contains 2 lists of names of the tests:
- * 1. list of all tests
- * 2. list of failed tests
+ * TestResult contains 2 lists of names of the tests: list of all tests 
+ * and list of failed tests
  */
 public class TestResult 
 {
-	private final List<String> allTests;
-	private final List<String> failures;
+	private final Set<String> allTests;
+	private final Set<String> failures;
 	
-	public TestResult(List<String> allTests, List<String> failures) 
+	public TestResult(Set<String> allTests, Set<String> failures) 
 	{
 		this.allTests = allTests;
 		this.failures = failures;
@@ -21,7 +20,7 @@ public class TestResult
 	/**
 	 * @return list of names of all tests
 	 */
-	public List<String> getAllTests() 
+	public Set<String> getAllTests() 
 	{
 		return allTests;
 	}
@@ -29,7 +28,7 @@ public class TestResult
 	/**
 	 * @return list of names of failed tests
 	 */
-	public List<String> getFailures() 
+	public Set<String> getFailures() 
 	{
 		return failures;
 	}

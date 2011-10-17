@@ -48,4 +48,10 @@ public class TestResultNode
 	{
 		return commit.hashCode();
 	}
+	
+	@Override
+	public String toString()
+	{
+		return commit;
+	}
 }

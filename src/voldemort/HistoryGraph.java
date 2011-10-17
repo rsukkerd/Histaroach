@@ -2,44 +2,73 @@ package voldemort;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 public class HistoryGraph 
 {
-	private Map<TestResultNode, List<TestResultNode>> nodeToParentsMap;
-	private Map<TestResultNode, List<TestResultNode>> nodeToChildrenMap;
+	private final Map<TestResultNode, List<TestResultNode>> nodeToParents;
+	private final Map<String, List<TestResultNode>> bugToNodes;
 	
 	public HistoryGraph() 
 	{
-		nodeToParentsMap = new HashMap<TestResultNode, List<TestResultNode>>();
-		nodeToChildrenMap = new HashMap<TestResultNode, List<TestResultNode>>();
+		nodeToParents = new HashMap<TestResultNode, List<TestResultNode>>();
+		bugToNodes = new HashMap<String, List<TestResultNode>>();
 	}
 	
 	/**
 	 * add new node to this HistoryGraph
+	 * @param node : node to add
+	 * @param parents : list of parents of the node
 	 */
 	public void addNode(TestResultNode node, List<TestResultNode> parents) 
 	{
-		nodeToParentsMap.put(node, parents);
-		nodeToChildrenMap.put(node, new ArrayList<TestResultNode>());
-		
-		for (TestResultNode parent : parents) 
+		nodeToParents.put(node, parents);
+	}
+	
+	/**
+	 * @param node
+	 * @return list of parents of node
+	 */
+	public List<TestResultNode> getParents(TestResultNode node)
+	{
+		return nodeToParents.get(node);
+	}
+	
+	/**
+	 * add bug fix information
+	 * @param bug : test that fails in parent node but passes in child node
+	 * @param node : child node that fixes the bug
+	 */
+	public void addBugFix(String bug, TestResultNode node)
+	{
+		if (!bugToNodes.containsKey(bug))
 		{
-			if (!nodeToChildrenMap.containsKey(parent))
-			{
-				List<TestResultNode> children = new ArrayList<TestResultNode>();
-				children.add(node);
-				nodeToChildrenMap.put(parent, children);
-			} else 
-			{
-				nodeToChildrenMap.get(parent).add(node);
-			}
+			List<TestResultNode> nodes = new ArrayList<TestResultNode>();
+			nodes.add(node);
+			bugToNodes.put(bug, nodes);
+		}
+		else
+		{
+			bugToNodes.get(bug).add(node);
 		}
 	}
 	
-	public List<TestResultNode> getParents(TestResultNode node)
+	/**
+	 * @return iterator over the bugs that get fixed
+	 */
+	public Iterator<String> getBugIterator()
 	{
-		return nodeToParentsMap.get(node);
+		return bugToNodes.keySet().iterator();
+	}
+	
+	/**
+	 * @param bug
+	 * @return list of nodes that fix the bug
+	 */
+	public List<TestResultNode> getNodesThatFixBug(String bug)
+	{
+		return bugToNodes.get(bug);
 	}
 }
