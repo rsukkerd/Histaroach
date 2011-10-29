@@ -15,13 +15,17 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class HistoryGraphBuilder 
+public class HistoryGraphBuilder 
 {
 	private static final File DIR = new File("/homes/iws/rsukkerd/workspace/github/voldemort");
 	private static final String[] TEST_CMD = {"ant", "junit"};
 	
-	public static HistoryGraph buildHistoryGraph() 
+	private static File repoDir;
+	
+	public static HistoryGraph buildHistoryGraph(String repoDir) 
 	{
+		HistoryGraphBuilder.repoDir = new File(repoDir);
+		
 		HistoryGraph historyGraph = new HistoryGraph();
 		
 		TestResultNode masterNode = getTestResultNode("master");
@@ -81,7 +85,7 @@ public final class HistoryGraphBuilder
 		checkoutCommit(commit);
 		
     	ProcessBuilder logBuilder = new ProcessBuilder("git", "log", "--parents", "-1");
-    	logBuilder.directory(DIR);
+    	logBuilder.directory(repoDir);
     	
     	List<String> parentCommits = new ArrayList<String>();
     	
@@ -134,7 +138,7 @@ public final class HistoryGraphBuilder
 	private static void checkoutCommit(String commit)
 	{
 		ProcessBuilder checkoutBuilder = new ProcessBuilder("git", "checkout", commit);
-    	checkoutBuilder.directory(DIR);
+    	checkoutBuilder.directory(repoDir);
     	
         try 
         {
@@ -166,7 +170,7 @@ public final class HistoryGraphBuilder
 		checkoutCommit(commit);
 		
 		ProcessBuilder runtestBuilder = new ProcessBuilder(TEST_CMD);
-		runtestBuilder.directory(DIR);
+		runtestBuilder.directory(repoDir);
         
 		TestResult testResult = null;
 		

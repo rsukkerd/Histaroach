@@ -10,7 +10,7 @@ public class Main
 	 */
 	public static void main(String[] args) 
 	{
-		ParallelFixesFinder finder = new ParallelFixesFinder();
+		ParallelFixesFinder finder = new ParallelFixesFinder(args[0]);
 		Map<String, Set<TestResultNode>> map = finder.findParallelFixes();
 		
 		printParallelFixes(map);

@@ -11,9 +11,9 @@ public class ParallelFixesFinder
 {
 	private final HistoryGraph historyGraph;
 	
-	public ParallelFixesFinder()
+	public ParallelFixesFinder(String repoDir)
 	{
-		historyGraph = HistoryGraphBuilder.buildHistoryGraph();
+		historyGraph = HistoryGraphBuilder.buildHistoryGraph(repoDir);
 	}
 	
 	/**
@@ -52,12 +52,6 @@ public class ParallelFixesFinder
     						map.get(bug).add(node_A);
     						map.get(bug).add(node_B);
     					}
-    					
-    					System.out.println(node_A + " and " + node_B + " are parallel");
-    				} 
-    				else 
-    				{
-    					System.out.println(node_A + " and " + node_B + " are not parallel");
     				}
     			}
     		}
