@@ -9,12 +9,12 @@ import java.util.Map;
 public class HistoryGraph 
 {
 	private final Map<TestResultNode, List<TestResultNode>> nodeToParents;
-	private final Map<String, List<TestResultNode>> bugToNodes;
+	private final Map<String, List<BugFixPair>> bugToPairs;
 	
 	public HistoryGraph() 
 	{
 		nodeToParents = new HashMap<TestResultNode, List<TestResultNode>>();
-		bugToNodes = new HashMap<String, List<TestResultNode>>();
+		bugToPairs = new HashMap<String, List<BugFixPair>>();
 	}
 	
 	/**
@@ -28,8 +28,8 @@ public class HistoryGraph
 	}
 	
 	/**
-	 * @param node
-	 * @return list of parents of node
+	 * @param node : node to get parents
+	 * @return list of parents of the node
 	 */
 	public List<TestResultNode> getParents(TestResultNode node)
 	{
@@ -39,19 +39,19 @@ public class HistoryGraph
 	/**
 	 * add bug fix information
 	 * @param bug : test that fails in parent node but passes in child node
-	 * @param node : child node that fixes the bug
+	 * @param pair : pair of <parent node, child node>
 	 */
-	public void addBugFix(String bug, TestResultNode node)
+	public void addBugFix(String bug, BugFixPair pair)
 	{
-		if (!bugToNodes.containsKey(bug))
+		if (!bugToPairs.containsKey(bug))
 		{
-			List<TestResultNode> nodes = new ArrayList<TestResultNode>();
-			nodes.add(node);
-			bugToNodes.put(bug, nodes);
+			List<BugFixPair> pairs = new ArrayList<BugFixPair>();
+			pairs.add(pair);
+			bugToPairs.put(bug, pairs);
 		}
 		else
 		{
-			bugToNodes.get(bug).add(node);
+			bugToPairs.get(bug).add(pair);
 		}
 	}
 	
@@ -60,15 +60,15 @@ public class HistoryGraph
 	 */
 	public Iterator<String> getBugIterator()
 	{
-		return bugToNodes.keySet().iterator();
+		return bugToPairs.keySet().iterator();
 	}
 	
 	/**
 	 * @param bug
-	 * @return list of nodes that fix the bug
+	 * @return list of <nodeFail, nodePass> pairs of the bug
 	 */
-	public List<TestResultNode> getNodesThatFixBug(String bug)
+	public List<BugFixPair> getBugFixPairs(String bug)
 	{
-		return bugToNodes.get(bug);
+		return bugToPairs.get(bug);
 	}
 }

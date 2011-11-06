@@ -11,21 +11,25 @@ public class Main
 	public static void main(String[] args) 
 	{
 		ParallelFixesFinder finder = new ParallelFixesFinder(args[0]);
-		Map<String, Set<TestResultNode>> map = finder.findParallelFixes();
+		Map<String, Set<BugFixPair>> map = finder.findParallelFixes();
 		
 		printParallelFixes(map);
 	}
 	
-	private static void printParallelFixes(Map<String, Set<TestResultNode>> map)
+	private static void printParallelFixes(Map<String, Set<BugFixPair>> map)
 	{
 		for (String bug : map.keySet())
 		{
 			System.out.println("Test : " + bug);
 			System.out.println("Commits that fix this bug in parallel:");
 			
-			for (TestResultNode node : map.get(bug))
+			for (BugFixPair pair : map.get(bug))
 			{
-				System.out.println("\t" + node);
+				TestResultNode nodeFail = pair.getNodeFail();
+				TestResultNode nodePass = pair.getNodePass();
+				
+				System.out.println("\t" + "node fixed : " + nodePass.toString());
+				System.out.println("\t" + "node failed : " + nodeFail.toString());
 			}
 			
 			System.out.println();

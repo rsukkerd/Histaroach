@@ -68,7 +68,8 @@ public class HistoryGraphBuilder
     				if (!next.getTestResult().getFailures().contains(test) && 
     						next.getTestResult().getAllTests().contains(test))
     				{
-    					historyGraph.addBugFix(test, next);
+    					BugFixPair pair = new BugFixPair(parent, next);
+    					historyGraph.addBugFix(test, pair);
     				}
     			}
     		}

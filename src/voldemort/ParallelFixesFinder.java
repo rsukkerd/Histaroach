@@ -19,38 +19,41 @@ public class ParallelFixesFinder
 	/**
      * @return mapping from bug to TestResultNodes that fix it in parallel
      */
-    public Map<String, Set<TestResultNode>> findParallelFixes() 
+    public Map<String, Set<BugFixPair>> findParallelFixes() 
     {
-    	Map<String, Set<TestResultNode>> map = new HashMap<String, Set<TestResultNode>>();
+    	Map<String, Set<BugFixPair>> map = new HashMap<String, Set<BugFixPair>>();
     	
     	Iterator<String> bugItr = historyGraph.getBugIterator();
     	
     	while (bugItr.hasNext())
     	{
     		String bug = bugItr.next();
-    		List<TestResultNode> nodes = historyGraph.getNodesThatFixBug(bug);
+    		List<BugFixPair> pairs = historyGraph.getBugFixPairs(bug);
     		
-    		for (int i = 0; i < nodes.size(); i++) 
+    		for (int i = 0; i < pairs.size(); i++) 
     		{	
-    			for (int j = i + 1; j < nodes.size(); j++) 
+    			for (int j = i + 1; j < pairs.size(); j++) 
     			{	
-    				TestResultNode node_A = nodes.get(i);
-    				TestResultNode node_B = nodes.get(j);
+    				BugFixPair pair_A = pairs.get(i);
+    				BugFixPair pair_B = pairs.get(j);
+    				
+    				TestResultNode node_A = pair_A.getNodePass();
+    				TestResultNode node_B = pair_B.getNodePass();
     				    				
     				if (areParallel(node_A, node_B)) 
     				{
     					if (!map.containsKey(bug))
     					{
-    						Set<TestResultNode> parallelFixes = new HashSet<TestResultNode>();
-    						parallelFixes.add(node_A);
-    						parallelFixes.add(node_B);
+    						Set<BugFixPair> parallelFixes = new HashSet<BugFixPair>();
+    						parallelFixes.add(pair_A);
+    						parallelFixes.add(pair_B);
     						
     						map.put(bug, parallelFixes);
     					}
     					else
     					{
-    						map.get(bug).add(node_A);
-    						map.get(bug).add(node_B);
+    						map.get(bug).add(pair_A);
+    						map.get(bug).add(pair_B);
     					}
     				}
     			}
