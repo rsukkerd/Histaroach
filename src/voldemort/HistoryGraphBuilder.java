@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class HistoryGraphBuilder 
+public final class HistoryGraphBuilder 
 {
 	private static final File DIR = new File("/homes/iws/rsukkerd/workspace/github/voldemort");
 	private static final String[] TEST_CMD = {"ant", "junit"};

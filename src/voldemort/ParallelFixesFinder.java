@@ -7,20 +7,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class ParallelFixesFinder 
+public final class ParallelFixesFinder 
 {
-	private final HistoryGraph historyGraph;
-	
-	public ParallelFixesFinder(String repoDir)
-	{
-		historyGraph = HistoryGraphBuilder.buildHistoryGraph(repoDir);
-	}
-	
+	private static HistoryGraph historyGraph;
+
 	/**
-     * @return mapping from bug to TestResultNodes that fix it in parallel
+	 * @param historyGraph
+     * @return mapping from bug to BugFixPairs that fix it in parallel
      */
-    public Map<String, Set<BugFixPair>> findParallelFixes() 
+    public static Map<String, Set<BugFixPair>> findParallelFixes(HistoryGraph historyGraph) 
     {
+    	ParallelFixesFinder.historyGraph = historyGraph;
+    	
     	Map<String, Set<BugFixPair>> map = new HashMap<String, Set<BugFixPair>>();
     	
     	Iterator<String> bugItr = historyGraph.getBugIterator();
@@ -66,7 +64,7 @@ public class ParallelFixesFinder
     /**
      * @return true iff node_A is neither ancestor or descendant of node_B
      */
-    private boolean areParallel(TestResultNode node_A, TestResultNode node_B)
+    private static boolean areParallel(TestResultNode node_A, TestResultNode node_B)
     {
     	return !isAncestor(node_A, node_B, new HashSet<TestResultNode>()) && 
     		!isAncestor(node_B, node_A, new HashSet<TestResultNode>());
@@ -75,7 +73,7 @@ public class ParallelFixesFinder
     /**
      * @return true iff node_B is an ancestor of node_A
      */
-    private boolean isAncestor(TestResultNode node_A, TestResultNode node_B, Set<TestResultNode> visited)
+    private static boolean isAncestor(TestResultNode node_A, TestResultNode node_B, Set<TestResultNode> visited)
     {
     	visited.add(node_A);
     	
