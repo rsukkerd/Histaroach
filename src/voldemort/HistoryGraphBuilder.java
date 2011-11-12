@@ -1,6 +1,5 @@
 package voldemort;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -204,12 +203,10 @@ public final class HistoryGraphBuilder
 	 * get TestResult from output on screen
 	 * @return TestResult
 	 */
-	private static TestResult getTestResultHelper(Process process)
+	/* package */ static TestResult getTestResultHelper(Process process)
 	{
-		InputStreamReader tempReader = new InputStreamReader(
-				new BufferedInputStream(process.getInputStream()));
-		
-		BufferedReader reader = new BufferedReader(tempReader);
+		BufferedReader reader = new BufferedReader(new
+				InputStreamReader(process.getInputStream()));
 		
 		String line = new String();
 		Set<String> allTests = new HashSet<String>();
@@ -218,11 +215,11 @@ public final class HistoryGraphBuilder
 		try 
 		{
 			while ((line = reader.readLine()) != null) 
-			{
-				Pattern testPattern = Pattern.compile("\\s*[junit] Running (\\S+)");
+			{				
+				Pattern testPattern = Pattern.compile("\\s*\\[junit\\] Running (\\S+)");
 				Matcher testMatcher = testPattern.matcher(line);
 				
-				Pattern failPattern = Pattern.compile("\\s*[junit] Test (\\S+) FAILED");
+				Pattern failPattern = Pattern.compile("\\s*\\[junit\\] Test (\\S+) FAILED");
 				Matcher failMatcher = failPattern.matcher(line);
 				
 				if (testMatcher.find()) 

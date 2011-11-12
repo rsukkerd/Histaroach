@@ -1,12 +1,17 @@
 package voldemort;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -59,6 +64,34 @@ public class HistoryGraphBuilderTest
 		MAP.put(NODE_6, PARENTS_6);
 	}
 	
+	private static final String[] JUNIT_TESTS = {"voldemort.client.AdminServiceBasicTest",
+			"voldemort.client.AdminServiceFailureTest",
+			"voldemort.client.AdminServiceFilterTest",
+			"voldemort.client.AdminServiceMultiJVMTest",
+			"voldemort.client.CachingStoreClientFactoryTest",
+			"voldemort.client.DefaultStoreClientTest",
+			"voldemort.client.HttpStoreClientFactoryTest",
+			"voldemort.client.LazyStoreClientTest",
+			"voldemort.client.SocketStoreClientFactoryTest",
+			"voldemort.client.rebalance.AdminRebalanceTest",
+			"voldemort.client.rebalance.RebalanceClusterPlanTest",
+			"voldemort.client.rebalance.RebalancePartitionsInfoTest",
+			"voldemort.client.rebalance.RebalanceTest",
+			"voldemort.cluster.failuredetector.BannagePeriodFailureDetectorTest",
+			"voldemort.cluster.failuredetector.ServerStoreVerifierTest",
+			"voldemort.cluster.failuredetector.ThresholdFailureDetectorTest",
+			"voldemort.protocol.pb.ProtocolBuffersRequestFormatTest",
+			"voldemort.protocol.vold.VoldemortNativeRequestFormatTest",
+			"voldemort.routing.ConsistentRoutingStrategyTest", };
+	
+	private static final String[] FAILED_TESTS = {"voldemort.client.AdminServiceBasicTest",
+			"voldemort.client.AdminServiceFailureTest",
+			"voldemort.client.AdminServiceFilterTest",
+			"voldemort.client.AdminServiceMultiJVMTest",
+			"voldemort.client.SocketStoreClientFactoryTest",
+			"voldemort.client.rebalance.AdminRebalanceTest",
+			"voldemort.client.rebalance.RebalanceTest", };
+	
 	@Test
 	public void testBuildHistoryGraph()
 	{
@@ -73,5 +106,52 @@ public class HistoryGraphBuilderTest
 			assertTrue(MAP.containsKey(node));
 			assertEquals(MAP.get(node), parents);
 		}
+	}
+	
+	@Test
+	public void testGetTestResult()
+	{
+		Set<String> allTests = new HashSet<String>();
+		for (String test : JUNIT_TESTS)
+		{
+			allTests.add(test);
+		}
+		
+		Set<String> failures = new HashSet<String>();
+		for (String test : FAILED_TESTS)
+		{
+			failures.add(test);
+		}
+		
+		TestResult expectedTestResult = new TestResult(allTests, failures);
+		TestResult actualTestResult = null;
+		
+		ProcessBuilder builder = new ProcessBuilder("cat", "junit.txt");
+    	builder.directory(new File(DIR));
+    	
+        try 
+        {
+			Process process = builder.start();
+			
+        	try 
+        	{
+        		// make current thread waits until this process terminates
+				process.waitFor();
+			} 
+        	catch (InterruptedException e) 
+			{
+				e.printStackTrace();
+			}
+        	
+        	actualTestResult = HistoryGraphBuilder.getTestResultHelper(process);
+        	
+		} 
+        catch (IOException e) 
+        {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+        
+        assertEquals(expectedTestResult, actualTestResult);
 	}
 }
