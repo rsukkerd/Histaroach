@@ -36,6 +36,9 @@ public class HistoryGraph
 		return nodeToParents.get(node);
 	}
 	
+	/**
+	 * @return iterator over all nodes
+	 */
 	/* package private */ Iterator<TestResultNode> getNodeIterator()
 	{
 		return nodeToParents.keySet().iterator();
@@ -44,7 +47,7 @@ public class HistoryGraph
 	/**
 	 * add bug fix information
 	 * @param bug : test that fails in parent node but passes in child node
-	 * @param pair : pair of <parent node, child node>
+	 * @param pair : pair of (parent node, child node)
 	 */
 	public void addBugFix(String bug, BugFixPair pair)
 	{
@@ -70,7 +73,7 @@ public class HistoryGraph
 	
 	/**
 	 * @param bug
-	 * @return list of <nodeFail, nodePass> pairs of the bug
+	 * @return list of (nodeFail, nodePass) pairs of the bug
 	 */
 	public List<BugFixPair> getBugFixPairs(String bug)
 	{

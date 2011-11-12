@@ -21,6 +21,10 @@ public final class HistoryGraphBuilder
 	
 	private static File repoDir;
 	
+	/**
+	 * @param repoDir : full path to directory of the repository
+	 * @return HistoryGraph of the repository
+	 */
 	public static HistoryGraph buildHistoryGraph(String repoDir) 
 	{
 		HistoryGraphBuilder.repoDir = new File(repoDir);
@@ -77,6 +81,33 @@ public final class HistoryGraphBuilder
 		return historyGraph;
 	}
 	
+	private static void checkoutCommit(String commit)
+	{
+		ProcessBuilder checkoutBuilder = new ProcessBuilder("git", "checkout", commit);
+		checkoutBuilder.directory(repoDir);
+		
+	    try 
+	    {
+			Process checkoutProcess = checkoutBuilder.start();
+			
+	    	try 
+	    	{
+	    		// make current thread waits until this process terminates
+				checkoutProcess.waitFor();
+			} 
+	    	catch (InterruptedException e) 
+			{
+				e.printStackTrace();
+			}
+	    	
+		} 
+	    catch (IOException e) 
+	    {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+	}
+
 	/**
 	 * @return list of parent commits of this commit
 	 */
@@ -133,33 +164,6 @@ public final class HistoryGraphBuilder
 		TestResultNode testResultNode = new TestResultNode(commit, result);
 		
 		return testResultNode;
-	}
-	
-	private static void checkoutCommit(String commit)
-	{
-		ProcessBuilder checkoutBuilder = new ProcessBuilder("git", "checkout", commit);
-    	checkoutBuilder.directory(repoDir);
-    	
-        try 
-        {
-			Process checkoutProcess = checkoutBuilder.start();
-			
-        	try 
-        	{
-        		// make current thread waits until this process terminates
-				checkoutProcess.waitFor();
-			} 
-        	catch (InterruptedException e) 
-			{
-				e.printStackTrace();
-			}
-        	
-		} 
-        catch (IOException e) 
-        {
-			e.printStackTrace();
-			System.exit(-1);
-		}
 	}
 	
 	/**

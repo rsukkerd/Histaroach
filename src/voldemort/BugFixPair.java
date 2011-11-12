@@ -5,6 +5,10 @@ public class BugFixPair
 	private final TestResultNode nodeFail;
 	private final TestResultNode nodePass;
 	
+	/**
+	 * @param nodeFail : the most recent node that fails the test
+	 * @param nodePass : the node that fixes the bug
+	 */
 	public BugFixPair(TestResultNode nodeFail, TestResultNode nodePass)
 	{
 		this.nodeFail = nodeFail;

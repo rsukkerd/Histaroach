@@ -13,7 +13,7 @@ public final class ParallelFixesFinder
 
 	/**
 	 * @param historyGraph
-     * @return mapping from bug to BugFixPairs that fix it in parallel
+     * @return mapping from bug to BugFixPairs that fix the bug in parallel
      */
     public static Map<String, Set<BugFixPair>> findParallelFixes(HistoryGraph historyGraph) 
     {
@@ -66,8 +66,9 @@ public final class ParallelFixesFinder
      */
     private static boolean areParallel(TestResultNode node_A, TestResultNode node_B)
     {
-    	return !isAncestor(node_A, node_B, new HashSet<TestResultNode>()) && 
-    		!isAncestor(node_B, node_A, new HashSet<TestResultNode>());
+    	return !node_A.equals(node_B) && 
+    	!isAncestor(node_A, node_B, new HashSet<TestResultNode>()) && 
+    	!isAncestor(node_B, node_A, new HashSet<TestResultNode>());
     }
     
     /**
