@@ -16,22 +16,21 @@ import java.util.regex.Pattern;
 
 public final class HistoryGraphBuilder 
 {
-	private static final File DIR = new File("/homes/iws/rsukkerd/workspace/github/voldemort");
 	private static final String[] TEST_CMD = {"ant", "junit"};
-	
-	private static File repoDir;
-	
+		
 	/**
 	 * @param repoDir : full path to directory of the repository
 	 * @return HistoryGraph of the repository
 	 */
 	public static HistoryGraph buildHistoryGraph(String repoDir) 
 	{
-		HistoryGraphBuilder.repoDir = new File(repoDir);
+		File directory = new File(repoDir);
 		
 		HistoryGraph historyGraph = new HistoryGraph();
 		
-		TestResultNode masterNode = getTestResultNode("master");
+		int commitCount = 0;
+		
+		TestResultNode masterNode = getTestResultNode(directory, "master");
 		
 		Queue<TestResultNode> q = new LinkedList<TestResultNode>();
     	q.add(masterNode);
@@ -43,15 +42,15 @@ public final class HistoryGraphBuilder
     	{
     		TestResultNode next = q.poll();
     		    		
-    		// process next
+    		// process 'next'
     		String currCommit = next.getCommit();
-    		List<String> parentCommits = getParentCommits(currCommit);
+    		List<String> parentCommits = getParentCommits(directory, currCommit);
     		
     		List<TestResultNode> parents = new ArrayList<TestResultNode>();
     		    		
     		for (String parentCommit : parentCommits) 
     		{    			
-				TestResultNode parent = getTestResultNode(parentCommit);
+				TestResultNode parent = getTestResultNode(directory, parentCommit);
 				parents.add(parent);
 				
     			if (!visited.contains(parentCommit)) 
@@ -60,31 +59,97 @@ public final class HistoryGraphBuilder
     				visited.add(parentCommit);
     			}
     		}
-    		// add node to graph
+    		// add 'next' to graph
     		historyGraph.addNode(next, parents);
     		
-    		// add information about bug fixes
-    		for (TestResultNode parent : parents)
-    		{
-    			for (String test : parent.getTestResult().getFailures())
-    			{
-    				if (!next.getTestResult().getFailures().contains(test) && 
-    						next.getTestResult().getAllTests().contains(test))
-    				{
-    					BugFixPair pair = new BugFixPair(parent, next);
-    					historyGraph.addBugFix(test, pair);
-    				}
-    			}
-    		}
+    		commitCount++;
+    		printProgress(next, commitCount);
     	}
-		
+    	
+    	addBugFixesInfo(historyGraph, masterNode);
+    			
 		return historyGraph;
 	}
 	
-	private static void checkoutCommit(String commit)
+	/**
+	 * add information about bug fixes to historyGraph
+	 * @modifies historyGraph
+	 */
+	/*package*/ static void addBugFixesInfo(HistoryGraph historyGraph, TestResultNode masterNode)
+	{
+		Queue<TestResultNode> queue = new LinkedList<TestResultNode>();
+    	queue.add(masterNode);
+    	
+    	Set<TestResultNode> visitedNodes = new HashSet<TestResultNode>();
+    	visitedNodes.add(masterNode);
+    	
+    	while (!queue.isEmpty())
+    	{
+    		TestResultNode next = queue.poll();
+    		
+    		// find all fixed bugs in 'next'
+    		Set<String> fixedBugs = new HashSet<String>();
+    		
+    		List<TestResultNode> parents = historyGraph.getParents(next);
+    		for (TestResultNode parent : parents)
+    		{
+    			if (!visitedNodes.contains(parent))
+    			{
+    				queue.add(parent);
+    				visitedNodes.add(parent);
+    			}
+    			
+    			for (String bug : parent.getTestResult().getFailures())
+    			{
+    				if (next.pass(bug))
+    				{
+    					fixedBugs.add(bug);
+    				}
+    			}
+    		}
+    		
+    		for (String bug : fixedBugs)
+    		{
+    			// BFS to find all consecutive nodes, start from 'next', that fail 'bug'
+    			Queue<TestResultNode> failQueue = new LinkedList<TestResultNode>();
+    			BugFix bugFix = new BugFix(next);
+    			
+    			Set<TestResultNode> subVisitedNodes = new HashSet<TestResultNode>();
+    			
+    			for (TestResultNode parent : parents)
+    			{
+    				if (parent.fail(bug))
+    				{
+    					failQueue.add(parent);
+    					bugFix.addNodeFail(parent);
+    					subVisitedNodes.add(parent);
+    				}
+    			}
+    			
+    			while (!failQueue.isEmpty())
+    			{
+    				TestResultNode failNode = failQueue.poll();
+    				
+    				for (TestResultNode p : historyGraph.getParents(failNode))
+    				{
+    					if (!subVisitedNodes.contains(p) && p.fail(bug))
+    					{
+    						failQueue.add(p);
+    						bugFix.addNodeFail(p);
+    						subVisitedNodes.add(p);
+    					}
+    				}
+    			}
+    			
+    			historyGraph.addBugFix(bug, bugFix);
+    		}	
+    	}
+	}
+	
+	private static void checkoutCommit(File directory, String commit)
 	{
 		ProcessBuilder checkoutBuilder = new ProcessBuilder("git", "checkout", commit);
-		checkoutBuilder.directory(repoDir);
+		checkoutBuilder.directory(directory);
 		
 	    try 
 	    {
@@ -99,7 +164,6 @@ public final class HistoryGraphBuilder
 			{
 				e.printStackTrace();
 			}
-	    	
 		} 
 	    catch (IOException e) 
 	    {
@@ -109,30 +173,20 @@ public final class HistoryGraphBuilder
 	}
 
 	/**
-	 * @return list of parent commits of this commit
+	 * @return list of parent commits (Strings) of this commit
 	 */
-	private static List<String> getParentCommits(String commit) 
+	private static List<String> getParentCommits(File directory, String commit) 
 	{	
-		checkoutCommit(commit);
+		checkoutCommit(directory, commit);
 		
     	ProcessBuilder logBuilder = new ProcessBuilder("git", "log", "--parents", "-1");
-    	logBuilder.directory(repoDir);
+    	logBuilder.directory(directory);
     	
     	List<String> parentCommits = new ArrayList<String>();
     	
     	try 
     	{
 			Process logProcess = logBuilder.start();
-			
-			try 
-			{
-				// make current thread waits until this process terminates
-				logProcess.waitFor();
-			} 
-			catch (InterruptedException e) 
-			{
-				e.printStackTrace();
-			}
 			
 			BufferedReader reader = new BufferedReader(new
 					InputStreamReader(logProcess.getInputStream()));
@@ -145,22 +199,32 @@ public final class HistoryGraphBuilder
 			while (scanner.hasNext()) // parent commits
 			{ 
 				parentCommits.add(scanner.next());
+			}	
+			
+			try 
+			{
+				// make current thread waits until this process terminates
+				logProcess.waitFor();
+			} 
+			catch (InterruptedException e) 
+			{
+				e.printStackTrace();
 			}
 		} 
     	catch (IOException e) 
     	{
 			e.printStackTrace();
 		}
-    	
+    	    	
     	return parentCommits;
     }
 	
 	/**
 	 * @return TestResultNode representing the commit
 	 */
-	private static TestResultNode getTestResultNode(String commit)
+	private static TestResultNode getTestResultNode(File directory, String commit)
 	{
-		TestResult result = getTestResult(commit);
+		TestResult result = getTestResult(directory, commit);
 		TestResultNode testResultNode = new TestResultNode(commit, result);
 		
 		return testResultNode;
@@ -169,18 +233,19 @@ public final class HistoryGraphBuilder
 	/**
 	 * @return TestResult of the commit
 	 */
-	private static TestResult getTestResult(String commit)
+	/*package*/ static TestResult getTestResult(File directory, String commit)
 	{
-		checkoutCommit(commit);
+		checkoutCommit(directory, commit);
 		
 		ProcessBuilder runtestBuilder = new ProcessBuilder(TEST_CMD);
-		runtestBuilder.directory(repoDir);
+		runtestBuilder.directory(directory);
         
 		TestResult testResult = null;
 		
 		try 
 		{
 			Process runtestProcess = runtestBuilder.start();
+			testResult = getTestResultHelper(runtestProcess);
 			
 			try 
 			{
@@ -190,9 +255,7 @@ public final class HistoryGraphBuilder
 			catch (InterruptedException e) 
 			{
 				e.printStackTrace();
-			}
-			
-			testResult = getTestResultHelper(runtestProcess);
+			}		
 		} 
 		catch (IOException e) 
 		{
@@ -204,13 +267,15 @@ public final class HistoryGraphBuilder
 	}
 	
 	/**
-	 * get TestResult from output on screen
-	 * @return TestResult
+	 * @return TestResult from output from process
 	 */
-	/* package */ static TestResult getTestResultHelper(Process process)
+	private static TestResult getTestResultHelper(Process process)
 	{
-		BufferedReader reader = new BufferedReader(new
+		BufferedReader stdOutputReader = new BufferedReader(new
 				InputStreamReader(process.getInputStream()));
+		
+		BufferedReader stdErrorReader = new BufferedReader(new
+				InputStreamReader(process.getErrorStream()));
 		
 		String line = new String();
 		Set<String> allTests = new HashSet<String>();
@@ -218,21 +283,33 @@ public final class HistoryGraphBuilder
     	
 		try 
 		{
-			while ((line = reader.readLine()) != null) 
+			while ((line = stdOutputReader.readLine()) != null) 
 			{				
-				Pattern testPattern = Pattern.compile("\\s*\\[junit\\] Running (\\S+)");
-				Matcher testMatcher = testPattern.matcher(line);
+				Pattern allTestsPattern = Pattern.compile("\\s*\\[junit\\] Running (\\S+)");
+				Matcher allTestsMatcher = allTestsPattern.matcher(line);
 				
-				Pattern failPattern = Pattern.compile("\\s*\\[junit\\] Test (\\S+) FAILED");
-				Matcher failMatcher = failPattern.matcher(line);
+				if (allTestsMatcher.find()) 
+				{
+					allTests.add(allTestsMatcher.group(1));
+				}
+			}
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		
+		try 
+		{
+			while ((line = stdErrorReader.readLine()) != null) 
+			{	
+				Pattern failuresPattern = Pattern.compile("\\s*\\[junit\\] Test (\\S+) FAILED");
+				Matcher failuresMatcher = failuresPattern.matcher(line);
 				
-				if (testMatcher.find()) 
+				if (failuresMatcher.find()) 
 				{
-					allTests.add(testMatcher.group(1));
-				} 
-				else if (failMatcher.find()) 
-				{
-					failures.add(failMatcher.group(1));
+					failures.add(failuresMatcher.group(1));
 				}
 			}
 		} 
@@ -245,5 +322,10 @@ public final class HistoryGraphBuilder
 		TestResult testResult = new TestResult(allTests, failures);
 		
 		return testResult;
+	}
+	
+	private static void printProgress(TestResultNode node, int count)
+	{
+		System.out.println("(" + count + ") " + node);
 	}
 }

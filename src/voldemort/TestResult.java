@@ -51,4 +51,22 @@ public class TestResult
 	{
 		return 13 * allTests.hashCode() + 17 * failures.hashCode();
 	}
+	
+	@Override
+	public String toString()
+	{
+		String result = "Tests: \n";
+		for (String test : allTests)
+		{
+			result += test + "\n";
+		}
+		
+		result += "Failures: \n";
+		for (String fail : failures)
+		{
+			result += fail + "\n";
+		}
+		
+		return result;
+	}
 }

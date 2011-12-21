@@ -30,6 +30,22 @@ public class TestResultNode
 		return result;
 	}
 	
+	/**
+	 * @return true iff this node passes the test
+	 */
+	public boolean pass(String test)
+	{
+		return !result.getFailures().contains(test) && result.getAllTests().contains(test);
+	}
+	
+	/**
+	 * @return truee iff this node fails the test
+	 */
+	public boolean fail(String test)
+	{
+		return result.getFailures().contains(test);
+	}
+	
 	@Override
 	public boolean equals(Object other) 
 	{
@@ -52,6 +68,6 @@ public class TestResultNode
 	@Override
 	public String toString()
 	{
-		return commit;
+		return "commit : " + commit + "\n" + result.toString();
 	}
 }

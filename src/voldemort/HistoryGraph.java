@@ -9,12 +9,12 @@ import java.util.Map;
 public class HistoryGraph 
 {
 	private final Map<TestResultNode, List<TestResultNode>> nodeToParents;
-	private final Map<String, List<BugFixPair>> bugToPairs;
+	private final Map<String, List<BugFix>> bugToFixList;
 	
 	public HistoryGraph() 
 	{
 		nodeToParents = new HashMap<TestResultNode, List<TestResultNode>>();
-		bugToPairs = new HashMap<String, List<BugFixPair>>();
+		bugToFixList = new HashMap<String, List<BugFix>>();
 	}
 	
 	/**
@@ -47,19 +47,20 @@ public class HistoryGraph
 	/**
 	 * add bug fix information
 	 * @param bug : test that fails in parent node but passes in child node
-	 * @param pair : pair of (parent node, child node)
+	 * @param fix : a node that fixes the bug and a list of 
+	 * 				consecutive nodes that have the bug
 	 */
-	public void addBugFix(String bug, BugFixPair pair)
+	public void addBugFix(String bug, BugFix fix)
 	{
-		if (!bugToPairs.containsKey(bug))
+		if (!bugToFixList.containsKey(bug))
 		{
-			List<BugFixPair> pairs = new ArrayList<BugFixPair>();
-			pairs.add(pair);
-			bugToPairs.put(bug, pairs);
+			List<BugFix> list = new ArrayList<BugFix>();
+			list.add(fix);
+			bugToFixList.put(bug, list);
 		}
 		else
 		{
-			bugToPairs.get(bug).add(pair);
+			bugToFixList.get(bug).add(fix);
 		}
 	}
 
@@ -68,15 +69,15 @@ public class HistoryGraph
 	 */
 	public Iterator<String> getBugIterator()
 	{
-		return bugToPairs.keySet().iterator();
+		return bugToFixList.keySet().iterator();
 	}
 	
 	/**
 	 * @param bug
-	 * @return list of (nodeFail, nodePass) pairs of the bug
+	 * @return list of BugFixes of the bug
 	 */
-	public List<BugFixPair> getBugFixPairs(String bug)
+	public List<BugFix> getBugFixList(String bug)
 	{
-		return bugToPairs.get(bug);
+		return bugToFixList.get(bug);
 	}
 }

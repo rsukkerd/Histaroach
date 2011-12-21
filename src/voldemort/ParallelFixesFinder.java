@@ -13,45 +13,45 @@ public final class ParallelFixesFinder
 
 	/**
 	 * @param historyGraph
-     * @return mapping from bug to BugFixPairs that fix the bug in parallel
+     * @return mapping from bug to BugFixes that fix the bug in parallel
      */
-    public static Map<String, Set<BugFixPair>> findParallelFixes(HistoryGraph historyGraph) 
+    public static Map<String, Set<BugFix>> findParallelFixes(HistoryGraph historyGraph) 
     {
     	ParallelFixesFinder.historyGraph = historyGraph;
     	
-    	Map<String, Set<BugFixPair>> map = new HashMap<String, Set<BugFixPair>>();
+    	Map<String, Set<BugFix>> map = new HashMap<String, Set<BugFix>>();
     	
     	Iterator<String> bugItr = historyGraph.getBugIterator();
     	
     	while (bugItr.hasNext())
     	{
     		String bug = bugItr.next();
-    		List<BugFixPair> pairs = historyGraph.getBugFixPairs(bug);
+    		List<BugFix> bugFixes = historyGraph.getBugFixList(bug);
     		
-    		for (int i = 0; i < pairs.size(); i++) 
+    		for (int i = 0; i < bugFixes.size() - 1; i++) 
     		{	
-    			for (int j = i + 1; j < pairs.size(); j++) 
+    			for (int j = i + 1; j < bugFixes.size(); j++) 
     			{	
-    				BugFixPair pair_A = pairs.get(i);
-    				BugFixPair pair_B = pairs.get(j);
+    				BugFix fix_A = bugFixes.get(i);
+    				BugFix fix_B = bugFixes.get(j);
     				
-    				TestResultNode node_A = pair_A.getNodePass();
-    				TestResultNode node_B = pair_B.getNodePass();
+    				TestResultNode node_A = fix_A.getNodePass();
+    				TestResultNode node_B = fix_B.getNodePass();
     				    				
     				if (areParallel(node_A, node_B)) 
     				{
     					if (!map.containsKey(bug))
     					{
-    						Set<BugFixPair> parallelFixes = new HashSet<BugFixPair>();
-    						parallelFixes.add(pair_A);
-    						parallelFixes.add(pair_B);
+    						Set<BugFix> parallelFixes = new HashSet<BugFix>();
+    						parallelFixes.add(fix_A);
+    						parallelFixes.add(fix_B);
     						
     						map.put(bug, parallelFixes);
     					}
     					else
     					{
-    						map.get(bug).add(pair_A);
-    						map.get(bug).add(pair_B);
+    						map.get(bug).add(fix_A);
+    						map.get(bug).add(fix_B);
     					}
     				}
     			}
