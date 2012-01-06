@@ -32,10 +32,10 @@ public class Main
 			System.out.println("Test : " + bug);
 			System.out.println("All commits that fix this bug:");
 			
-			List<BugFix> lists = historyGraph.getBugFixList(bug);
-			for (BugFix list : lists)
+			List<BugFix> list = historyGraph.getBugFixList(bug);
+			for (BugFix fix : list)
 			{
-				System.out.println(list);
+				System.out.println(fix);
 			}
 		}
 	}
@@ -47,10 +47,10 @@ public class Main
 			System.out.println("Test : " + bug);
 			System.out.println("Commits that fix this bug in parallel:");
 			
-			Set<BugFix> lists = bugFixMap.get(bug);
-			for (BugFix list : lists)
+			Set<BugFix> fixes = bugFixMap.get(bug);
+			for (BugFix fix : fixes)
 			{
-				System.out.println(list);
+				System.out.println(fix);
 			}
 		}
 	}
