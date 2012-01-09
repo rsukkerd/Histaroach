@@ -19,7 +19,7 @@ public class HistoryGraph
 	
 	/**
 	 * add new node to this HistoryGraph
-	 * @param node : node to add
+	 * @param node : node to be added
 	 * @param parents : list of parents of the node
 	 */
 	public void addNode(TestResultNode node, List<TestResultNode> parents) 

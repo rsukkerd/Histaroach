@@ -39,7 +39,7 @@ public class TestResultNode
 	}
 	
 	/**
-	 * @return truee iff this node fails the test
+	 * @return true iff this node fails the test
 	 */
 	public boolean fail(String test)
 	{
