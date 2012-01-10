@@ -19,8 +19,14 @@ import voldemort.TestResultNode;
 
 public final class RepositoryBuilder 
 {
-	public static final String[] TEST_CMD = {"ant", "junit"};
+	private static final String[] ALL_TESTS_CMD = {"ant", "junit"};
+	private static final String SINGLE_TEST_CMD = "ant junit-test -Dtest.name=";
 	
+	/**
+	 * @param path : full path to directory of the repository
+	 * @param commit : starting commit
+	 * @return Repository
+	 */
 	public static Repository buildRepository(String path, String commit)
 	{
 		File directory = new File(path);
@@ -158,7 +164,7 @@ public final class RepositoryBuilder
 	 */
 	public static TestResultNode getTestResultNode(File directory, String commit)
 	{
-		TestResult result = getTestResult(directory, commit);
+		TestResult result = getTestResult(directory, commit, ALL_TESTS_CMD);
 		TestResultNode testResultNode = new TestResultNode(commit, result);
 		
 		return testResultNode;
@@ -167,26 +173,27 @@ public final class RepositoryBuilder
 	/**
 	 * @param directory : directory of the repository
 	 * @param commit : commit id
+	 * @param command : test command
 	 * @return TestResult of the commit
 	 */
-	public static TestResult getTestResult(File directory, String commit)
+	public static TestResult getTestResult(File directory, String commit, String[] command)
 	{
 		checkoutCommit(directory, commit);
 		
-		ProcessBuilder runtestBuilder = new ProcessBuilder(TEST_CMD);
-		runtestBuilder.directory(directory);
+		ProcessBuilder runTestBuilder = new ProcessBuilder(command);
+		runTestBuilder.directory(directory);
         
 		TestResult testResult = null;
 		
 		try 
 		{
-			Process runtestProcess = runtestBuilder.start();
-			testResult = getTestResultHelper(runtestProcess);
+			Process runTestProcess = runTestBuilder.start();
+			testResult = getTestResultHelper(runTestProcess);
 			
 			try 
 			{
 				// make current thread waits until this process terminates
-				runtestProcess.waitFor();
+				runTestProcess.waitFor();
 			} 
 			catch (InterruptedException e) 
 			{
@@ -289,7 +296,7 @@ public final class RepositoryBuilder
 	/**
 	 * @return diff files between childCommit and parentCommit
 	 */
-	private static List<String> getChangedFiles(File directory, String childCommit, String parentCommit)
+	public static List<String> getChangedFiles(File directory, String childCommit, String parentCommit)
 	{
 		List<String> files = new ArrayList<String>();
 		
@@ -326,5 +333,13 @@ public final class RepositoryBuilder
 		}
 	    
 	    return files;
+	}
+	
+	public static boolean passSingleTest(File directory, String commit, String testName)
+	{
+		String command = SINGLE_TEST_CMD + testName;
+		TestResult result = getTestResult(directory, commit, command.split(" "));
+		
+		return result.getFailures().isEmpty();
 	}
 }
