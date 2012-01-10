@@ -14,14 +14,15 @@ import java.util.Set;
 
 public class FindNextCommit 
 {
-	private static final File DIR = new File("/homes/iws/rsukkerd/workspace/github/voldemort");
-	private static final String TARGET = "8c07e32d40adc1f98d9a8edc6e05f1f00719a04f";
-	
 	/**
-	 * @param args
+	 * @param args[0] : full path to directory of the repository
+	 * @param args[1] : the target commit id
 	 */
 	public static void main(String[] args) 
 	{
+		File directory = new File(args[0]);
+		String targetCommit = args[1];
+		
 		int count = 0;
 		String headCommit = "master";
 		
@@ -38,13 +39,13 @@ public class FindNextCommit
 			count++;
 			System.out.println(count + " : " + currCommit);
 			
-			if (currCommit.equals(TARGET))
+			if (currCommit.equals(targetCommit))
 			{
 				System.out.println("The next commit is " + queue.poll());
 				break;
 			}
 			
-			List<String> parentCommits = getParentCommits(currCommit);
+			List<String> parentCommits = getParentCommits(directory, currCommit);
 			
 			for (String parentCommit : parentCommits)
 			{
@@ -57,10 +58,10 @@ public class FindNextCommit
 		}
 	}
 	
-	public static void checkoutCommit(String commit)
+	public static void checkoutCommit(File directory, String commit)
 	{
 		ProcessBuilder checkoutBuilder = new ProcessBuilder("git", "checkout", commit);
-		checkoutBuilder.directory(DIR);
+		checkoutBuilder.directory(directory);
 		
 	    try 
 	    {
@@ -86,12 +87,12 @@ public class FindNextCommit
 	/**
 	 * @return list of parent commits (Strings) of this commit
 	 */
-	public static List<String> getParentCommits(String commit) 
+	public static List<String> getParentCommits(File directory, String commit) 
 	{	
-		checkoutCommit(commit);
+		checkoutCommit(directory, commit);
 		
     	ProcessBuilder logBuilder = new ProcessBuilder("git", "log", "--parents", "-1");
-    	logBuilder.directory(DIR);
+    	logBuilder.directory(directory);
     	
     	List<String> parentCommits = new ArrayList<String>();
     	
