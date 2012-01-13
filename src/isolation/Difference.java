@@ -54,7 +54,7 @@ public class Difference
 	@Override
 	public String toString()
 	{
-		String result = "Child commit: " + child + "\n" + "Parent commit: " + parent + "\n";
+		String result = "Child commit: " + child.getCommit() + "\n" + "Parent commit: " + parent.getCommit() + "\n";
 		result += "Diff files:\n";
 		for (String file : changedFiles)
 		{

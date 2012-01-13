@@ -5,9 +5,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Scanner;
 import java.util.Set;
@@ -21,6 +23,8 @@ public final class RepositoryBuilder
 {
 	private static final String[] ALL_TESTS_CMD = {"ant", "junit"};
 	private static final String SINGLE_TEST_CMD = "ant junit-test -Dtest.name=";
+	private static final String PROCESSING_COMMIT = "Processing commit";
+	private static final String PROCESSING_PARENTS = "Processing parents of commit";
 	
 	/**
 	 * @param path : full path to directory of the repository
@@ -45,7 +49,7 @@ public final class RepositoryBuilder
     	while (!q.isEmpty()) 
     	{
     		TestResultNode next = q.poll();
-    		printInProgress(next);
+    		printInProgress(next.getCommit(), PROCESSING_PARENTS);
     		    		
     		// process 'next'
     		String currCommit = next.getCommit();
@@ -64,8 +68,8 @@ public final class RepositoryBuilder
     				visited.add(parentCommit);
     			}
     			
-    			// check for 1st fail and find diff
-    			checkFailure(directory, next, parent);
+    			// check for sudden fail and find diff
+    			checkSuddenFail(directory, next, parent);
     		}
     		// add 'next' to repository
     		repository.addNode(next, parents);
@@ -164,6 +168,8 @@ public final class RepositoryBuilder
 	 */
 	public static TestResultNode getTestResultNode(File directory, String commit)
 	{
+		printInProgress(commit, PROCESSING_COMMIT);
+		
 		TestResult result = getTestResult(directory, commit, ALL_TESTS_CMD);
 		TestResultNode testResultNode = new TestResultNode(commit, result);
 		
@@ -268,23 +274,42 @@ public final class RepositoryBuilder
 		return testResult;
 	}
 	
-	private static void printInProgress(TestResultNode node)
+	private static void printInProgress(String commit, String message)
 	{
-		System.out.println("Processing commit: " + node);
+		System.out.println(message + " " + commit);
 	}
 	
 	private static void printCommitCompleted(TestResultNode node, int count)
 	{
+		System.out.println("Completed this commit and its parents");
 		System.out.println("(" + count + ") " + node);
 	}
 	
-	private static void checkFailure(File directory, TestResultNode node, TestResultNode parent)
-	{		
+	/**
+	 * check if a test suddenly fails ie. the test passes in 'parent' but fails in 'node'
+	 * find diff files between node and parent
+	 */
+	public static void checkSuddenFail(File directory, TestResultNode node, TestResultNode parent)
+	{
+		Map<Difference, List<String>> diffCache = new HashMap<Difference, List<String>>();
+		
 		for (String test : node.getTestResult().getAllTests())
 		{
 			if (node.fail(test) && parent.pass(test))
 			{
-				List<String> changedFiles = getChangedFiles(directory, node.getCommit(), parent.getCommit());
+				Difference dummyDiff = new Difference(node, parent, null);
+				List<String> changedFiles = null;
+				
+				if (diffCache.containsKey(dummyDiff))
+				{
+					changedFiles = diffCache.get(dummyDiff);
+				}
+				else
+				{
+					changedFiles = getChangedFiles(directory, node.getCommit(), parent.getCommit());
+					diffCache.put(dummyDiff, changedFiles);
+				}
+				
 				Difference diff = new Difference(node, parent, changedFiles);
 				
 				System.out.println("Failed Test: " + test);
@@ -333,6 +358,11 @@ public final class RepositoryBuilder
 		}
 	    
 	    return files;
+	}
+	
+	public static void combineFiles(File directory, Difference diff, String testName)
+	{
+		
 	}
 	
 	public static boolean passSingleTest(File directory, String commit, String testName)
