@@ -27,65 +27,75 @@ public class DataExtractor
 		FileWriter fileStream = new FileWriter(outputFile);
 		BufferedWriter out = new BufferedWriter(fileStream);
 		
-		checkoutCommit(directory, startCommit);
+		int exitValue = checkoutCommit(directory, startCommit);
 		
-		ProcessBuilder logBuilder = new ProcessBuilder(LOG_COMMAND);
-		logBuilder.directory(directory);
-		
-		try 
-    	{
-			Process logProcess = logBuilder.start();
-			
-			BufferedReader reader = new BufferedReader(new
-					InputStreamReader(logProcess.getInputStream()));
-			
-			String line = new String();
-			while ((line = reader.readLine()) != null)
-			{
-				String[] hashes = line.split(" ");
-				String commit = hashes[0];
-				out.write("COMMIT " + commit + "\n");
-				
-				if (hashes.length > 1)
-				{
-					for (int i = 1; i < hashes.length; i++)
-					{
-						String parent = hashes[i];
-						out.write("PARENT " + parent + "\n");
-						out.write("DIFF FILES:\n");
-						
-						List<String> diffFiles = getChangedFiles(directory, commit, parent);
-						for (String file : diffFiles)
-						{
-							out.write(file + "\n");
-						}
-					}
-				}
-				
-				TestResult testResult = getTestResult(directory, commit, ALL_TESTS_CMD);
-				out.write(testResult.toString());
-				out.write("\n");
-				
-				if (commit.equals(endCommit))
-				{
-					break;
-				}
-			}
-			out.close();
+		if (exitValue == 0)
+		{
+			ProcessBuilder logBuilder = new ProcessBuilder(LOG_COMMAND);
+			logBuilder.directory(directory);
 			
 			try 
-			{
-				// make current thread waits until this process terminates
-				logProcess.waitFor();
+	    	{
+				Process logProcess = logBuilder.start();
+				
+				BufferedReader reader = new BufferedReader(new
+						InputStreamReader(logProcess.getInputStream()));
+				
+				String line = new String();
+				while ((line = reader.readLine()) != null)
+				{
+					String[] hashes = line.split(" ");
+					String commit = hashes[0];
+					out.write("COMMIT " + commit + "\n");
+					
+					if (hashes.length > 1)
+					{
+						for (int i = 1; i < hashes.length; i++)
+						{
+							String parent = hashes[i];
+							out.write("PARENT " + parent + "\n");
+							out.write("DIFF FILES:\n");
+							
+							List<String> diffFiles = getChangedFiles(directory, commit, parent);
+							for (String file : diffFiles)
+							{
+								out.write(file + "\n");
+							}
+						}
+					}
+					
+					TestResult testResult = getTestResult(directory, commit, ALL_TESTS_CMD);
+					if (testResult != null)
+					{
+						out.write(testResult.toString());
+					}
+					out.write("\n");
+					
+					if (commit.equals(endCommit))
+					{
+						break;
+					}
+				}
+				out.close();
+				
+				try 
+				{
+					// make current thread waits until this process terminates
+					logProcess.waitFor();
+				} 
+				catch (InterruptedException e) 
+				{
+					e.printStackTrace();
+				}
 			} 
-			catch (InterruptedException e) 
-			{
+	    	catch (IOException e) 
+	    	{
 				e.printStackTrace();
 			}
-		} 
-    	catch (IOException e) 
-    	{
-			e.printStackTrace();
+		}
+		else
+		{
+			System.out.println("\'git checkout\' process returns non-zero exit value");
 		}
 	}
 	
@@ -93,9 +103,12 @@ public class DataExtractor
 	 * checkout commit from the repository
 	 * @param directory : repository directory
 	 * @param commit : commit id
+	 * @return exit value of 'git checkout' process
 	 */
-	public static void checkoutCommit(File directory, String commit)
+	public static int checkoutCommit(File directory, String commit)
 	{
+		int exitValue = -1;
+		
 		ProcessBuilder checkoutBuilder = new ProcessBuilder("git", "checkout", commit);
 		checkoutBuilder.directory(directory);
 		
@@ -106,7 +119,7 @@ public class DataExtractor
 	    	try 
 	    	{
 	    		// make current thread waits until this process terminates
-				checkoutProcess.waitFor();
+				exitValue = checkoutProcess.waitFor();
 			} 
 	    	catch (InterruptedException e) 
 			{
@@ -118,6 +131,8 @@ public class DataExtractor
 			e.printStackTrace();
 			System.exit(-1);
 		}
+	    
+	    return exitValue;
 	}
 	
 	/**
@@ -170,32 +185,38 @@ public class DataExtractor
 	 */
 	public static TestResult getTestResult(File directory, String commit, String[] command)
 	{
-		checkoutCommit(directory, commit);
-		
-		ProcessBuilder runTestBuilder = new ProcessBuilder(command);
-		runTestBuilder.directory(directory);
-        
+		int exitValue = checkoutCommit(directory, commit);
 		TestResult testResult = null;
 		
-		try 
+		if (exitValue == 0)
 		{
-			Process runTestProcess = runTestBuilder.start();
-			testResult = getTestResultHelper(runTestProcess);
+			ProcessBuilder runTestBuilder = new ProcessBuilder(command);
+			runTestBuilder.directory(directory);
 			
 			try 
 			{
-				// make current thread waits until this process terminates
-				runTestProcess.waitFor();
+				Process runTestProcess = runTestBuilder.start();
+				testResult = getTestResultHelper(runTestProcess);
+				
+				try 
+				{
+					// make current thread waits until this process terminates
+					runTestProcess.waitFor();
+				} 
+				catch (InterruptedException e) 
+				{
+					e.printStackTrace();
+				}		
 			} 
-			catch (InterruptedException e) 
+			catch (IOException e) 
 			{
 				e.printStackTrace();
-			}		
-		} 
-		catch (IOException e) 
+				System.exit(-1);
+			}
+		}
+		else
 		{
-			e.printStackTrace();
-			System.exit(-1);
+			System.out.println("\'ant junit\' process returns non-zero exit value");
 		}
         
         return testResult;
