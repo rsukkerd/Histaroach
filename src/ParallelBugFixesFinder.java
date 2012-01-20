@@ -5,10 +5,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import voldemort.BugFix;
-import voldemort.HistoryGraph;
-import voldemort.HistoryGraphBuilder;
-import voldemort.ParallelFixesFinder;
+import common.BugFix;
+import common.HistoryGraph;
+import common.HistoryGraphBuilder;
+import common.ParallelFixesFinder;
+
 
 public class ParallelBugFixesFinder 
 {

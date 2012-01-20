@@ -1,4 +1,4 @@
-package voldemort;
+package tests;
 
 import static org.junit.Assert.assertEquals;
 
@@ -7,6 +7,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Test;
+
+import common.HistoryGraphBuilder;
+import common.TestResult;
 
 public class ProcessResultTest 
 {

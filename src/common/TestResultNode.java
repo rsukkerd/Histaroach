@@ -1,4 +1,4 @@
-package voldemort;
+package common;
 
 /**
  * TestResultNode contains a commit string and a TestResult

@@ -1,4 +1,4 @@
-package voldemort;
+package tests;
 
 import static org.junit.Assert.assertEquals;
 
@@ -10,6 +10,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
+
+import common.BugFix;
+import common.HistoryGraph;
+import common.HistoryGraphBuilder;
+import common.ParallelFixesFinder;
+import common.TestResult;
+import common.TestResultNode;
 
 public class ParallelFixesFinderTest
 {

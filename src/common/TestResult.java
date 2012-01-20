@@ -1,0 +1,77 @@
+package common;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+/**
+ * TestResult contains 2 lists of names of the tests: list of all tests and list
+ * of failed tests
+ */
+public class TestResult {
+    private final Set<String> allTests;
+    private final Set<String> failures;
+
+    public TestResult() {
+        this.allTests = new LinkedHashSet<String>();
+        this.failures = new LinkedHashSet<String>();
+    }
+
+    public TestResult(Set<String> allTests, Set<String> failures) {
+        this.allTests = allTests;
+        this.failures = failures;
+    }
+
+    public void addFailedTest(String test) {
+        failures.add(test);
+    }
+
+    public void addTest(String test) {
+        allTests.add(test);
+    }
+
+    /**
+     * @return list of names of all tests
+     */
+    public Set<String> getAllTests() {
+        return allTests;
+    }
+
+    /**
+     * @return list of names of failed tests
+     */
+    public Set<String> getFailures() {
+        return failures;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == null || !other.getClass().equals(this.getClass())) {
+            return false;
+        }
+
+        TestResult result = (TestResult) other;
+
+        return allTests.equals(result.allTests)
+                && failures.equals(result.failures);
+    }
+
+    @Override
+    public int hashCode() {
+        return 13 * allTests.hashCode() + 17 * failures.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        String result = "Tests: \n";
+        for (String test : allTests) {
+            result += test + "\n";
+        }
+
+        result += "Failures: \n";
+        for (String fail : failures) {
+            result += fail + "\n";
+        }
+
+        return result;
+    }
+}

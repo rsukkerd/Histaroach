@@ -1,4 +1,4 @@
-package isolation;
+package common;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import voldemort.TestResult;
+
 
 public class DataExtractor 
 {

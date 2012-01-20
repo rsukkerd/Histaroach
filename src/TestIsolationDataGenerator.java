@@ -1,8 +1,9 @@
-import isolation.DataExtractor;
 
 import java.io.IOException;
 
-public class TestDataGenerator {
+import common.DataExtractor;
+
+public class TestIsolationDataGenerator {
 
     /**
      * @param args

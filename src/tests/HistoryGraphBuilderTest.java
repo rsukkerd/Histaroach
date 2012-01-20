@@ -1,4 +1,4 @@
-package voldemort;
+package tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -13,14 +13,18 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import common.BugFix;
+import common.HistoryGraph;
+import common.HistoryGraphBuilder;
+import common.TestResult;
+import common.TestResultNode;
+
 public class HistoryGraphBuilderTest {
-    // private static final String DIR_1 =
-    // "/home/rsukkerd/workspace/project499/test/voldemort/sample/sample1";
-    private static final String DIR_1 = "test/voldemort/sample/sample1";
-    private static final String DIR_2 = "test/voldemort/sample/sample2";
-    private static final String DIR_3 = "test/voldemort/sample/sample3";
-    private static final String DIR_4 = "test/voldemort/sample/sample4";
-    private static final String DIR_5 = "test/voldemort/sample/sample5";
+    private static final String DIR_1 = "test/sample/sample1";
+    private static final String DIR_2 = "test/sample/sample2";
+    private static final String DIR_3 = "test/sample/sample3";
+    private static final String DIR_4 = "test/sample/sample4";
+    private static final String DIR_5 = "test/sample/sample5";
 
     private static final TestResultNode NODE_1_MAP_1 = new TestResultNode(
             "master", null);

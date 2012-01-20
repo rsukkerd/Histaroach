@@ -1,8 +1,8 @@
-package isolation;
+package common;
 
 import java.util.List;
 
-import voldemort.TestResultNode;
+
 
 public class Difference 
 {
