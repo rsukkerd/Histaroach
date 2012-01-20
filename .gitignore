@@ -1,0 +1,5 @@
+# Compiled sources
+*.class
+
+# JUnit reports
+*Test.xml
