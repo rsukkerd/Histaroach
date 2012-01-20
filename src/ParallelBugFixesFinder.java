@@ -1,11 +1,16 @@
-package voldemort;
+
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class Main 
+import voldemort.BugFix;
+import voldemort.HistoryGraph;
+import voldemort.HistoryGraphBuilder;
+import voldemort.ParallelFixesFinder;
+
+public class ParallelBugFixesFinder 
 {
 	/**
 	 * @param args[0] : full path of the repository directory
