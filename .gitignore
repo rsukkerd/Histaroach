@@ -1,3 +1,7 @@
+# The bin and junit directories
+bin/
+junit/
+
 # Compiled sources
 *.class
 
