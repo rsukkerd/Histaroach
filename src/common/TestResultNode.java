@@ -12,22 +12,29 @@ public class TestResultNode {
     private final TestResult result;
 
     /**
-     * @return true iff node_A is neither ancestor or descendant of node_B
+     * @return true iff this node is neither ancestor or descendant of node_B
      */
-    static boolean areParallel(HistoryGraph historyGraph,
-            TestResultNode node_A, TestResultNode node_B) {
-        return !node_A.equals(node_B)
-                && !TestResultNode.isAncestor(historyGraph, node_A, node_B,
-                        new HashSet<TestResultNode>())
-                && !TestResultNode.isAncestor(historyGraph, node_B, node_A,
-                        new HashSet<TestResultNode>());
+    public boolean isParallelWith(HistoryGraph historyGraph,
+            TestResultNode node_B) {
+        return !this.equals(node_B) && !this.isAncestorOf(historyGraph, node_B)
+                && !this.isAncestorOf(historyGraph, node_B);
     }
 
     /**
-     * @return true iff node_B is an ancestor of node_A
+     * @return true iff this node is an ancestor of node_B
      */
-    static boolean isAncestor(HistoryGraph historyGraph, TestResultNode node_A,
-            TestResultNode node_B, Set<TestResultNode> visited) {
+    public boolean isAncestorOf(HistoryGraph historyGraph, TestResultNode node_B) {
+        return isAncestorOf(historyGraph, this, node_B,
+                new HashSet<TestResultNode>());
+
+    }
+
+    /**
+     * @return true iff node_A is an ancestor of node_B
+     */
+    static private boolean isAncestorOf(HistoryGraph historyGraph,
+            TestResultNode node_A, TestResultNode node_B,
+            Set<TestResultNode> visited) {
         visited.add(node_A);
 
         List<TestResultNode> parents = historyGraph.getParents(node_A);
@@ -39,7 +46,7 @@ public class TestResultNode {
 
         for (TestResultNode parent : parents) {
             if (!visited.contains(parent)) {
-                if (isAncestor(historyGraph, parent, node_B, visited)) {
+                if (isAncestorOf(historyGraph, parent, node_B, visited)) {
                     return true;
                 }
             }

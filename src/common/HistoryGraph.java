@@ -145,7 +145,7 @@ public class HistoryGraph {
                     TestResultNode node_A = fix_A.getNodePass();
                     TestResultNode node_B = fix_B.getNodePass();
 
-                    if (TestResultNode.areParallel(this, node_A, node_B)) {
+                    if (node_A.isParallelWith(this, node_B)) {
                         if (!map.containsKey(bug)) {
                             Set<BugFix> parallelFixes = new HashSet<BugFix>();
                             parallelFixes.add(fix_A);
