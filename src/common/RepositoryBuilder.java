@@ -1,9 +1,6 @@
 package common;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public final class RepositoryBuilder {
     private static final String SINGLE_TEST_CMD = "ant junit-test -Dtest.name=";
@@ -73,121 +68,6 @@ public final class RepositoryBuilder {
         return repo;
     }
 
-    /**
-     * checkout commit from the repository
-     * 
-     * @param directory
-     *            : directory of the repository
-     * @param commit
-     *            : commit id
-     */
-    public static void checkoutCommit(File directory, String commit) {
-        ProcessBuilder checkoutBuilder = new ProcessBuilder("git", "checkout",
-                commit);
-        checkoutBuilder.directory(directory);
-
-        try {
-            Process checkoutProcess = checkoutBuilder.start();
-
-            try {
-                // make current thread waits until this process terminates
-                checkoutProcess.waitFor();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
-    }
-
-    /**
-     * @param directory
-     *            : directory of the repository
-     * @param commit
-     *            : commit id
-     * @param command
-     *            : test command
-     * @return TestResult of the commit
-     */
-    public static TestResult getTestResult(File directory, String commit,
-            String[] command) {
-        checkoutCommit(directory, commit);
-
-        ProcessBuilder runTestBuilder = new ProcessBuilder(command);
-        runTestBuilder.directory(directory);
-
-        TestResult testResult = null;
-
-        try {
-            Process runTestProcess = runTestBuilder.start();
-            testResult = getTestResultHelper(runTestProcess);
-
-            try {
-                // make current thread waits until this process terminates
-                runTestProcess.waitFor();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
-
-        return testResult;
-    }
-
-    /**
-     * @param process
-     *            : 'ant junit' process
-     * @return TestResult from output from process
-     */
-    private static TestResult getTestResultHelper(Process process) {
-        BufferedReader stdOutputReader = new BufferedReader(
-                new InputStreamReader(process.getInputStream()));
-
-        BufferedReader stdErrorReader = new BufferedReader(
-                new InputStreamReader(process.getErrorStream()));
-
-        String line = new String();
-        Set<String> allTests = new HashSet<String>();
-        Set<String> failures = new HashSet<String>();
-
-        try {
-            while ((line = stdOutputReader.readLine()) != null) {
-                Pattern allTestsPattern = Pattern
-                        .compile("\\s*\\[junit\\] Running (\\S+)");
-                Matcher allTestsMatcher = allTestsPattern.matcher(line);
-
-                if (allTestsMatcher.find()) {
-                    allTests.add(allTestsMatcher.group(1));
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
-
-        try {
-            while ((line = stdErrorReader.readLine()) != null) {
-                Pattern failuresPattern = Pattern
-                        .compile("\\s*\\[junit\\] Test (\\S+) FAILED");
-                Matcher failuresMatcher = failuresPattern.matcher(line);
-
-                if (failuresMatcher.find()) {
-                    failures.add(failuresMatcher.group(1));
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
-
-        TestResult testResult = new TestResult(allTests, failures);
-
-        return testResult;
-    }
-
     private static void printInProgress(String commit, String message) {
         System.out.println(message + " " + commit);
     }
@@ -226,10 +106,10 @@ public final class RepositoryBuilder {
         }
     }
 
-    public static boolean passSingleTest(File directory, String commit,
+    public static boolean passSingleTest(Repository repo, String commit,
             String testName) {
         String command = SINGLE_TEST_CMD + testName;
-        TestResult result = getTestResult(directory, commit, command.split(" "));
+        TestResult result = repo.getTestResult(commit, command.split(" "));
 
         return result.getFailures().isEmpty();
     }

@@ -26,7 +26,8 @@ public class Repository {
     /**
      * @return diff files between childCommit and parentCommit
      */
-    public List<String> getChangedFiles(String childCommitID, String parentCommitID) {
+    public List<String> getChangedFiles(String childCommitID,
+            String parentCommitID) {
         List<String> files = new ArrayList<String>();
 
         ProcessBuilder diffBuilder = new ProcessBuilder("git", "diff",
@@ -59,15 +60,22 @@ public class Repository {
     }
 
     /**
-     * @param directory
-     *            : repository directory
+     * @param commitID
+     *            : commit id
+     * @return TestResult of the commit
+     */
+    public TestResult getTestResult(String commitID) {
+        return getTestResult(commitID, ALL_TESTS_CMD);
+    }
+
+    /**
      * @param commitID
      *            : commit id
      * @param command
      *            : test command
      * @return TestResult of the commit
      */
-    public TestResult getTestResult(String commitID) {
+    public TestResult getTestResult(String commitID, String[] commands) {
         int exitValue = checkoutCommit(commitID);
         TestResult testResult = null;
 
@@ -78,7 +86,7 @@ public class Repository {
             return testResult;
         }
 
-        ProcessBuilder runTestBuilder = new ProcessBuilder(ALL_TESTS_CMD);
+        ProcessBuilder runTestBuilder = new ProcessBuilder(commands);
         runTestBuilder.directory(this.repositoryDir);
 
         try {
