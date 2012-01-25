@@ -1,14 +1,19 @@
 package common;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import voldemort.VoldemortTestResult;
+
 public class Repository {
+    private static final String[] ALL_TESTS_CMD = { "ant", "junit" };
     private final Map<TestResultNode, List<TestResultNode>> nodeToChildren;
     private File repositoryDir;
 
@@ -17,15 +22,58 @@ public class Repository {
         this.repositoryDir = repositoryDir;
     }
 
-    public File getDirectory() {
-        return repositoryDir;
+    /**
+     * @param directory
+     *            : repository directory
+     * @param commitID
+     *            : commit id
+     * @param command
+     *            : test command
+     * @return TestResult of the commit
+     */
+    public TestResult getTestResult(String commitID) {
+        int exitValue = checkoutCommit(commitID);
+        TestResult testResult = null;
+
+        if (exitValue != 0) {
+            System.out
+                    .println("\'ant junit\' process returns non-zero exit value");
+            // TODO: Do something sensible.
+            return testResult;
+        }
+
+        ProcessBuilder runTestBuilder = new ProcessBuilder(ALL_TESTS_CMD);
+        runTestBuilder.directory(this.repositoryDir);
+
+        try {
+            Process runTestProcess = runTestBuilder.start();
+
+            BufferedReader stdOutputReader = new BufferedReader(
+                    new InputStreamReader(runTestProcess.getInputStream()));
+
+            BufferedReader stdErrorReader = new BufferedReader(
+                    new InputStreamReader(runTestProcess.getErrorStream()));
+
+            testResult = new VoldemortTestResult(stdOutputReader,
+                    stdErrorReader);
+
+            try {
+                // make current thread waits until this process terminates
+                runTestProcess.waitFor();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+
+        return testResult;
     }
 
     /**
      * Checks out a particular commit for this repository.
      * 
-     * @param directory
-     *            : repository directory
      * @param commit
      *            : commit id
      * @return exit value of 'git checkout' process

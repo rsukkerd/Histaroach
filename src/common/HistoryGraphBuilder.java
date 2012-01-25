@@ -12,8 +12,6 @@ import java.util.Queue;
 import java.util.Scanner;
 import java.util.Set;
 
-import voldemort.VoldemortTestResult;
-
 public final class HistoryGraphBuilder {
     private static final String[] TEST_CMD = { "ant", "junit" };
 
@@ -24,12 +22,13 @@ public final class HistoryGraphBuilder {
      */
     public static HistoryGraph buildHistoryGraph(String repoDir) {
         File directory = new File(repoDir);
+        Repository repo = new Repository(directory);
 
         HistoryGraph historyGraph = new HistoryGraph();
 
         int commitCount = 0;
 
-        TestResultNode masterNode = getTestResultNode(directory, "master");
+        TestResultNode masterNode = getTestResultNode(repo, "master");
 
         Queue<TestResultNode> q = new LinkedList<TestResultNode>();
         q.add(masterNode);
@@ -47,8 +46,7 @@ public final class HistoryGraphBuilder {
             List<TestResultNode> parents = new ArrayList<TestResultNode>();
 
             for (String parentCommit : parentCommits) {
-                TestResultNode parent = getTestResultNode(directory,
-                        parentCommit);
+                TestResultNode parent = getTestResultNode(repo, parentCommit);
                 parents.add(parent);
 
                 if (!visited.contains(parentCommit)) {
@@ -198,48 +196,12 @@ public final class HistoryGraphBuilder {
     /**
      * @return TestResultNode representing the commit
      */
-    private static TestResultNode getTestResultNode(File directory,
+    private static TestResultNode getTestResultNode(Repository repo,
             String commit) {
-        TestResult result = getTestResult(directory, commit);
+        TestResult result = repo.getTestResult(commit);
         TestResultNode testResultNode = new TestResultNode(commit, result);
 
         return testResultNode;
-    }
-
-    /**
-     * @return TestResult of the commit
-     */
-    public static TestResult getTestResult(File directory, String commit) {
-        checkoutCommit(directory, commit);
-
-        ProcessBuilder runtestBuilder = new ProcessBuilder(TEST_CMD);
-        runtestBuilder.directory(directory);
-
-        TestResult testResult = null;
-
-        try {
-            Process runtestProcess = runtestBuilder.start();
-            BufferedReader stdOutputReader = new BufferedReader(
-                    new InputStreamReader(runtestProcess.getInputStream()));
-
-            BufferedReader stdErrorReader = new BufferedReader(
-                    new InputStreamReader(runtestProcess.getErrorStream()));
-
-            testResult = new VoldemortTestResult(stdOutputReader,
-                    stdErrorReader);
-
-            try {
-                // make current thread waits until this process terminates
-                runtestProcess.waitFor();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
-
-        return testResult;
     }
 
     private static void printProgress(TestResultNode node, int count) {

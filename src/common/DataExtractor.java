@@ -9,12 +9,10 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import voldemort.VoldemortTestResult;
-
 public class DataExtractor {
     private static final String[] LOG_COMMAND = { "git", "log",
             "--pretty=format:%h %p" };
-    private static final String[] ALL_TESTS_CMD = { "ant", "junit" };
+
     private static final String SINGLE_TEST_CMD = "ant junit-test -Dtest.name=";
 
     public static void extractData(String repositoryDirStr, String outputFile,
@@ -62,8 +60,7 @@ public class DataExtractor {
                     }
                 }
 
-                TestResult testResult = getTestResult(repo, commit,
-                        ALL_TESTS_CMD);
+                TestResult testResult = repo.getTestResult(commit);
                 if (testResult != null) {
                     outFileWriter.write(testResult.toString());
                 }
@@ -123,53 +120,4 @@ public class DataExtractor {
         return files;
     }
 
-    /**
-     * @param directory
-     *            : repository directory
-     * @param commitID
-     *            : commit id
-     * @param command
-     *            : test command
-     * @return TestResult of the commit
-     */
-    public static TestResult getTestResult(Repository repo, String commitID,
-            String[] command) {
-        int exitValue = repo.checkoutCommit(commitID);
-        TestResult testResult = null;
-
-        if (exitValue != 0) {
-            System.out
-                    .println("\'ant junit\' process returns non-zero exit value");
-            // TODO: Do something sensible.
-            return testResult;
-        }
-
-        ProcessBuilder runTestBuilder = new ProcessBuilder(command);
-        runTestBuilder.directory(repo.getDirectory());
-
-        try {
-            Process runTestProcess = runTestBuilder.start();
-
-            BufferedReader stdOutputReader = new BufferedReader(
-                    new InputStreamReader(runTestProcess.getInputStream()));
-
-            BufferedReader stdErrorReader = new BufferedReader(
-                    new InputStreamReader(runTestProcess.getErrorStream()));
-
-            testResult = new VoldemortTestResult(stdOutputReader,
-                    stdErrorReader);
-
-            try {
-                // make current thread waits until this process terminates
-                runTestProcess.waitFor();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
-
-        return testResult;
-    }
 }
