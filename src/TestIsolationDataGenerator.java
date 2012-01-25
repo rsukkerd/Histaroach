@@ -47,8 +47,6 @@ public class TestIsolationDataGenerator {
             aliases = { "-repodir" })
     public static String repositoryDirName = null;
 
-    private static Options plumeOptions;
-
     /** One line synopsis of usage */
     public static final String usage_string = "TestIsolationDataGenerator [options]";
 
@@ -61,9 +59,9 @@ public class TestIsolationDataGenerator {
      * @throws IOException
      */
     public static void main(String[] args) throws IOException {
-        plumeOptions = new Options(TestIsolationDataGenerator.usage_string);
-        @SuppressWarnings("unused")
-        String[] cmdLineArgs = plumeOptions.parse_or_usage(args);
+        Options plumeOptions = new Options(
+                TestIsolationDataGenerator.usage_string);
+        plumeOptions.parse_or_usage(args);
 
         // Display the help screen.
         if (showHelp) {
