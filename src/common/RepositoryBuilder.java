@@ -61,7 +61,7 @@ public final class RepositoryBuilder {
                 }
 
                 // check for sudden fail and find diff
-                checkSuddenFail(directory, next, parent);
+                checkSuddenFail(repo, next, parent);
             }
             // add 'next' to repository
             repo.addNode(next, parents);
@@ -201,7 +201,7 @@ public final class RepositoryBuilder {
      * check if a test suddenly fails ie. the test passes in 'parent' but fails
      * in 'node' find diff files between node and parent
      */
-    public static void checkSuddenFail(File directory, TestResultNode node,
+    public static void checkSuddenFail(Repository repo, TestResultNode node,
             TestResultNode parent) {
         Map<Difference, List<String>> diffCache = new HashMap<Difference, List<String>>();
 
@@ -213,7 +213,7 @@ public final class RepositoryBuilder {
                 if (diffCache.containsKey(dummyDiff)) {
                     changedFiles = diffCache.get(dummyDiff);
                 } else {
-                    changedFiles = getChangedFiles(directory, node.getCommit(),
+                    changedFiles = repo.getChangedFiles(node.getCommit(),
                             parent.getCommit());
                     diffCache.put(dummyDiff, changedFiles);
                 }
@@ -224,42 +224,6 @@ public final class RepositoryBuilder {
                 System.out.println(diff);
             }
         }
-    }
-
-    /**
-     * @return diff files between childCommit and parentCommit
-     */
-    public static List<String> getChangedFiles(File directory,
-            String childCommit, String parentCommit) {
-        List<String> files = new ArrayList<String>();
-
-        ProcessBuilder diffBuilder = new ProcessBuilder("git", "diff",
-                "--name-only", childCommit, parentCommit);
-        diffBuilder.directory(directory);
-
-        try {
-            Process diffProcess = diffBuilder.start();
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    diffProcess.getInputStream()));
-
-            String line = new String();
-            while ((line = reader.readLine()) != null) {
-                files.add(line);
-            }
-
-            try {
-                // make current thread waits until this process terminates
-                diffProcess.waitFor();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
-
-        return files;
     }
 
     public static boolean passSingleTest(File directory, String commit,
