@@ -7,11 +7,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import voldemort.VoldemortTestResult;
 
 public class DataExtractor {
     private static final String[] LOG_COMMAND = { "git", "log",
@@ -151,7 +149,15 @@ public class DataExtractor {
 
         try {
             Process runTestProcess = runTestBuilder.start();
-            testResult = getTestResultHelper(runTestProcess);
+
+            BufferedReader stdOutputReader = new BufferedReader(
+                    new InputStreamReader(runTestProcess.getInputStream()));
+
+            BufferedReader stdErrorReader = new BufferedReader(
+                    new InputStreamReader(runTestProcess.getErrorStream()));
+
+            testResult = new VoldemortTestResult(stdOutputReader,
+                    stdErrorReader);
 
             try {
                 // make current thread waits until this process terminates
@@ -163,57 +169,6 @@ public class DataExtractor {
             e.printStackTrace();
             System.exit(-1);
         }
-
-        return testResult;
-    }
-
-    /**
-     * @param process
-     *            : 'ant junit' process
-     * @return TestResult from output from process
-     */
-    private static TestResult getTestResultHelper(Process process) {
-        BufferedReader stdOutputReader = new BufferedReader(
-                new InputStreamReader(process.getInputStream()));
-
-        BufferedReader stdErrorReader = new BufferedReader(
-                new InputStreamReader(process.getErrorStream()));
-
-        String line = new String();
-        Set<String> allTests = new HashSet<String>();
-        Set<String> failures = new HashSet<String>();
-
-        try {
-            while ((line = stdOutputReader.readLine()) != null) {
-                Pattern allTestsPattern = Pattern
-                        .compile("\\s*\\[junit\\] Running (\\S+)");
-                Matcher allTestsMatcher = allTestsPattern.matcher(line);
-
-                if (allTestsMatcher.find()) {
-                    allTests.add(allTestsMatcher.group(1));
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
-
-        try {
-            while ((line = stdErrorReader.readLine()) != null) {
-                Pattern failuresPattern = Pattern
-                        .compile("\\s*\\[junit\\] Test (\\S+) FAILED");
-                Matcher failuresMatcher = failuresPattern.matcher(line);
-
-                if (failuresMatcher.find()) {
-                    failures.add(failuresMatcher.group(1));
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
-
-        TestResult testResult = new TestResult(allTests, failures);
 
         return testResult;
     }
