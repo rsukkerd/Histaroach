@@ -14,10 +14,6 @@ public class TestResult {
     private final Set<String> failures;
     private final String commit;
 
-    public static TestResult fromRepo(Repository repo, String commit) {
-        return repo.getTestResult(commit);
-    }
-
     public TestResult(String commit) {
         this.allTests = new LinkedHashSet<String>();
         this.failures = new LinkedHashSet<String>();
