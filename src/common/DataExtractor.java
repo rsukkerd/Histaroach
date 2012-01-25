@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
 
 public class DataExtractor {
@@ -52,8 +51,8 @@ public class DataExtractor {
                         outFileWriter.write("PARENT " + parent + "\n");
                         outFileWriter.write("DIFF FILES:\n");
 
-                        List<String> diffFiles = getChangedFiles(repositoryDir,
-                                commit, parent);
+                        List<String> diffFiles = repo.getChangedFiles(commit,
+                                parent);
                         for (String file : diffFiles) {
                             outFileWriter.write(file + "\n");
                         }
@@ -82,42 +81,6 @@ public class DataExtractor {
             e.printStackTrace();
         }
 
-    }
-
-    /**
-     * @return diff files between childCommit and parentCommit
-     */
-    public static List<String> getChangedFiles(File directory,
-            String childCommit, String parentCommit) {
-        List<String> files = new ArrayList<String>();
-
-        ProcessBuilder diffBuilder = new ProcessBuilder("git", "diff",
-                "--name-status", childCommit, parentCommit);
-        diffBuilder.directory(directory);
-
-        try {
-            Process diffProcess = diffBuilder.start();
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    diffProcess.getInputStream()));
-
-            String line = new String();
-            while ((line = reader.readLine()) != null) {
-                files.add(line);
-            }
-
-            try {
-                // make current thread waits until this process terminates
-                diffProcess.waitFor();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
-
-        return files;
     }
 
 }

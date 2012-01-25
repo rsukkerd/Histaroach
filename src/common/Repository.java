@@ -23,6 +23,41 @@ public class Repository {
     }
 
     /**
+     * @return diff files between childCommit and parentCommit
+     */
+    public List<String> getChangedFiles(String childCommit, String parentCommit) {
+        List<String> files = new ArrayList<String>();
+
+        ProcessBuilder diffBuilder = new ProcessBuilder("git", "diff",
+                "--name-status", childCommit, parentCommit);
+        diffBuilder.directory(repositoryDir);
+
+        try {
+            Process diffProcess = diffBuilder.start();
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    diffProcess.getInputStream()));
+
+            String line = new String();
+            while ((line = reader.readLine()) != null) {
+                files.add(line);
+            }
+
+            try {
+                // make current thread waits until this process terminates
+                diffProcess.waitFor();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+
+        return files;
+    }
+
+    /**
      * @param directory
      *            : repository directory
      * @param commitID
