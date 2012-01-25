@@ -15,11 +15,11 @@ import voldemort.VoldemortTestResult;
 
 public class Repository {
     private static final String[] ALL_TESTS_CMD = { "ant", "junit" };
-    private final Map<TestResultNode, List<TestResultNode>> nodeToChildren;
+    private final Map<TestResult, List<TestResult>> nodeToChildren;
     private File repositoryDir;
 
     public Repository(File repositoryDir) {
-        nodeToChildren = new HashMap<TestResultNode, List<TestResultNode>>();
+        nodeToChildren = new HashMap<TestResult, List<TestResult>>();
         this.repositoryDir = repositoryDir;
     }
 
@@ -98,7 +98,7 @@ public class Repository {
             BufferedReader stdErrorReader = new BufferedReader(
                     new InputStreamReader(runTestProcess.getErrorStream()));
 
-            testResult = new VoldemortTestResult(stdOutputReader,
+            testResult = new VoldemortTestResult(commitID, stdOutputReader,
                     stdErrorReader);
 
             try {
@@ -154,10 +154,10 @@ public class Repository {
      * @param parents
      *            : list of parents of the node
      */
-    public void addNode(TestResultNode node, List<TestResultNode> parents) {
-        for (TestResultNode parent : parents) {
+    public void addNode(TestResult node, List<TestResult> parents) {
+        for (TestResult parent : parents) {
             if (!nodeToChildren.containsKey(parent)) {
-                List<TestResultNode> children = new ArrayList<TestResultNode>();
+                List<TestResult> children = new ArrayList<TestResult>();
                 children.add(node);
                 nodeToChildren.put(parent, children);
             } else {
@@ -171,7 +171,7 @@ public class Repository {
      *            : node to get Iterator over its children
      * @return Iterator over children of the node
      */
-    public Iterator<TestResultNode> getChildrenIterator(TestResultNode node) {
+    public Iterator<TestResult> getChildrenIterator(TestResult node) {
         return nodeToChildren.get(node).iterator();
     }
 

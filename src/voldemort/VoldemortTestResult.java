@@ -11,9 +11,9 @@ public class VoldemortTestResult extends TestResult {
     /**
      * @return TestResult from output from process
      */
-    public VoldemortTestResult(BufferedReader stdOutputReader,
+    public VoldemortTestResult(String commitID, BufferedReader stdOutputReader,
             BufferedReader stdErrorReader) {
-        super();
+        super(commitID);
 
         String line = new String();
 

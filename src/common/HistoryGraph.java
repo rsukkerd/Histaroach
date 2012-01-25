@@ -11,11 +11,11 @@ import java.util.Queue;
 import java.util.Set;
 
 public class HistoryGraph {
-    private final Map<TestResultNode, List<TestResultNode>> nodeToParents;
+    private final Map<TestResult, List<TestResult>> nodeToParents;
     private final Map<String, List<BugFix>> bugToFixList;
 
     public HistoryGraph() {
-        nodeToParents = new HashMap<TestResultNode, List<TestResultNode>>();
+        nodeToParents = new HashMap<TestResult, List<TestResult>>();
         bugToFixList = new HashMap<String, List<BugFix>>();
     }
 
@@ -23,25 +23,25 @@ public class HistoryGraph {
         this();
         int commitCount = 0;
 
-        TestResultNode masterNode = new TestResultNode(repo, "master");
+        TestResult masterNode = repo.getTestResult("master");
 
-        Queue<TestResultNode> q = new LinkedList<TestResultNode>();
+        Queue<TestResult> q = new LinkedList<TestResult>();
         q.add(masterNode);
 
         Set<String> visited = new HashSet<String>();
         visited.add("master");
 
         while (!q.isEmpty()) {
-            TestResultNode next = q.poll();
+            TestResult next = q.poll();
 
             // process 'next'
             String currCommit = next.getCommit();
             List<String> parentCommits = repo.getParentCommits(currCommit);
 
-            List<TestResultNode> parents = new ArrayList<TestResultNode>();
+            List<TestResult> parents = new ArrayList<TestResult>();
 
             for (String parentCommit : parentCommits) {
-                TestResultNode parent = new TestResultNode(repo, parentCommit);
+                TestResult parent = repo.getTestResult(parentCommit);
                 parents.add(parent);
 
                 if (!visited.contains(parentCommit)) {
@@ -64,27 +64,27 @@ public class HistoryGraph {
      * 
      * @modifies historyGraph
      */
-    public void addBugFixesInfo(TestResultNode masterNode) {
-        Queue<TestResultNode> queue = new LinkedList<TestResultNode>();
+    public void addBugFixesInfo(TestResult masterNode) {
+        Queue<TestResult> queue = new LinkedList<TestResult>();
         queue.add(masterNode);
 
-        Set<TestResultNode> visitedNodes = new HashSet<TestResultNode>();
+        Set<TestResult> visitedNodes = new HashSet<TestResult>();
         visitedNodes.add(masterNode);
 
         while (!queue.isEmpty()) {
-            TestResultNode next = queue.poll();
+            TestResult next = queue.poll();
 
             // find all fixed bugs in 'next'
             Set<String> fixedBugs = new HashSet<String>();
 
-            List<TestResultNode> parents = getParents(next);
-            for (TestResultNode parent : parents) {
+            List<TestResult> parents = getParents(next);
+            for (TestResult parent : parents) {
                 if (!visitedNodes.contains(parent)) {
                     queue.add(parent);
                     visitedNodes.add(parent);
                 }
 
-                for (String bug : parent.getTestResult().getFailures()) {
+                for (String bug : parent.getFailures()) {
                     if (next.pass(bug)) {
                         fixedBugs.add(bug);
                     }
@@ -94,12 +94,12 @@ public class HistoryGraph {
             for (String bug : fixedBugs) {
                 // BFS to find all consecutive nodes, start from 'next', that
                 // fail 'bug'
-                Queue<TestResultNode> failQueue = new LinkedList<TestResultNode>();
+                Queue<TestResult> failQueue = new LinkedList<TestResult>();
                 BugFix bugFix = new BugFix(next);
 
-                Set<TestResultNode> subVisitedNodes = new HashSet<TestResultNode>();
+                Set<TestResult> subVisitedNodes = new HashSet<TestResult>();
 
-                for (TestResultNode parent : parents) {
+                for (TestResult parent : parents) {
                     if (parent.fail(bug)) {
                         failQueue.add(parent);
                         bugFix.addNodeFail(parent);
@@ -108,9 +108,9 @@ public class HistoryGraph {
                 }
 
                 while (!failQueue.isEmpty()) {
-                    TestResultNode failNode = failQueue.poll();
+                    TestResult failNode = failQueue.poll();
 
-                    for (TestResultNode p : getParents(failNode)) {
+                    for (TestResult p : getParents(failNode)) {
                         if (!subVisitedNodes.contains(p) && p.fail(bug)) {
                             failQueue.add(p);
                             bugFix.addNodeFail(p);
@@ -142,8 +142,8 @@ public class HistoryGraph {
                     BugFix fix_A = bugFixes.get(i);
                     BugFix fix_B = bugFixes.get(j);
 
-                    TestResultNode node_A = fix_A.getNodePass();
-                    TestResultNode node_B = fix_B.getNodePass();
+                    TestResult node_A = fix_A.getNodePass();
+                    TestResult node_B = fix_B.getNodePass();
 
                     if (node_A.isParallelWith(this, node_B)) {
                         if (!map.containsKey(bug)) {
@@ -164,7 +164,7 @@ public class HistoryGraph {
         return map;
     }
 
-    private static void printProgress(TestResultNode node, int count) {
+    private static void printProgress(TestResult node, int count) {
         System.out.println("(" + count + ") " + node);
     }
 
@@ -176,7 +176,7 @@ public class HistoryGraph {
      * @param parents
      *            : list of parents of the node
      */
-    public void addNode(TestResultNode node, List<TestResultNode> parents) {
+    public void addNode(TestResult node, List<TestResult> parents) {
         nodeToParents.put(node, parents);
     }
 
@@ -185,14 +185,14 @@ public class HistoryGraph {
      *            : node to get parents
      * @return list of parents of the node
      */
-    public List<TestResultNode> getParents(TestResultNode node) {
+    public List<TestResult> getParents(TestResult node) {
         return nodeToParents.get(node);
     }
 
     /**
      * @return iterator over all nodes
      */
-    public Iterator<TestResultNode> getNodeIterator() {
+    public Iterator<TestResult> getNodeIterator() {
         return nodeToParents.keySet().iterator();
     }
 

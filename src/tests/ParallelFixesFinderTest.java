@@ -14,7 +14,6 @@ import org.junit.Test;
 import common.BugFix;
 import common.HistoryGraph;
 import common.TestResult;
-import common.TestResultNode;
 
 public class ParallelFixesFinderTest {
     private static final String TEST_1 = "test1";
@@ -52,32 +51,32 @@ public class ParallelFixesFinderTest {
     private static final Set<String> FAILURES_4_1 = new HashSet<String>();
 
     // node1 in graph1
-    private static final TestResultNode NODE_1_1 = new TestResultNode("1",
-            new TestResult(ALL_TESTS_1, FAILURES_1_1));
+    private static final TestResult NODE_1_1 = new TestResult("1", ALL_TESTS_1,
+            FAILURES_1_1);
     // node2 in graph1
-    private static final TestResultNode NODE_2_1 = new TestResultNode("2",
-            new TestResult(ALL_TESTS_1, FAILURES_2_1));
+    private static final TestResult NODE_2_1 = new TestResult("2", ALL_TESTS_1,
+            FAILURES_2_1);
     // node3 in graph1
-    private static final TestResultNode NODE_3_1 = new TestResultNode("3",
-            new TestResult(ALL_TESTS_1, FAILURES_3_1));
+    private static final TestResult NODE_3_1 = new TestResult("3", ALL_TESTS_1,
+            FAILURES_3_1);
     // node4 in graph1
-    private static final TestResultNode NODE_4_1 = new TestResultNode("4",
-            new TestResult(ALL_TESTS_1, FAILURES_4_1));
+    private static final TestResult NODE_4_1 = new TestResult("4", ALL_TESTS_1,
+            FAILURES_4_1);
 
     // parents of node1 in graph1
-    private static final List<TestResultNode> PARENTS_1_1 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_1_1 = new ArrayList<TestResult>();
     // parents of node2 in graph1
-    private static final List<TestResultNode> PARENTS_2_1 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_2_1 = new ArrayList<TestResult>();
     static {
         PARENTS_2_1.add(NODE_1_1);
     }
     // parents of node3 in graph1
-    private static final List<TestResultNode> PARENTS_3_1 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_3_1 = new ArrayList<TestResult>();
     static {
         PARENTS_3_1.add(NODE_2_1);
     }
     // parents of node4 in graph1
-    private static final List<TestResultNode> PARENTS_4_1 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_4_1 = new ArrayList<TestResult>();
     static {
         PARENTS_4_1.add(NODE_3_1);
     }
@@ -105,32 +104,32 @@ public class ParallelFixesFinderTest {
     private static final Set<String> FAILURES_4_2 = new HashSet<String>();
 
     // node1 in graph2
-    private static final TestResultNode NODE_1_2 = new TestResultNode("1",
-            new TestResult(ALL_TESTS_2, FAILURES_1_2));
+    private static final TestResult NODE_1_2 = new TestResult("1", ALL_TESTS_2,
+            FAILURES_1_2);
     // node2 in graph2
-    private static final TestResultNode NODE_2_2 = new TestResultNode("2",
-            new TestResult(ALL_TESTS_2, FAILURES_2_2));
+    private static final TestResult NODE_2_2 = new TestResult("2", ALL_TESTS_2,
+            FAILURES_2_2);
     // node3 in graph2
-    private static final TestResultNode NODE_3_2 = new TestResultNode("3",
-            new TestResult(ALL_TESTS_2, FAILURES_3_2));
+    private static final TestResult NODE_3_2 = new TestResult("3", ALL_TESTS_2,
+            FAILURES_3_2);
     // node4 in graph2
-    private static final TestResultNode NODE_4_2 = new TestResultNode("4",
-            new TestResult(ALL_TESTS_2, FAILURES_4_2));
+    private static final TestResult NODE_4_2 = new TestResult("4", ALL_TESTS_2,
+            FAILURES_4_2);
 
     // parents of node1 in graph2
-    private static final List<TestResultNode> PARENTS_1_2 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_1_2 = new ArrayList<TestResult>();
     // parents of node2 in graph2
-    private static final List<TestResultNode> PARENTS_2_2 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_2_2 = new ArrayList<TestResult>();
     static {
         PARENTS_2_2.add(NODE_1_2);
     }
     // parents of node3 in graph2
-    private static final List<TestResultNode> PARENTS_3_2 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_3_2 = new ArrayList<TestResult>();
     static {
         PARENTS_3_2.add(NODE_1_2);
     }
     // parents of node4 in graph2
-    private static final List<TestResultNode> PARENTS_4_2 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_4_2 = new ArrayList<TestResult>();
     static {
         PARENTS_4_2.add(NODE_3_2);
         PARENTS_4_2.add(NODE_2_2);
@@ -216,57 +215,57 @@ public class ParallelFixesFinderTest {
     }
 
     // node1 in graph3
-    private static final TestResultNode NODE_1_3 = new TestResultNode("1",
-            new TestResult(ALL_TESTS_3, FAILURES_1_3));
+    private static final TestResult NODE_1_3 = new TestResult("1", ALL_TESTS_3,
+            FAILURES_1_3);
     // node2 in graph3
-    private static final TestResultNode NODE_2_3 = new TestResultNode("2",
-            new TestResult(ALL_TESTS_3, FAILURES_2_3));
+    private static final TestResult NODE_2_3 = new TestResult("2", ALL_TESTS_3,
+            FAILURES_2_3);
     // node3 in graph3
-    private static final TestResultNode NODE_3_3 = new TestResultNode("3",
-            new TestResult(ALL_TESTS_3, FAILURES_3_3));
+    private static final TestResult NODE_3_3 = new TestResult("3", ALL_TESTS_3,
+            FAILURES_3_3);
     // node4 in graph3
-    private static final TestResultNode NODE_4_3 = new TestResultNode("4",
-            new TestResult(ALL_TESTS_3, FAILURES_4_3));
+    private static final TestResult NODE_4_3 = new TestResult("4", ALL_TESTS_3,
+            FAILURES_4_3);
     // node5 in graph3
-    private static final TestResultNode NODE_5_3 = new TestResultNode("5",
-            new TestResult(ALL_TESTS_3, FAILURES_5_3));
+    private static final TestResult NODE_5_3 = new TestResult("5", ALL_TESTS_3,
+            FAILURES_5_3);
     // node6 in graph3
-    private static final TestResultNode NODE_6_3 = new TestResultNode("6",
-            new TestResult(ALL_TESTS_3, FAILURES_6_3));
+    private static final TestResult NODE_6_3 = new TestResult("6", ALL_TESTS_3,
+            FAILURES_6_3);
     // node7 in graph3
-    private static final TestResultNode NODE_7_3 = new TestResultNode("7",
-            new TestResult(ALL_TESTS_3, FAILURES_7_3));
+    private static final TestResult NODE_7_3 = new TestResult("7", ALL_TESTS_3,
+            FAILURES_7_3);
 
     // parents of node1 in graph3
-    private static final List<TestResultNode> PARENTS_1_3 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_1_3 = new ArrayList<TestResult>();
     // parents of node2 in graph3
-    private static final List<TestResultNode> PARENTS_2_3 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_2_3 = new ArrayList<TestResult>();
     static {
         PARENTS_2_3.add(NODE_1_3);
     }
     // parents of node3 in graph3
-    private static final List<TestResultNode> PARENTS_3_3 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_3_3 = new ArrayList<TestResult>();
     static {
         PARENTS_3_3.add(NODE_2_3);
     }
     // parents of node4 in graph3
-    private static final List<TestResultNode> PARENTS_4_3 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_4_3 = new ArrayList<TestResult>();
     static {
         PARENTS_4_3.add(NODE_2_3);
     }
     // parents of node5 in graph3
-    private static final List<TestResultNode> PARENTS_5_3 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_5_3 = new ArrayList<TestResult>();
     static {
         PARENTS_5_3.add(NODE_4_3);
         PARENTS_5_3.add(NODE_3_3);
     }
     // parents of node6 in graph3
-    private static final List<TestResultNode> PARENTS_6_3 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_6_3 = new ArrayList<TestResult>();
     static {
         PARENTS_6_3.add(NODE_1_3);
     }
     // parents of node7 in graph3
-    private static final List<TestResultNode> PARENTS_7_3 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_7_3 = new ArrayList<TestResult>();
     static {
         PARENTS_7_3.add(NODE_6_3);
         PARENTS_7_3.add(NODE_5_3);

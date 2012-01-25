@@ -18,7 +18,6 @@ import common.BugFix;
 import common.HistoryGraph;
 import common.Repository;
 import common.TestResult;
-import common.TestResultNode;
 
 public class HistoryGraphTest {
     private static final String DIR_1 = "test/sample/sample1";
@@ -27,63 +26,66 @@ public class HistoryGraphTest {
     private static final String DIR_4 = "test/sample/sample4";
     private static final String DIR_5 = "test/sample/sample5";
 
-    private static final TestResultNode NODE_1_MAP_1 = new TestResultNode(
-            "master", null);
+    // TODO: initializing TestResult will null, null for allTests and failures
+    // is a bad idea.
 
-    private static final TestResultNode NODE_1_MAP_2 = new TestResultNode(
-            "88cb3de667c0de7c18710d011a2357b0fa81f5b9", null);
-    private static final TestResultNode NODE_2_MAP_2 = new TestResultNode(
-            "master", null);
+    private static final TestResult NODE_1_MAP_1 = new TestResult("master",
+            null, null);
 
-    private static final TestResultNode NODE_1_MAP_3 = new TestResultNode(
-            "4cb3b283449c3f180c2d5e7de5a7a1c4ec6f220b", null);
-    private static final TestResultNode NODE_2_MAP_3 = new TestResultNode(
-            "d3885c6b2054d27e7c7f011b72151db54dfa7f2e", null);
-    private static final TestResultNode NODE_3_MAP_3 = new TestResultNode(
-            "master", null);
+    private static final TestResult NODE_1_MAP_2 = new TestResult(
+            "88cb3de667c0de7c18710d011a2357b0fa81f5b9", null, null);
+    private static final TestResult NODE_2_MAP_2 = new TestResult("master",
+            null, null);
 
-    private static final TestResultNode NODE_1_MAP_4 = new TestResultNode(
-            "ce23b5c98d6d6379998b466b1f75cb8cd11a305e", null);
-    private static final TestResultNode NODE_2_MAP_4 = new TestResultNode(
-            "cf3709a5b0a02e2a4db8188908210f1e021bc749", null);
-    private static final TestResultNode NODE_3_MAP_4 = new TestResultNode(
-            "6a33c575386da5056f4c9fef4fbd2ceb903a33da", null);
-    private static final TestResultNode NODE_4_MAP_4 = new TestResultNode(
-            "master", null);
+    private static final TestResult NODE_1_MAP_3 = new TestResult(
+            "4cb3b283449c3f180c2d5e7de5a7a1c4ec6f220b", null, null);
+    private static final TestResult NODE_2_MAP_3 = new TestResult(
+            "d3885c6b2054d27e7c7f011b72151db54dfa7f2e", null, null);
+    private static final TestResult NODE_3_MAP_3 = new TestResult("master",
+            null, null);
 
-    private static final TestResultNode NODE_1_MAP_5 = new TestResultNode(
-            "05475b452fe2c26f42515ed3cba4fa169bef8700", null);
-    private static final TestResultNode NODE_2_MAP_5 = new TestResultNode(
-            "4c7f7bd25c0738087f4839624576749161224930", null);
-    private static final TestResultNode NODE_3_MAP_5 = new TestResultNode(
-            "3bfa3dabf0b67b740522a650a9f18adc521fb588", null);
-    private static final TestResultNode NODE_4_MAP_5 = new TestResultNode(
-            "f4f5b80555533b32e411784b1ced71a18e12f5cd", null);
-    private static final TestResultNode NODE_5_MAP_5 = new TestResultNode(
-            "29e5218f558665a8380eb2ebc8c99bb289171472", null);
-    private static final TestResultNode NODE_6_MAP_5 = new TestResultNode(
-            "master", null);
+    private static final TestResult NODE_1_MAP_4 = new TestResult(
+            "ce23b5c98d6d6379998b466b1f75cb8cd11a305e", null, null);
+    private static final TestResult NODE_2_MAP_4 = new TestResult(
+            "cf3709a5b0a02e2a4db8188908210f1e021bc749", null, null);
+    private static final TestResult NODE_3_MAP_4 = new TestResult(
+            "6a33c575386da5056f4c9fef4fbd2ceb903a33da", null, null);
+    private static final TestResult NODE_4_MAP_4 = new TestResult("master",
+            null, null);
 
-    private static final List<TestResultNode> PARENTS_1_MAP_1 = new ArrayList<TestResultNode>();
+    private static final TestResult NODE_1_MAP_5 = new TestResult(
+            "05475b452fe2c26f42515ed3cba4fa169bef8700", null, null);
+    private static final TestResult NODE_2_MAP_5 = new TestResult(
+            "4c7f7bd25c0738087f4839624576749161224930", null, null);
+    private static final TestResult NODE_3_MAP_5 = new TestResult(
+            "3bfa3dabf0b67b740522a650a9f18adc521fb588", null, null);
+    private static final TestResult NODE_4_MAP_5 = new TestResult(
+            "f4f5b80555533b32e411784b1ced71a18e12f5cd", null, null);
+    private static final TestResult NODE_5_MAP_5 = new TestResult(
+            "29e5218f558665a8380eb2ebc8c99bb289171472", null, null);
+    private static final TestResult NODE_6_MAP_5 = new TestResult("master",
+            null, null);
 
-    private static final List<TestResultNode> PARENTS_1_MAP_2 = new ArrayList<TestResultNode>();
-    private static final List<TestResultNode> PARENTS_2_MAP_2 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_1_MAP_1 = new ArrayList<TestResult>();
+
+    private static final List<TestResult> PARENTS_1_MAP_2 = new ArrayList<TestResult>();
+    private static final List<TestResult> PARENTS_2_MAP_2 = new ArrayList<TestResult>();
     static {
         PARENTS_2_MAP_2.add(NODE_1_MAP_2);
     }
 
-    private static final List<TestResultNode> PARENTS_1_MAP_3 = new ArrayList<TestResultNode>();
-    private static final List<TestResultNode> PARENTS_2_MAP_3 = new ArrayList<TestResultNode>();
-    private static final List<TestResultNode> PARENTS_3_MAP_3 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_1_MAP_3 = new ArrayList<TestResult>();
+    private static final List<TestResult> PARENTS_2_MAP_3 = new ArrayList<TestResult>();
+    private static final List<TestResult> PARENTS_3_MAP_3 = new ArrayList<TestResult>();
     static {
         PARENTS_2_MAP_3.add(NODE_1_MAP_3);
         PARENTS_3_MAP_3.add(NODE_2_MAP_3);
     }
 
-    private static final List<TestResultNode> PARENTS_1_MAP_4 = new ArrayList<TestResultNode>();
-    private static final List<TestResultNode> PARENTS_2_MAP_4 = new ArrayList<TestResultNode>();
-    private static final List<TestResultNode> PARENTS_3_MAP_4 = new ArrayList<TestResultNode>();
-    private static final List<TestResultNode> PARENTS_4_MAP_4 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_1_MAP_4 = new ArrayList<TestResult>();
+    private static final List<TestResult> PARENTS_2_MAP_4 = new ArrayList<TestResult>();
+    private static final List<TestResult> PARENTS_3_MAP_4 = new ArrayList<TestResult>();
+    private static final List<TestResult> PARENTS_4_MAP_4 = new ArrayList<TestResult>();
     static {
         PARENTS_2_MAP_4.add(NODE_1_MAP_4);
         PARENTS_3_MAP_4.add(NODE_1_MAP_4);
@@ -91,12 +93,12 @@ public class HistoryGraphTest {
         PARENTS_4_MAP_4.add(NODE_2_MAP_4);
     }
 
-    private static final List<TestResultNode> PARENTS_1_MAP_5 = new ArrayList<TestResultNode>();
-    private static final List<TestResultNode> PARENTS_2_MAP_5 = new ArrayList<TestResultNode>();
-    private static final List<TestResultNode> PARENTS_3_MAP_5 = new ArrayList<TestResultNode>();
-    private static final List<TestResultNode> PARENTS_4_MAP_5 = new ArrayList<TestResultNode>();
-    private static final List<TestResultNode> PARENTS_5_MAP_5 = new ArrayList<TestResultNode>();
-    private static final List<TestResultNode> PARENTS_6_MAP_5 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_1_MAP_5 = new ArrayList<TestResult>();
+    private static final List<TestResult> PARENTS_2_MAP_5 = new ArrayList<TestResult>();
+    private static final List<TestResult> PARENTS_3_MAP_5 = new ArrayList<TestResult>();
+    private static final List<TestResult> PARENTS_4_MAP_5 = new ArrayList<TestResult>();
+    private static final List<TestResult> PARENTS_5_MAP_5 = new ArrayList<TestResult>();
+    private static final List<TestResult> PARENTS_6_MAP_5 = new ArrayList<TestResult>();
     static {
         PARENTS_2_MAP_5.add(NODE_1_MAP_5);
         PARENTS_3_MAP_5.add(NODE_1_MAP_5);
@@ -107,25 +109,25 @@ public class HistoryGraphTest {
         PARENTS_6_MAP_5.add(NODE_4_MAP_5);
     }
 
-    private static final Map<TestResultNode, List<TestResultNode>> MAP_NODE_PARENTS_1 = new HashMap<TestResultNode, List<TestResultNode>>();
+    private static final Map<TestResult, List<TestResult>> MAP_NODE_PARENTS_1 = new HashMap<TestResult, List<TestResult>>();
     static {
         MAP_NODE_PARENTS_1.put(NODE_1_MAP_1, PARENTS_1_MAP_1);
     }
 
-    private static final Map<TestResultNode, List<TestResultNode>> MAP_NODE_PARENTS_2 = new HashMap<TestResultNode, List<TestResultNode>>();
+    private static final Map<TestResult, List<TestResult>> MAP_NODE_PARENTS_2 = new HashMap<TestResult, List<TestResult>>();
     static {
         MAP_NODE_PARENTS_2.put(NODE_1_MAP_2, PARENTS_1_MAP_2);
         MAP_NODE_PARENTS_2.put(NODE_2_MAP_2, PARENTS_2_MAP_2);
     }
 
-    private static final Map<TestResultNode, List<TestResultNode>> MAP_NODE_PARENTS_3 = new HashMap<TestResultNode, List<TestResultNode>>();
+    private static final Map<TestResult, List<TestResult>> MAP_NODE_PARENTS_3 = new HashMap<TestResult, List<TestResult>>();
     static {
         MAP_NODE_PARENTS_3.put(NODE_1_MAP_3, PARENTS_1_MAP_3);
         MAP_NODE_PARENTS_3.put(NODE_2_MAP_3, PARENTS_2_MAP_3);
         MAP_NODE_PARENTS_3.put(NODE_3_MAP_3, PARENTS_3_MAP_3);
     }
 
-    private static final Map<TestResultNode, List<TestResultNode>> MAP_NODE_PARENTS_4 = new HashMap<TestResultNode, List<TestResultNode>>();
+    private static final Map<TestResult, List<TestResult>> MAP_NODE_PARENTS_4 = new HashMap<TestResult, List<TestResult>>();
     static {
         MAP_NODE_PARENTS_4.put(NODE_1_MAP_4, PARENTS_1_MAP_4);
         MAP_NODE_PARENTS_4.put(NODE_2_MAP_4, PARENTS_2_MAP_4);
@@ -133,7 +135,7 @@ public class HistoryGraphTest {
         MAP_NODE_PARENTS_4.put(NODE_4_MAP_4, PARENTS_4_MAP_4);
     }
 
-    private static final Map<TestResultNode, List<TestResultNode>> MAP_NODE_PARENTS_5 = new HashMap<TestResultNode, List<TestResultNode>>();
+    private static final Map<TestResult, List<TestResult>> MAP_NODE_PARENTS_5 = new HashMap<TestResult, List<TestResult>>();
     static {
         MAP_NODE_PARENTS_5.put(NODE_1_MAP_5, PARENTS_1_MAP_5);
         MAP_NODE_PARENTS_5.put(NODE_2_MAP_5, PARENTS_2_MAP_5);
@@ -179,16 +181,16 @@ public class HistoryGraphTest {
     }
 
     /* node1 in graph1 */
-    private static final TestResultNode NODE_1_1 = new TestResultNode("1",
-            new TestResult(ALL_TESTS_1, FAILURES_1_1));
+    private static final TestResult NODE_1_1 = new TestResult("1", ALL_TESTS_1,
+            FAILURES_1_1);
     /* node2 in graph1 */
-    private static final TestResultNode NODE_2_1 = new TestResultNode("2",
-            new TestResult(ALL_TESTS_1, FAILURES_2_1));
+    private static final TestResult NODE_2_1 = new TestResult("2", ALL_TESTS_1,
+            FAILURES_2_1);
 
     /* parents of node1 in graph1 */
-    private static final List<TestResultNode> PARENTS_1_1 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_1_1 = new ArrayList<TestResult>();
     /* parents of node2 in graph1 */
-    private static final List<TestResultNode> PARENTS_2_1 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_2_1 = new ArrayList<TestResult>();
     static {
         PARENTS_2_1.add(NODE_1_1);
     }
@@ -225,24 +227,24 @@ public class HistoryGraphTest {
     }
 
     /* node1 in graph2 */
-    private static final TestResultNode NODE_1_2 = new TestResultNode("1",
-            new TestResult(ALL_TESTS_2, FAILURES_1_2));
+    private static final TestResult NODE_1_2 = new TestResult("1", ALL_TESTS_2,
+            FAILURES_1_2);
     /* node2 in graph2 */
-    private static final TestResultNode NODE_2_2 = new TestResultNode("2",
-            new TestResult(ALL_TESTS_2, FAILURES_2_2));
+    private static final TestResult NODE_2_2 = new TestResult("2", ALL_TESTS_2,
+            FAILURES_2_2);
     /* node3 in graph2 */
-    private static final TestResultNode NODE_3_2 = new TestResultNode("3",
-            new TestResult(ALL_TESTS_2, FAILURES_3_2));
+    private static final TestResult NODE_3_2 = new TestResult("3", ALL_TESTS_2,
+            FAILURES_3_2);
 
     /* parents of node1 in graph2 */
-    private static final List<TestResultNode> PARENTS_1_2 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_1_2 = new ArrayList<TestResult>();
     /* parents of node2 in graph2 */
-    private static final List<TestResultNode> PARENTS_2_2 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_2_2 = new ArrayList<TestResult>();
     static {
         PARENTS_2_2.add(NODE_1_2);
     }
     /* parents of node3 in graph2 */
-    private static final List<TestResultNode> PARENTS_3_2 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_3_2 = new ArrayList<TestResult>();
     static {
         PARENTS_3_2.add(NODE_2_2);
     }
@@ -306,32 +308,32 @@ public class HistoryGraphTest {
     }
 
     /* node1 in graph3 */
-    private static final TestResultNode NODE_1_3 = new TestResultNode("1",
-            new TestResult(ALL_TESTS_3, FAILURES_1_3));
+    private static final TestResult NODE_1_3 = new TestResult("1", ALL_TESTS_3,
+            FAILURES_1_3);
     /* node2 in graph3 */
-    private static final TestResultNode NODE_2_3 = new TestResultNode("2",
-            new TestResult(ALL_TESTS_3, FAILURES_2_3));
+    private static final TestResult NODE_2_3 = new TestResult("2", ALL_TESTS_3,
+            FAILURES_2_3);
     /* node3 in graph3 */
-    private static final TestResultNode NODE_3_3 = new TestResultNode("3",
-            new TestResult(ALL_TESTS_3, FAILURES_3_3));
+    private static final TestResult NODE_3_3 = new TestResult("3", ALL_TESTS_3,
+            FAILURES_3_3);
     /* node4 in graph3 */
-    private static final TestResultNode NODE_4_3 = new TestResultNode("4",
-            new TestResult(ALL_TESTS_3, FAILURES_4_3));
+    private static final TestResult NODE_4_3 = new TestResult("4", ALL_TESTS_3,
+            FAILURES_4_3);
 
     /* parents of node1 in graph3 */
-    private static final List<TestResultNode> PARENTS_1_3 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_1_3 = new ArrayList<TestResult>();
     /* parents of node2 in graph3 */
-    private static final List<TestResultNode> PARENTS_2_3 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_2_3 = new ArrayList<TestResult>();
     static {
         PARENTS_2_3.add(NODE_1_3);
     }
     /* parents of node3 in graph3 */
-    private static final List<TestResultNode> PARENTS_3_3 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_3_3 = new ArrayList<TestResult>();
     static {
         PARENTS_3_3.add(NODE_1_3);
     }
     /* parents of node4 in graph3 */
-    private static final List<TestResultNode> PARENTS_4_3 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_4_3 = new ArrayList<TestResult>();
     static {
         PARENTS_4_3.add(NODE_3_3);
         PARENTS_4_3.add(NODE_2_3);
@@ -427,57 +429,57 @@ public class HistoryGraphTest {
     private static final Set<String> FAILURES_7_4 = new HashSet<String>();
 
     /* node1 in graph4 */
-    private static final TestResultNode NODE_1_4 = new TestResultNode("1",
-            new TestResult(ALL_TESTS_4, FAILURES_1_4));
+    private static final TestResult NODE_1_4 = new TestResult("1", ALL_TESTS_4,
+            FAILURES_1_4);
     /* node2 in graph4 */
-    private static final TestResultNode NODE_2_4 = new TestResultNode("2",
-            new TestResult(ALL_TESTS_4, FAILURES_2_4));
+    private static final TestResult NODE_2_4 = new TestResult("2", ALL_TESTS_4,
+            FAILURES_2_4);
     /* node3 in graph4 */
-    private static final TestResultNode NODE_3_4 = new TestResultNode("3",
-            new TestResult(ALL_TESTS_4, FAILURES_3_4));
+    private static final TestResult NODE_3_4 = new TestResult("3", ALL_TESTS_4,
+            FAILURES_3_4);
     /* node4 in graph4 */
-    private static final TestResultNode NODE_4_4 = new TestResultNode("4",
-            new TestResult(ALL_TESTS_4, FAILURES_4_4));
+    private static final TestResult NODE_4_4 = new TestResult("4", ALL_TESTS_4,
+            FAILURES_4_4);
     /* node5 in graph4 */
-    private static final TestResultNode NODE_5_4 = new TestResultNode("5",
-            new TestResult(ALL_TESTS_4, FAILURES_5_4));
+    private static final TestResult NODE_5_4 = new TestResult("5", ALL_TESTS_4,
+            FAILURES_5_4);
     /* node6 in graph4 */
-    private static final TestResultNode NODE_6_4 = new TestResultNode("6",
-            new TestResult(ALL_TESTS_4, FAILURES_6_4));
+    private static final TestResult NODE_6_4 = new TestResult("6", ALL_TESTS_4,
+            FAILURES_6_4);
     /* node7 in graph4 */
-    private static final TestResultNode NODE_7_4 = new TestResultNode("7",
-            new TestResult(ALL_TESTS_4, FAILURES_7_4));
+    private static final TestResult NODE_7_4 = new TestResult("7", ALL_TESTS_4,
+            FAILURES_7_4);
 
     /* parents of node1 in graph4 */
-    private static final List<TestResultNode> PARENTS_1_4 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_1_4 = new ArrayList<TestResult>();
     /* parents of node2 in graph4 */
-    private static final List<TestResultNode> PARENTS_2_4 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_2_4 = new ArrayList<TestResult>();
     static {
         PARENTS_2_4.add(NODE_1_4);
     }
     /* parents of node3 in graph4 */
-    private static final List<TestResultNode> PARENTS_3_4 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_3_4 = new ArrayList<TestResult>();
     static {
         PARENTS_3_4.add(NODE_2_4);
     }
     /* parents of node4 in graph4 */
-    private static final List<TestResultNode> PARENTS_4_4 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_4_4 = new ArrayList<TestResult>();
     static {
         PARENTS_4_4.add(NODE_2_4);
     }
     /* parents of node5 in graph4 */
-    private static final List<TestResultNode> PARENTS_5_4 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_5_4 = new ArrayList<TestResult>();
     static {
         PARENTS_5_4.add(NODE_4_4);
         PARENTS_5_4.add(NODE_3_4);
     }
     /* parents of node6 in graph4 */
-    private static final List<TestResultNode> PARENTS_6_4 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_6_4 = new ArrayList<TestResult>();
     static {
         PARENTS_6_4.add(NODE_1_4);
     }
     /* parents of node7 in graph4 */
-    private static final List<TestResultNode> PARENTS_7_4 = new ArrayList<TestResultNode>();
+    private static final List<TestResult> PARENTS_7_4 = new ArrayList<TestResult>();
     static {
         PARENTS_7_4.add(NODE_6_4);
         PARENTS_7_4.add(NODE_5_4);
@@ -731,14 +733,14 @@ public class HistoryGraphTest {
     }
 
     private void checkHistoryGraph(String dir,
-            Map<TestResultNode, List<TestResultNode>> map) {
+            Map<TestResult, List<TestResult>> map) {
         Repository repo = new Repository(new File(dir));
         HistoryGraph graph = new HistoryGraph(repo);
 
-        Iterator<TestResultNode> itr = graph.getNodeIterator();
+        Iterator<TestResult> itr = graph.getNodeIterator();
         while (itr.hasNext()) {
-            TestResultNode node = itr.next();
-            List<TestResultNode> parents = graph.getParents(node);
+            TestResult node = itr.next();
+            List<TestResult> parents = graph.getParents(node);
 
             assertTrue(map.containsKey(node));
             assertEquals(map.get(node), parents);

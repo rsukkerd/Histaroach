@@ -142,7 +142,8 @@ public class ProcessResultTest {
             failures.add(test);
         }
 
-        TestResult expectedTestResult = new TestResult(allTests, failures);
+        TestResult expectedTestResult = new TestResult("master", allTests,
+                failures);
         Repository repo = new Repository(directory);
 
         TestResult actualTestResult = repo.getTestResult("master");

@@ -28,26 +28,26 @@ public final class RepositoryBuilder {
 
         int commitCount = 0;
 
-        TestResultNode startNode = new TestResultNode(repo, commit);
+        TestResult startNode = repo.getTestResult(commit);
 
-        Queue<TestResultNode> q = new LinkedList<TestResultNode>();
+        Queue<TestResult> q = new LinkedList<TestResult>();
         q.add(startNode);
 
         Set<String> visited = new HashSet<String>();
         visited.add(commit);
 
         while (!q.isEmpty()) {
-            TestResultNode next = q.poll();
+            TestResult next = q.poll();
             printInProgress(next.getCommit(), PROCESSING_PARENTS);
 
             // process 'next'
             String currCommit = next.getCommit();
             List<String> parentCommits = repo.getParentCommits(currCommit);
 
-            List<TestResultNode> parents = new ArrayList<TestResultNode>();
+            List<TestResult> parents = new ArrayList<TestResult>();
 
             for (String parentCommit : parentCommits) {
-                TestResultNode parent = new TestResultNode(repo, parentCommit);
+                TestResult parent = repo.getTestResult(parentCommit);
                 parents.add(parent);
 
                 if (!visited.contains(parentCommit)) {
@@ -72,7 +72,7 @@ public final class RepositoryBuilder {
         System.out.println(message + " " + commit);
     }
 
-    private static void printCommitCompleted(TestResultNode node, int count) {
+    private static void printCommitCompleted(TestResult node, int count) {
         System.out.println("Completed this commit and its parents");
         System.out.println("(" + count + ") " + node);
     }
@@ -81,11 +81,11 @@ public final class RepositoryBuilder {
      * check if a test suddenly fails ie. the test passes in 'parent' but fails
      * in 'node' find diff files between node and parent
      */
-    public static void checkSuddenFail(Repository repo, TestResultNode node,
-            TestResultNode parent) {
+    public static void checkSuddenFail(Repository repo, TestResult node,
+            TestResult parent) {
         Map<Difference, List<String>> diffCache = new HashMap<Difference, List<String>>();
 
-        for (String test : node.getTestResult().getAllTests()) {
+        for (String test : node.getAllTests()) {
             if (node.fail(test) && parent.pass(test)) {
                 Difference dummyDiff = new Difference(node, parent, null);
                 List<String> changedFiles = null;
