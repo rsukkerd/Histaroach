@@ -6,7 +6,6 @@ import java.util.Set;
 
 import common.BugFix;
 import common.HistoryGraph;
-import common.HistoryGraphBuilder;
 import common.ParallelFixesFinder;
 import common.Repository;
 
@@ -48,7 +47,7 @@ public class ParallelBugFixesFinder {
 
         Repository repo = new Repository(new File(repositoryDirName));
 
-        HistoryGraph historyGraph = HistoryGraphBuilder.buildHistoryGraph(repo);
+        HistoryGraph historyGraph = new HistoryGraph(repo);
 
         Map<String, Set<BugFix>> bugFixMap = ParallelFixesFinder
                 .findParallelFixes(historyGraph);

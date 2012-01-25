@@ -16,12 +16,11 @@ import org.junit.Test;
 
 import common.BugFix;
 import common.HistoryGraph;
-import common.HistoryGraphBuilder;
 import common.Repository;
 import common.TestResult;
 import common.TestResultNode;
 
-public class HistoryGraphBuilderTest {
+public class HistoryGraphTest {
     private static final String DIR_1 = "test/sample/sample1";
     private static final String DIR_2 = "test/sample/sample2";
     private static final String DIR_3 = "test/sample/sample3";
@@ -734,7 +733,7 @@ public class HistoryGraphBuilderTest {
     private void checkHistoryGraph(String dir,
             Map<TestResultNode, List<TestResultNode>> map) {
         Repository repo = new Repository(new File(dir));
-        HistoryGraph graph = HistoryGraphBuilder.buildHistoryGraph(repo);
+        HistoryGraph graph = new HistoryGraph(repo);
 
         Iterator<TestResultNode> itr = graph.getNodeIterator();
         while (itr.hasNext()) {
@@ -752,7 +751,7 @@ public class HistoryGraphBuilderTest {
         graph.addNode(NODE_1_1, PARENTS_1_1);
         graph.addNode(NODE_2_1, PARENTS_2_1);
 
-        HistoryGraphBuilder.addBugFixesInfo(graph, NODE_2_1);
+        graph.addBugFixesInfo(NODE_2_1);
         checkBugFixes(EXPECTED_BUG_FIXES_1, graph);
     }
 
@@ -763,7 +762,7 @@ public class HistoryGraphBuilderTest {
         graph.addNode(NODE_2_2, PARENTS_2_2);
         graph.addNode(NODE_3_2, PARENTS_3_2);
 
-        HistoryGraphBuilder.addBugFixesInfo(graph, NODE_3_2);
+        graph.addBugFixesInfo(NODE_3_2);
         checkBugFixes(EXPECTED_BUG_FIXES_2, graph);
     }
 
@@ -775,7 +774,7 @@ public class HistoryGraphBuilderTest {
         graph.addNode(NODE_3_3, PARENTS_3_3);
         graph.addNode(NODE_4_3, PARENTS_4_3);
 
-        HistoryGraphBuilder.addBugFixesInfo(graph, NODE_4_3);
+        graph.addBugFixesInfo(NODE_4_3);
         checkBugFixes(EXPECTED_BUG_FIXES_3, graph);
     }
 
@@ -790,7 +789,7 @@ public class HistoryGraphBuilderTest {
         graph.addNode(NODE_6_4, PARENTS_6_4);
         graph.addNode(NODE_7_4, PARENTS_7_4);
 
-        HistoryGraphBuilder.addBugFixesInfo(graph, NODE_7_4);
+        graph.addBugFixesInfo(NODE_7_4);
         checkBugFixes(EXPECTED_BUG_FIXES_4, graph);
     }
 
