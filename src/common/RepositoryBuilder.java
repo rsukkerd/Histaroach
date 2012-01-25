@@ -16,8 +16,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
-
 public final class RepositoryBuilder {
     private static final String[] ALL_TESTS_CMD = { "ant", "junit" };
     private static final String SINGLE_TEST_CMD = "ant junit-test -Dtest.name=";
@@ -33,7 +31,7 @@ public final class RepositoryBuilder {
      */
     public static Repository buildRepository(String path, String commit) {
         File directory = new File(path);
-        Repository repository = new Repository();
+        Repository repository = new Repository(directory);
 
         int commitCount = 0;
 
