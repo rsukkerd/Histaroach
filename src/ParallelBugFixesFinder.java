@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -7,6 +8,7 @@ import common.BugFix;
 import common.HistoryGraph;
 import common.HistoryGraphBuilder;
 import common.ParallelFixesFinder;
+import common.Repository;
 
 import plume.Option;
 import plume.OptionGroup;
@@ -44,8 +46,9 @@ public class ParallelBugFixesFinder {
             return;
         }
 
-        HistoryGraph historyGraph = HistoryGraphBuilder
-                .buildHistoryGraph(repositoryDirName);
+        Repository repo = new Repository(new File(repositoryDirName));
+
+        HistoryGraph historyGraph = HistoryGraphBuilder.buildHistoryGraph(repo);
 
         Map<String, Set<BugFix>> bugFixMap = ParallelFixesFinder
                 .findParallelFixes(historyGraph);

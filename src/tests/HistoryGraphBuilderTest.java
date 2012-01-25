@@ -3,6 +3,7 @@ package tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,6 +17,7 @@ import org.junit.Test;
 import common.BugFix;
 import common.HistoryGraph;
 import common.HistoryGraphBuilder;
+import common.Repository;
 import common.TestResult;
 import common.TestResultNode;
 
@@ -731,7 +733,8 @@ public class HistoryGraphBuilderTest {
 
     private void checkHistoryGraph(String dir,
             Map<TestResultNode, List<TestResultNode>> map) {
-        HistoryGraph graph = HistoryGraphBuilder.buildHistoryGraph(dir);
+        Repository repo = new Repository(new File(dir));
+        HistoryGraph graph = HistoryGraphBuilder.buildHistoryGraph(repo);
 
         Iterator<TestResultNode> itr = graph.getNodeIterator();
         while (itr.hasNext()) {

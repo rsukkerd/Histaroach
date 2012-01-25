@@ -1,34 +1,26 @@
 package common;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.Scanner;
 import java.util.Set;
 
 public final class HistoryGraphBuilder {
-    private static final String[] TEST_CMD = { "ant", "junit" };
 
     /**
      * @param repoDir
      *            : full path to directory of the repository
      * @return HistoryGraph of the repository
      */
-    public static HistoryGraph buildHistoryGraph(String repoDir) {
-        File directory = new File(repoDir);
-        Repository repo = new Repository(directory);
+    public static HistoryGraph buildHistoryGraph(Repository repo) {
 
         HistoryGraph historyGraph = new HistoryGraph();
 
         int commitCount = 0;
 
-        TestResultNode masterNode = getTestResultNode(repo, "master");
+        TestResultNode masterNode = new TestResultNode(repo, "master");
 
         Queue<TestResultNode> q = new LinkedList<TestResultNode>();
         q.add(masterNode);
@@ -41,12 +33,12 @@ public final class HistoryGraphBuilder {
 
             // process 'next'
             String currCommit = next.getCommit();
-            List<String> parentCommits = getParentCommits(directory, currCommit);
+            List<String> parentCommits = repo.getParentCommits(currCommit);
 
             List<TestResultNode> parents = new ArrayList<TestResultNode>();
 
             for (String parentCommit : parentCommits) {
-                TestResultNode parent = getTestResultNode(repo, parentCommit);
+                TestResultNode parent = new TestResultNode(repo, parentCommit);
                 parents.add(parent);
 
                 if (!visited.contains(parentCommit)) {
@@ -130,78 +122,6 @@ public final class HistoryGraphBuilder {
                 historyGraph.addBugFix(bug, bugFix);
             }
         }
-    }
-
-    private static void checkoutCommit(File directory, String commit) {
-        ProcessBuilder checkoutBuilder = new ProcessBuilder("git", "checkout",
-                commit);
-        checkoutBuilder.directory(directory);
-
-        try {
-            Process checkoutProcess = checkoutBuilder.start();
-
-            try {
-                // make current thread waits until this process terminates
-                checkoutProcess.waitFor();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
-    }
-
-    /**
-     * @return list of parent commits (Strings) of this commit
-     */
-    private static List<String> getParentCommits(File directory, String commit) {
-        checkoutCommit(directory, commit);
-
-        ProcessBuilder logBuilder = new ProcessBuilder("git", "log",
-                "--parents", "-1");
-        logBuilder.directory(directory);
-
-        List<String> parentCommits = new ArrayList<String>();
-
-        try {
-            Process logProcess = logBuilder.start();
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    logProcess.getInputStream()));
-
-            String parentsLine = reader.readLine();
-
-            Scanner scanner = new Scanner(parentsLine);
-            scanner.next(); // "commit"
-            scanner.next(); // this commit
-            while (scanner.hasNext()) // parent commits
-            {
-                parentCommits.add(scanner.next());
-            }
-
-            try {
-                // make current thread waits until this process terminates
-                logProcess.waitFor();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return parentCommits;
-    }
-
-    /**
-     * @return TestResultNode representing the commit
-     */
-    private static TestResultNode getTestResultNode(Repository repo,
-            String commit) {
-        TestResult result = repo.getTestResult(commit);
-        TestResultNode testResultNode = new TestResultNode(commit, result);
-
-        return testResultNode;
     }
 
     private static void printProgress(TestResultNode node, int count) {

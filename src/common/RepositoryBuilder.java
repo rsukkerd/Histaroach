@@ -17,7 +17,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class RepositoryBuilder {
-    private static final String[] ALL_TESTS_CMD = { "ant", "junit" };
     private static final String SINGLE_TEST_CMD = "ant junit-test -Dtest.name=";
     private static final String PROCESSING_COMMIT = "Processing commit";
     private static final String PROCESSING_PARENTS = "Processing parents of commit";
@@ -31,11 +30,11 @@ public final class RepositoryBuilder {
      */
     public static Repository buildRepository(String path, String commit) {
         File directory = new File(path);
-        Repository repository = new Repository(directory);
+        Repository repo = new Repository(directory);
 
         int commitCount = 0;
 
-        TestResultNode startNode = getTestResultNode(directory, commit);
+        TestResultNode startNode = new TestResultNode(repo, commit);
 
         Queue<TestResultNode> q = new LinkedList<TestResultNode>();
         q.add(startNode);
@@ -54,8 +53,7 @@ public final class RepositoryBuilder {
             List<TestResultNode> parents = new ArrayList<TestResultNode>();
 
             for (String parentCommit : parentCommits) {
-                TestResultNode parent = getTestResultNode(directory,
-                        parentCommit);
+                TestResultNode parent = new TestResultNode(repo, parentCommit);
                 parents.add(parent);
 
                 if (!visited.contains(parentCommit)) {
@@ -67,13 +65,13 @@ public final class RepositoryBuilder {
                 checkSuddenFail(directory, next, parent);
             }
             // add 'next' to repository
-            repository.addNode(next, parents);
+            repo.addNode(next, parents);
 
             commitCount++;
             printCommitCompleted(next, commitCount);
         }
 
-        return repository;
+        return repo;
     }
 
     /**
@@ -147,22 +145,6 @@ public final class RepositoryBuilder {
         }
 
         return parentCommits;
-    }
-
-    /**
-     * @param directory
-     *            : directory of the repository
-     * @param commit
-     *            : commit id
-     * @return TestResultNode representing the commit
-     */
-    public static TestResultNode getTestResultNode(File directory, String commit) {
-        printInProgress(commit, PROCESSING_COMMIT);
-
-        TestResult result = getTestResult(directory, commit, ALL_TESTS_CMD);
-        TestResultNode testResultNode = new TestResultNode(commit, result);
-
-        return testResultNode;
     }
 
     /**

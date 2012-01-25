@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 import voldemort.VoldemortTestResult;
 
@@ -164,5 +165,46 @@ public class Repository {
      */
     public Iterator<TestResultNode> getChildrenIterator(TestResultNode node) {
         return nodeToChildren.get(node).iterator();
+    }
+
+    /**
+     * @return list of parent commits (Strings) of this commit
+     */
+    public List<String> getParentCommits(String commit) {
+        checkoutCommit(commit);
+
+        ProcessBuilder logBuilder = new ProcessBuilder("git", "log",
+                "--parents", "-1");
+        logBuilder.directory(repositoryDir);
+
+        List<String> parentCommits = new ArrayList<String>();
+
+        try {
+            Process logProcess = logBuilder.start();
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    logProcess.getInputStream()));
+
+            String parentsLine = reader.readLine();
+
+            Scanner scanner = new Scanner(parentsLine);
+            scanner.next(); // "commit"
+            scanner.next(); // this commit
+            while (scanner.hasNext()) // parent commits
+            {
+                parentCommits.add(scanner.next());
+            }
+
+            try {
+                // make current thread waits until this process terminates
+                logProcess.waitFor();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return parentCommits;
     }
 }
