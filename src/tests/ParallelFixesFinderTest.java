@@ -13,7 +13,6 @@ import org.junit.Test;
 
 import common.BugFix;
 import common.HistoryGraph;
-import common.ParallelFixesFinder;
 import common.TestResult;
 import common.TestResultNode;
 
@@ -410,8 +409,7 @@ public class ParallelFixesFinderTest {
 
     private void checkParallelFixes(Map<String, Set<BugFix>> expected,
             HistoryGraph graph) {
-        Map<String, Set<BugFix>> actual = ParallelFixesFinder
-                .findParallelFixes(graph);
+        Map<String, Set<BugFix>> actual = graph.findParallelFixes();
         assertEquals(expected, actual);
     }
 }

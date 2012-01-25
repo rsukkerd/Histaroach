@@ -124,6 +124,46 @@ public class HistoryGraph {
         }
     }
 
+    /**
+     * @param hGraph
+     * @return mapping from bug to BugFixes that fix the bug in parallel
+     */
+    public Map<String, Set<BugFix>> findParallelFixes() {
+        Map<String, Set<BugFix>> map = new HashMap<String, Set<BugFix>>();
+
+        Iterator<String> bugItr = getBugIterator();
+
+        while (bugItr.hasNext()) {
+            String bug = bugItr.next();
+            List<BugFix> bugFixes = getBugFixList(bug);
+
+            for (int i = 0; i < bugFixes.size() - 1; i++) {
+                for (int j = i + 1; j < bugFixes.size(); j++) {
+                    BugFix fix_A = bugFixes.get(i);
+                    BugFix fix_B = bugFixes.get(j);
+
+                    TestResultNode node_A = fix_A.getNodePass();
+                    TestResultNode node_B = fix_B.getNodePass();
+
+                    if (TestResultNode.areParallel(this, node_A, node_B)) {
+                        if (!map.containsKey(bug)) {
+                            Set<BugFix> parallelFixes = new HashSet<BugFix>();
+                            parallelFixes.add(fix_A);
+                            parallelFixes.add(fix_B);
+
+                            map.put(bug, parallelFixes);
+                        } else {
+                            map.get(bug).add(fix_A);
+                            map.get(bug).add(fix_B);
+                        }
+                    }
+                }
+            }
+        }
+
+        return map;
+    }
+
     private static void printProgress(TestResultNode node, int count) {
         System.out.println("(" + count + ") " + node);
     }

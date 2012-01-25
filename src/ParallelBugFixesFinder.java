@@ -6,7 +6,6 @@ import java.util.Set;
 
 import common.BugFix;
 import common.HistoryGraph;
-import common.ParallelFixesFinder;
 import common.Repository;
 
 import plume.Option;
@@ -31,10 +30,6 @@ public class ParallelBugFixesFinder {
     /** One line synopsis of usage */
     public static final String usage_string = "ParallelBugFixesFinder [options]";
 
-    /**
-     * @param args
-     *            [0] : full path of the repository directory
-     */
     public static void main(String[] args) {
         Options plumeOptions = new Options(ParallelBugFixesFinder.usage_string);
         plumeOptions.parse_or_usage(args);
@@ -49,8 +44,7 @@ public class ParallelBugFixesFinder {
 
         HistoryGraph historyGraph = new HistoryGraph(repo);
 
-        Map<String, Set<BugFix>> bugFixMap = ParallelFixesFinder
-                .findParallelFixes(historyGraph);
+        Map<String, Set<BugFix>> bugFixMap = historyGraph.findParallelFixes();
 
         System.out.println("ALL BUG FIXES");
         printAllFixes(historyGraph);
