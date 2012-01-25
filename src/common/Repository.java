@@ -26,11 +26,11 @@ public class Repository {
     /**
      * @return diff files between childCommit and parentCommit
      */
-    public List<String> getChangedFiles(String childCommit, String parentCommit) {
+    public List<String> getChangedFiles(String childCommitID, String parentCommitID) {
         List<String> files = new ArrayList<String>();
 
         ProcessBuilder diffBuilder = new ProcessBuilder("git", "diff",
-                "--name-status", childCommit, parentCommit);
+                "--name-status", childCommitID, parentCommitID);
         diffBuilder.directory(repositoryDir);
 
         try {
@@ -110,15 +110,15 @@ public class Repository {
     /**
      * Checks out a particular commit for this repository.
      * 
-     * @param commit
+     * @param commitID
      *            : commit id
      * @return exit value of 'git checkout' process
      */
-    public int checkoutCommit(String commit) {
+    public int checkoutCommit(String commitID) {
         int exitValue = -1;
 
         ProcessBuilder checkoutBuilder = new ProcessBuilder("git", "checkout",
-                commit);
+                commitID);
         checkoutBuilder.directory(repositoryDir);
 
         try {
@@ -170,8 +170,8 @@ public class Repository {
     /**
      * @return list of parent commits (Strings) of this commit
      */
-    public List<String> getParentCommits(String commit) {
-        checkoutCommit(commit);
+    public List<String> getParentCommits(String commitID) {
+        checkoutCommit(commitID);
 
         ProcessBuilder logBuilder = new ProcessBuilder("git", "log",
                 "--parents", "-1");
