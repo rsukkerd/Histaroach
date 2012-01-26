@@ -9,20 +9,20 @@ import java.util.Set;
  */
 public class TestResult {
 	private final String commitID;
-	private boolean compiled;
+	private boolean compilable;
     private final Set<String> allTests;
     private final Set<String> failedTests;
 
     public TestResult(String commit) {
     	this.commitID = commit;
-    	this.compiled = false;
+    	this.compilable = false;
         this.allTests = new LinkedHashSet<String>();
         this.failedTests = new LinkedHashSet<String>();
     }
 
     public TestResult(String commit, boolean compiled, Set<String> allTests, Set<String> failedTests) {
         this.commitID = commit;
-        this.compiled = compiled;
+        this.compilable = compiled;
         this.allTests = allTests;
         this.failedTests = failedTests;
     }
@@ -35,11 +35,11 @@ public class TestResult {
     }
     
     public void setCompiledFlag(boolean compiled) {
-    	this.compiled = compiled;
+    	this.compilable = compiled;
     }
     
     public boolean compiled() {
-    	return compiled;
+    	return compilable;
     }
 
     public void addTest(String test) {
@@ -87,7 +87,7 @@ public class TestResult {
 
         TestResult result = (TestResult) other;
 
-        return commitID.equals(result.commitID) && compiled == result.compiled 
+        return commitID.equals(result.commitID) && compilable == result.compilable 
         		&&allTests.equals(result.allTests) && failedTests.equals(result.failedTests);
     }
 
@@ -102,13 +102,13 @@ public class TestResult {
             code += (17 * failedTests.hashCode());
         }
         
-        if (compiled) return 7 + code; return code;
+        if (compilable) return 7 + code; return code;
     }
 
     @Override
     public String toString() {
         String result = "compiled? : ";
-        if (compiled) {
+        if (compilable) {
         	result += "yes\n";
         	result += "Tests: \n";
             for (String test : allTests) {

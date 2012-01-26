@@ -12,6 +12,9 @@ public class Revision {
     private final Repository repository;
     private final String commitID;
     private final TestResult testResult;
+    
+    // TODO: describe.
+    // Maps parent commit IDs to list of files that are different between parent and this revision.
     private final Map<String, List<String>> diffFiles;
 
     public Revision(Repository repository, String commitID,

@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class HistoryGraph {
+	// TODO: describe what this map thing is
 	private final Map<String, Revision> map;
 	
 	public HistoryGraph() {
