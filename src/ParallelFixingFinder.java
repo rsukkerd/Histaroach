@@ -1,15 +1,19 @@
-
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import common.BugFix;
 import common.HistoryGraph;
-import common.Repository;
+import common.ParallelFixing;
 
 import plume.Option;
 import plume.OptionGroup;
 import plume.Options;
+import voldemort.ParallelRepository;
 
-public class TestIsolationDataGenerator {
-
+public class ParallelFixingFinder {
     /**
      * Print the short usage message.
      */
@@ -40,7 +44,7 @@ public class TestIsolationDataGenerator {
      */
     @Option(value = "-e Ending commit id")
     public static String endCommitID = null;
-
+    
     /**
      * Full path to the repository directory.
      */
@@ -49,19 +53,10 @@ public class TestIsolationDataGenerator {
     public static String repositoryDirName = null;
 
     /** One line synopsis of usage */
-    public static final String usage_string = "TestIsolationDataGenerator [options]";
+    public static final String usage_string = "ParallelFixingFinder [options]";
 
-    /**
-     * Initial program entrance -- parses the arguments and runs the data
-     * extraction.
-     * 
-     * @param args
-     *            command line arguments.
-     * @throws IOException
-     */
     public static void main(String[] args) throws IOException {
-        Options plumeOptions = new Options(
-                TestIsolationDataGenerator.usage_string);
+        Options plumeOptions = new Options(ParallelFixingFinder.usage_string);
         plumeOptions.parse_or_usage(args);
 
         // Display the help screen.
@@ -70,17 +65,23 @@ public class TestIsolationDataGenerator {
             return;
         }
 
-        HistoryGraph historyGraph = extractData();
+        Set<ParallelFixing> allParallelFixing = findParallelFixing();
     }
-
-    /**
-     * TODO: Add comment.
-     */
-    public static HistoryGraph extractData() throws IOException {
-    	Repository repository = new Repository(repositoryDirName, humanReadOutputFileName);
-    	HistoryGraph historyGraph = repository.buildHistoryGraph(startCommitID, endCommitID);
-    	
-    	return historyGraph;
+    
+    public static Set<ParallelFixing> findParallelFixing() throws IOException {
+    	Set<ParallelFixing> allParallelFixing = new HashSet<ParallelFixing>();
+        
+        ParallelRepository repository = new ParallelRepository(repositoryDirName, humanReadOutputFileName);
+        HistoryGraph historyGraph = repository.buildHistoryGraph(startCommitID, endCommitID);
+        Map<String, List<BugFix>> allBugFixes = repository.getAllBugFixes(historyGraph);
+        
+        for (String bug : allBugFixes.keySet()) {
+        	List<BugFix> allFixes = allBugFixes.get(bug);
+        	ParallelFixing parallelFixing = repository.getParallelFixing(historyGraph, bug, allFixes);
+        	
+        	allParallelFixing.add(parallelFixing);
+        }
+        
+        return allParallelFixing;
     }
-
 }

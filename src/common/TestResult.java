@@ -1,90 +1,53 @@
 package common;
 
-import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
- * TestResult contains 2 lists of names of the tests: list of all tests and list
- * of failed tests
+ * TestResult has a commit id and contains 2 sets of tests: 
+ * a set of all tests and a set of failed tests.
  */
 public class TestResult {
+	private final String commitID;
+	private boolean compiled;
     private final Set<String> allTests;
-    private final Set<String> failures;
-    private final String commit;
+    private final Set<String> failedTests;
 
     public TestResult(String commit) {
+    	this.commitID = commit;
+    	this.compiled = false;
         this.allTests = new LinkedHashSet<String>();
-        this.failures = new LinkedHashSet<String>();
-        this.commit = commit;
+        this.failedTests = new LinkedHashSet<String>();
     }
 
-    public TestResult(String commit, Set<String> allTests, Set<String> failures) {
-        this.commit = commit;
+    public TestResult(String commit, boolean compiled, Set<String> allTests, Set<String> failedTests) {
+        this.commitID = commit;
+        this.compiled = compiled;
         this.allTests = allTests;
-        this.failures = failures;
+        this.failedTests = failedTests;
     }
-
-    /**************************************************/
-
-    /**
-     * @return true iff this node is neither ancestor or descendant of node_B
-     */
-    public boolean isParallelWith(HistoryGraph historyGraph, TestResult node_B) {
-        return !this.equals(node_B) && !this.isAncestorOf(historyGraph, node_B)
-                && !this.isAncestorOf(historyGraph, node_B);
-    }
-
-    /**
-     * @return true iff this node is an ancestor of node_B
-     */
-    public boolean isAncestorOf(HistoryGraph historyGraph, TestResult node_B) {
-        return isAncestorOf(historyGraph, this, node_B,
-                new HashSet<TestResult>());
-
-    }
-
-    /**
-     * @return true iff node_A is an ancestor of node_B
-     */
-    static private boolean isAncestorOf(HistoryGraph historyGraph,
-            TestResult node_A, TestResult node_B, Set<TestResult> visited) {
-        visited.add(node_A);
-
-        List<TestResult> parents = historyGraph.getParents(node_A);
-        for (TestResult parent : parents) {
-            if (parent.equals(node_B)) {
-                return true;
-            }
-        }
-
-        for (TestResult parent : parents) {
-            if (!visited.contains(parent)) {
-                if (isAncestorOf(historyGraph, parent, node_B, visited)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /*************************************************/
 
     /**
      * @return commit string
      */
-    public String getCommit() {
-        return commit;
+    public String getCommitID() {
+        return commitID;
     }
-
-    public void addFailedTest(String test) {
-        failures.add(test);
+    
+    public void setCompiledFlag(boolean compiled) {
+    	this.compiled = compiled;
+    }
+    
+    public boolean compiled() {
+    	return compiled;
     }
 
     public void addTest(String test) {
-        allTests.add(test);
+	    allTests.add(test);
+	}
+
+	public void addFailedTest(String test) {
+        failedTests.add(test);
     }
 
     /**
@@ -97,15 +60,15 @@ public class TestResult {
     /**
      * @return list of names of failed tests
      */
-    public Set<String> getFailures() {
-        return failures;
+    public Set<String> getFailedTests() {
+        return failedTests;
     }
 
     /**
      * @return true iff this node passes the test
      */
     public boolean pass(String test) {
-        return !this.getFailures().contains(test)
+        return !this.getFailedTests().contains(test)
                 && this.getAllTests().contains(test);
     }
 
@@ -113,7 +76,7 @@ public class TestResult {
      * @return true iff this node fails the test
      */
     public boolean fail(String test) {
-        return this.getFailures().contains(test);
+        return this.getFailedTests().contains(test);
     }
 
     @Override
@@ -124,35 +87,40 @@ public class TestResult {
 
         TestResult result = (TestResult) other;
 
-        return commit.equals(result.commit) && allTests.equals(result.allTests)
-                && failures.equals(result.failures);
+        return commitID.equals(result.commitID) && compiled == result.compiled 
+        		&&allTests.equals(result.allTests) && failedTests.equals(result.failedTests);
     }
 
     @Override
     public int hashCode() {
-        int code;
-        code = 11 * commit.hashCode();
+        int code = 11 * commitID.hashCode();
         if (allTests != null) {
             code += (13 * allTests.hashCode());
         }
 
-        if (failures != null) {
-            code += (17 * failures.hashCode());
+        if (failedTests != null) {
+            code += (17 * failedTests.hashCode());
         }
-        return code;
+        
+        if (compiled) return 7 + code; return code;
     }
 
     @Override
     public String toString() {
-        String result = "commit : " + commit + "\n";
-        result += "Tests: \n";
-        for (String test : allTests) {
-            result += test + "\n";
-        }
+        String result = "compiled? : ";
+        if (compiled) {
+        	result += "yes\n";
+        	result += "Tests: \n";
+            for (String test : allTests) {
+                result += test + "\n";
+            }
 
-        result += "Failures: \n";
-        for (String fail : failures) {
-            result += fail + "\n";
+            result += "Failed Tests: \n";
+            for (String fail : failedTests) {
+                result += fail + "\n";
+            }
+        } else {
+        	result += "no\n";
         }
 
         return result;

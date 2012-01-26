@@ -4,28 +4,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BugFix {
-    private final List<TestResult> nodeFailList;
-    private final TestResult nodePass;
+	private final String testName;
+    private final Revision passedRevision;
+    private final List<Revision> failedRevisions;
 
-    /**
-     * @param nodePass
-     *            : node that fixes the bug
+	/**
+     * @param testName : test name
+     * @param passedRevision : revision that fixes the bug
      */
-    public BugFix(TestResult nodePass) {
-        this.nodePass = nodePass;
-        nodeFailList = new ArrayList<TestResult>();
+    public BugFix(String testName, Revision passedRevision) {
+    	this.testName = testName;
+        this.passedRevision = passedRevision;
+        failedRevisions = new ArrayList<Revision>();
     }
 
-    public void addNodeFail(TestResult nodeFail) {
-        nodeFailList.add(nodeFail);
+    public void addFailedRevision(Revision failedRevision) {
+        failedRevisions.add(failedRevision);
+    }
+    
+    public String getTestName() {
+    	return testName;
     }
 
-    public List<TestResult> getNodeFailList() {
-        return nodeFailList;
-    }
+    public Revision getPassedRevision() {
+	    return passedRevision;
+	}
 
-    public TestResult getNodePass() {
-        return nodePass;
+	public List<Revision> getFailedRevisions() {
+        return failedRevisions;
     }
 
     @Override
@@ -34,28 +40,27 @@ public class BugFix {
             return false;
         }
 
-        BugFix list = (BugFix) other;
+        BugFix fix = (BugFix) other;
 
-        return nodeFailList.equals(list.nodeFailList)
-                && nodePass.equals(list.nodePass);
+        return failedRevisions.equals(fix.failedRevisions)
+                && passedRevision.equals(fix.passedRevision);
     }
 
     @Override
     public int hashCode() {
-        return 13 * nodeFailList.hashCode() + 17 * nodePass.hashCode();
+        return 11 * testName.hashCode() + 13 * passedRevision.hashCode() + 17 * failedRevisions.hashCode();
     }
 
     @Override
     public String toString() {
-        String str = "Node that fixes the bug: " + nodePass + "\n"
-                + "Consecutive nodes that have the bug: ";
+    	String str = "Test : " + testName + "\n";
+        str += "Fixed at : " + passedRevision.getCommitID() + "\n";
+        str += "Failed at : \n";
 
-        for (int i = 0; i < nodeFailList.size() - 1; i++) {
-            str += nodeFailList.get(i) + ",\n";
+        for (Revision rev : failedRevisions) {
+            str += rev.getCommitID() + "\n";
         }
-
-        str += nodeFailList.get(nodeFailList.size() - 1) + "\n";
-
+        
         return str;
     }
 }

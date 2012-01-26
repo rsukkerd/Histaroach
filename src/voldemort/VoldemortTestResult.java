@@ -19,12 +19,18 @@ public class VoldemortTestResult extends TestResult {
 
         try {
             while ((line = stdOutputReader.readLine()) != null) {
-                Pattern allTestsPattern = Pattern
-                        .compile("\\s*\\[junit\\] Running (\\S+)");
-                Matcher allTestsMatcher = allTestsPattern.matcher(line);
+            	Pattern buildSuccessfulPattern = Pattern.compile("BUILD SUCCESSFUL");
+            	Matcher buildSuccessfulMatcher = buildSuccessfulPattern.matcher(line);
+            	
+            	if (buildSuccessfulMatcher.find()) {
+            		this.setCompiledFlag(true);
+            	}
+            	
+                Pattern testPattern = Pattern.compile("\\s*\\[junit\\] Running (\\S+)");
+                Matcher testMatcher = testPattern.matcher(line);
 
-                if (allTestsMatcher.find()) {
-                    this.addTest(allTestsMatcher.group(1));
+                if (testMatcher.find()) {
+                    this.addTest(testMatcher.group(1));
                 }
             }
         } catch (IOException e) {
@@ -34,18 +40,24 @@ public class VoldemortTestResult extends TestResult {
 
         try {
             while ((line = stdErrorReader.readLine()) != null) {
-                Pattern failuresPattern = Pattern
-                        .compile("\\s*\\[junit\\] Test (\\S+) FAILED");
-                Matcher failuresMatcher = failuresPattern.matcher(line);
+            	Pattern buildFailedPattern = Pattern.compile("BUILD FAILED");
+            	Matcher buildFailedMatcher = buildFailedPattern.matcher(line);
+            	
+            	if (buildFailedMatcher.find()) {
+            		this.setCompiledFlag(false);
+            		break;
+            	}
+            	
+                Pattern failedTestPattern = Pattern.compile("\\s*\\[junit\\] Test (\\S+) FAILED");
+                Matcher failedTestMatcher = failedTestPattern.matcher(line);
 
-                if (failuresMatcher.find()) {
-                    this.addFailedTest(failuresMatcher.group(1));
+                if (failedTestMatcher.find()) {
+                    this.addFailedTest(failedTestMatcher.group(1));
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(-1);
         }
-
     }
 }
