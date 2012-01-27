@@ -1,4 +1,6 @@
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import common.HistoryGraph;
@@ -55,8 +57,7 @@ public class TestIsolationDataGenerator {
      * Initial program entrance -- parses the arguments and runs the data
      * extraction.
      * 
-     * @param args
-     *            command line arguments.
+     * @param args : command line arguments.
      * @throws IOException
      */
     public static void main(String[] args) throws IOException {
@@ -71,13 +72,20 @@ public class TestIsolationDataGenerator {
         }
 
         HistoryGraph historyGraph = extractData();
+        
+        // write historyGraph in human-readable form to output file
+        FileWriter outFileStream = new FileWriter(humanReadOutputFileName);
+        BufferedWriter outFileWriter = new BufferedWriter(outFileStream);
+        outFileWriter.write(historyGraph.toString());
+        outFileWriter.close();
     }
 
     /**
-     * TODO: Add comment.
+     * create a HistoryGraph instance from the given repository
+     * @return HistoryGraph
      */
     public static HistoryGraph extractData() throws IOException {
-    	Repository repository = new Repository(repositoryDirName, humanReadOutputFileName);
+    	Repository repository = new Repository(repositoryDirName);
     	HistoryGraph historyGraph = repository.buildHistoryGraph(startCommitID, endCommitID);
     	
     	return historyGraph;

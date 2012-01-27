@@ -4,16 +4,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import common.BugFix;
-import common.HistoryGraph;
-import common.ParallelFixing;
-
 import plume.Option;
 import plume.OptionGroup;
 import plume.Options;
-import voldemort.ParallelRepository;
 
-public class ParallelFixingFinder {
+import common.BugFix;
+import common.HistoryGraph;
+import common.ParallelBugFixes;
+import common.Repository;
+
+public class ParallelBugFixesFinder {
     /**
      * Print the short usage message.
      */
@@ -53,10 +53,10 @@ public class ParallelFixingFinder {
     public static String repositoryDirName = null;
 
     /** One line synopsis of usage */
-    public static final String usage_string = "ParallelFixingFinder [options]";
+    public static final String usage_string = "ParallelBugFixesFinder [options]";
 
     public static void main(String[] args) throws IOException {
-        Options plumeOptions = new Options(ParallelFixingFinder.usage_string);
+        Options plumeOptions = new Options(ParallelBugFixesFinder.usage_string);
         plumeOptions.parse_or_usage(args);
 
         // Display the help screen.
@@ -65,19 +65,23 @@ public class ParallelFixingFinder {
             return;
         }
 
-        Set<ParallelFixing> allParallelFixing = findParallelFixing();
+        Set<ParallelBugFixes> allParallelBugFixes = findAllParallelBugFixes();
     }
     
-    public static Set<ParallelFixing> findParallelFixing() throws IOException {
-    	Set<ParallelFixing> allParallelFixing = new HashSet<ParallelFixing>();
+    /**
+     * @return a set of all parallel bug fixes
+     * @throws IOException
+     */
+    public static Set<ParallelBugFixes> findAllParallelBugFixes() throws IOException {
+    	Set<ParallelBugFixes> allParallelFixing = new HashSet<ParallelBugFixes>();
         
-        ParallelRepository repository = new ParallelRepository(repositoryDirName, humanReadOutputFileName);
+        Repository repository = new Repository(repositoryDirName);
         HistoryGraph historyGraph = repository.buildHistoryGraph(startCommitID, endCommitID);
         Map<String, List<BugFix>> allBugFixes = repository.getAllBugFixes(historyGraph);
         
         for (String bug : allBugFixes.keySet()) {
         	List<BugFix> allFixes = allBugFixes.get(bug);
-        	ParallelFixing parallelFixing = repository.getParallelFixing(historyGraph, bug, allFixes);
+        	ParallelBugFixes parallelFixing = repository.getParallelBugFixes(historyGraph, bug, allFixes);
         	
         	allParallelFixing.add(parallelFixing);
         }
