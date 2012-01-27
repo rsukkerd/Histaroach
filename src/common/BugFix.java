@@ -3,6 +3,12 @@ package common;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * BugFix contains
+ * 1. a test that got fixed
+ * 2. a revision that fixed the test
+ * 3. a list of consecutive revisions that failed the test prior to the fix
+ */
 public class BugFix {
 	private final String testName;
     private final Revision passedRevision;
