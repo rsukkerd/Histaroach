@@ -1,79 +1,81 @@
 package common;
 
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * TestResult represents junit test results of a particular revision.
  * TestResult has a commit id and contains 2 sets of tests: 
  * a set of all tests and a set of failed tests.
  */
 public class TestResult {
 	private final String commitID;
-	private boolean compiled;
-    private final Set<String> allTests;
-    private final Set<String> failedTests;
+    private /*@Non-Null*/ Set<String> allTests;
+    private /*@Non-Null*/ Set<String> failedTests;
 
-    public TestResult(String commit) {
-    	this.commitID = commit;
-    	this.compiled = false;
-        this.allTests = new LinkedHashSet<String>();
-        this.failedTests = new LinkedHashSet<String>();
-    }
-
-    public TestResult(String commit, boolean compiled, Set<String> allTests, Set<String> failedTests) {
-        this.commitID = commit;
-        this.compiled = compiled;
-        this.allTests = allTests;
-        this.failedTests = failedTests;
+    /**
+     * create an empty TestResult
+     * @param commitID
+     */
+    public TestResult(String commitID) {
+    	this.commitID = commitID;
+        allTests = new HashSet<String>();
+        failedTests = new HashSet<String>();
     }
 
     /**
-     * @return commit string
+     * precondition : allTests and failedTests are Non-Null
+     */
+    public TestResult(String commitID, /*@Non-Null*/ Set<String> allTests, /*@Non-Null*/ Set<String> failedTests) {
+        this.commitID = commitID;
+        this.allTests = allTests;
+        this.failedTests = failedTests;
+    }
+    
+    /**
+     * @return commit id of the revision associated with this TestResult
      */
     public String getCommitID() {
         return commitID;
     }
     
-    public void setCompiledFlag(boolean compiled) {
-    	this.compiled = compiled;
-    }
-    
-    public boolean compiled() {
-    	return compiled;
-    }
-
+    /**
+     * add a test
+     */
     public void addTest(String test) {
-	    allTests.add(test);
+    	allTests.add(test);
 	}
 
-	public void addFailedTest(String test) {
-        failedTests.add(test);
+    /**
+     * add a failed test
+     */
+	public void addFailedTest(String failedTest) {
+		failedTests.add(failedTest);
     }
 
     /**
-     * @return list of names of all tests
+     * @return a set of all tests
      */
     public Set<String> getAllTests() {
         return allTests;
     }
 
     /**
-     * @return list of names of failed tests
+     * @return a set of failed tests
      */
     public Set<String> getFailedTests() {
         return failedTests;
     }
 
     /**
-     * @return true iff this node passes the test
+     * @return true iff this revision passes the test
      */
     public boolean pass(String test) {
-        return !this.getFailedTests().contains(test)
-                && this.getAllTests().contains(test);
+        return !this.getFailedTests().contains(test) && this.getAllTests().contains(test);
     }
 
     /**
-     * @return true iff this node fails the test
+     * @return true iff this revision fails the test
      */
     public boolean fail(String test) {
         return this.getFailedTests().contains(test);
@@ -87,40 +89,27 @@ public class TestResult {
 
         TestResult result = (TestResult) other;
 
-        return commitID.equals(result.commitID) && compiled == result.compiled 
-        		&&allTests.equals(result.allTests) && failedTests.equals(result.failedTests);
+        return commitID.equals(result.commitID) 
+        	&& allTests.equals(result.allTests) && failedTests.equals(result.failedTests);
     }
 
     @Override
     public int hashCode() {
-        int code = 11 * commitID.hashCode();
-        if (allTests != null) {
-            code += (13 * allTests.hashCode());
-        }
-
-        if (failedTests != null) {
-            code += (17 * failedTests.hashCode());
-        }
-        
-        if (compiled) return 7 + code; return code;
+        int code = 11 * commitID.hashCode() + 13 * allTests.hashCode() 
+        		+ 17 * failedTests.hashCode();
+        return code;
     }
 
     @Override
     public String toString() {
-        String result = "compiled? : ";
-        if (compiled) {
-        	result += "yes\n";
-        	result += "Tests: \n";
-            for (String test : allTests) {
-                result += test + "\n";
-            }
+		String result = "Tests: \n";
+        for (String test : allTests) {
+            result += test + "\n";
+        }
 
-            result += "Failed Tests: \n";
-            for (String fail : failedTests) {
-                result += fail + "\n";
-            }
-        } else {
-        	result += "no\n";
+        result += "Failed Tests: \n";
+        for (String fail : failedTests) {
+            result += fail + "\n";
         }
 
         return result;

@@ -8,27 +8,21 @@ import java.util.regex.Pattern;
 import common.TestResult;
 
 public class VoldemortTestResult extends TestResult {
+	
     /**
-     * @return TestResult from output from process
+     * parse junit test results from standard output and standard error streams
+     * @return TestResult instance of a given commit
      */
-    public VoldemortTestResult(String commitID, BufferedReader stdOutputReader,
-            BufferedReader stdErrorReader) {
+    public VoldemortTestResult(String commitID, BufferedReader stdOutputReader, BufferedReader stdErrorReader) {
         super(commitID);
-
+        
+    	Pattern testPattern = Pattern.compile("\\s*\\[junit\\] Running (\\S+)");
+    	Pattern failedTestPattern = Pattern.compile("\\s*\\[junit\\] Test (\\S+) FAILED");
+    	
         String line = new String();
-
         try {
             while ((line = stdOutputReader.readLine()) != null) {
-            	Pattern buildSuccessfulPattern = Pattern.compile("BUILD SUCCESSFUL");
-            	Matcher buildSuccessfulMatcher = buildSuccessfulPattern.matcher(line);
-            	
-            	if (buildSuccessfulMatcher.find()) {
-            		this.setCompiledFlag(true);
-            	}
-            	
-                Pattern testPattern = Pattern.compile("\\s*\\[junit\\] Running (\\S+)");
                 Matcher testMatcher = testPattern.matcher(line);
-
                 if (testMatcher.find()) {
                     this.addTest(testMatcher.group(1));
                 }
@@ -37,20 +31,10 @@ public class VoldemortTestResult extends TestResult {
             e.printStackTrace();
             System.exit(-1);
         }
-
+        
         try {
             while ((line = stdErrorReader.readLine()) != null) {
-            	Pattern buildFailedPattern = Pattern.compile("BUILD FAILED");
-            	Matcher buildFailedMatcher = buildFailedPattern.matcher(line);
-            	
-            	if (buildFailedMatcher.find()) {
-            		this.setCompiledFlag(false);
-            		break;
-            	}
-            	
-                Pattern failedTestPattern = Pattern.compile("\\s*\\[junit\\] Test (\\S+) FAILED");
-                Matcher failedTestMatcher = failedTestPattern.matcher(line);
-
+            	Matcher failedTestMatcher = failedTestPattern.matcher(line);
                 if (failedTestMatcher.find()) {
                     this.addFailedTest(failedTestMatcher.group(1));
                 }
