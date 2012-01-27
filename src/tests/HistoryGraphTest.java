@@ -15,8 +15,8 @@ import java.util.Set;
 import org.junit.Test;
 
 import common.BugFix;
-import common.HistoryGraph;
-import common.Repository;
+import common.HistoryGraphOld;
+import common.RepositoryOld;
 import common.TestResult;
 
 public class HistoryGraphTest {
@@ -489,7 +489,7 @@ public class HistoryGraphTest {
     static {
         List<BugFix> fixList_4 = new ArrayList<BugFix>(); // of test4
         BugFix fix_1_4 = new BugFix(NODE_2_1); // 1st fix of test4
-        fix_1_4.addNodeFail(NODE_1_1);
+        fix_1_4.addFailedRevision(NODE_1_1);
         fixList_4.add(fix_1_4);
 
         EXPECTED_BUG_FIXES_1.put(TEST_4, fixList_4);
@@ -499,23 +499,23 @@ public class HistoryGraphTest {
     static {
         List<BugFix> fixList_1 = new ArrayList<BugFix>(); // of test1
         BugFix fix_1_1 = new BugFix(NODE_3_2); // 1st fix of test1
-        fix_1_1.addNodeFail(NODE_2_2);
+        fix_1_1.addFailedRevision(NODE_2_2);
         fixList_1.add(fix_1_1);
 
         List<BugFix> fixList_2 = new ArrayList<BugFix>(); // of test2
         BugFix fix_1_2 = new BugFix(NODE_3_2); // 1st fix of test2
-        fix_1_2.addNodeFail(NODE_2_2);
-        fix_1_2.addNodeFail(NODE_1_2);
+        fix_1_2.addFailedRevision(NODE_2_2);
+        fix_1_2.addFailedRevision(NODE_1_2);
         fixList_2.add(fix_1_2);
 
         List<BugFix> fixList_3 = new ArrayList<BugFix>(); // of test3
         BugFix fix_1_3 = new BugFix(NODE_2_2); // 1st fix of test3
-        fix_1_3.addNodeFail(NODE_1_2);
+        fix_1_3.addFailedRevision(NODE_1_2);
         fixList_3.add(fix_1_3);
 
         List<BugFix> fixList_4 = new ArrayList<BugFix>(); // of test4
         BugFix fix_1_4 = new BugFix(NODE_2_2); // 1st fix of test4
-        fix_1_4.addNodeFail(NODE_1_2);
+        fix_1_4.addFailedRevision(NODE_1_2);
         fixList_4.add(fix_1_4);
 
         EXPECTED_BUG_FIXES_2.put(TEST_1, fixList_1);
@@ -528,49 +528,49 @@ public class HistoryGraphTest {
     static {
         List<BugFix> fixList_1 = new ArrayList<BugFix>(); // of test1
         BugFix fix_1_1 = new BugFix(NODE_4_3); // 1st fix of test1
-        fix_1_1.addNodeFail(NODE_3_3);
+        fix_1_1.addFailedRevision(NODE_3_3);
         fixList_1.add(fix_1_1);
 
         List<BugFix> fixList_2 = new ArrayList<BugFix>(); // of test2
         BugFix fix_1_2 = new BugFix(NODE_4_3); // 1st fix of test2
-        fix_1_2.addNodeFail(NODE_3_3);
-        fix_1_2.addNodeFail(NODE_2_3);
+        fix_1_2.addFailedRevision(NODE_3_3);
+        fix_1_2.addFailedRevision(NODE_2_3);
         fixList_2.add(fix_1_2);
 
         List<BugFix> fixList_3 = new ArrayList<BugFix>(); // of test3
         BugFix fix_1_3 = new BugFix(NODE_4_3); // 1st fix of test3
-        fix_1_3.addNodeFail(NODE_3_3);
-        fix_1_3.addNodeFail(NODE_2_3);
-        fix_1_3.addNodeFail(NODE_1_3);
+        fix_1_3.addFailedRevision(NODE_3_3);
+        fix_1_3.addFailedRevision(NODE_2_3);
+        fix_1_3.addFailedRevision(NODE_1_3);
         fixList_3.add(fix_1_3);
 
         List<BugFix> fixList_4 = new ArrayList<BugFix>(); // of test4
         BugFix fix_1_4 = new BugFix(NODE_3_3); // 1st fix of test4
-        fix_1_4.addNodeFail(NODE_1_3);
+        fix_1_4.addFailedRevision(NODE_1_3);
         fixList_4.add(fix_1_4);
 
         List<BugFix> fixList_5 = new ArrayList<BugFix>(); // of test5
         BugFix fix_1_5 = new BugFix(NODE_4_3); // 1st fix of test5
-        fix_1_5.addNodeFail(NODE_2_3);
-        fix_1_5.addNodeFail(NODE_1_3);
+        fix_1_5.addFailedRevision(NODE_2_3);
+        fix_1_5.addFailedRevision(NODE_1_3);
         BugFix fix_2_5 = new BugFix(NODE_3_3); // 2nd fix of test5
-        fix_2_5.addNodeFail(NODE_1_3);
+        fix_2_5.addFailedRevision(NODE_1_3);
         fixList_5.add(fix_1_5);
         fixList_5.add(fix_2_5);
 
         List<BugFix> fixList_6 = new ArrayList<BugFix>(); // of test6
         BugFix fix_1_6 = new BugFix(NODE_3_3); // 1st fix of test6
-        fix_1_6.addNodeFail(NODE_1_3);
+        fix_1_6.addFailedRevision(NODE_1_3);
         BugFix fix_2_6 = new BugFix(NODE_2_3); // 2nd fix of test6
-        fix_2_6.addNodeFail(NODE_1_3);
+        fix_2_6.addFailedRevision(NODE_1_3);
         fixList_6.add(fix_1_6);
         fixList_6.add(fix_2_6);
 
         List<BugFix> fixList_7 = new ArrayList<BugFix>(); // of test7
         BugFix fix_1_7 = new BugFix(NODE_3_3); // 1st fix of test7
-        fix_1_7.addNodeFail(NODE_1_3);
+        fix_1_7.addFailedRevision(NODE_1_3);
         BugFix fix_2_7 = new BugFix(NODE_2_3); // 2nd fix of test7
-        fix_2_7.addNodeFail(NODE_1_3);
+        fix_2_7.addFailedRevision(NODE_1_3);
         fixList_7.add(fix_1_7);
         fixList_7.add(fix_2_7);
 
@@ -587,110 +587,110 @@ public class HistoryGraphTest {
     static {
         List<BugFix> fixList_1 = new ArrayList<BugFix>(); // of test1
         BugFix fix_1_1 = new BugFix(NODE_7_4); // 1st fix of test1
-        fix_1_1.addNodeFail(NODE_5_4);
-        fix_1_1.addNodeFail(NODE_4_4);
+        fix_1_1.addFailedRevision(NODE_5_4);
+        fix_1_1.addFailedRevision(NODE_4_4);
         fixList_1.add(fix_1_1);
 
         List<BugFix> fixList_2 = new ArrayList<BugFix>(); // of test2
         BugFix fix_1_2 = new BugFix(NODE_7_4); // 1st fix of test2
-        fix_1_2.addNodeFail(NODE_6_4);
-        fix_1_2.addNodeFail(NODE_5_4);
-        fix_1_2.addNodeFail(NODE_4_4);
+        fix_1_2.addFailedRevision(NODE_6_4);
+        fix_1_2.addFailedRevision(NODE_5_4);
+        fix_1_2.addFailedRevision(NODE_4_4);
         fixList_2.add(fix_1_2);
 
         List<BugFix> fixList_3 = new ArrayList<BugFix>(); // of test3
         BugFix fix_1_3 = new BugFix(NODE_7_4); // 1st fix of test3
-        fix_1_3.addNodeFail(NODE_6_4);
-        fix_1_3.addNodeFail(NODE_5_4);
-        fix_1_3.addNodeFail(NODE_4_4);
-        fix_1_3.addNodeFail(NODE_3_4);
+        fix_1_3.addFailedRevision(NODE_6_4);
+        fix_1_3.addFailedRevision(NODE_5_4);
+        fix_1_3.addFailedRevision(NODE_4_4);
+        fix_1_3.addFailedRevision(NODE_3_4);
         fixList_3.add(fix_1_3);
 
         List<BugFix> fixList_4 = new ArrayList<BugFix>(); // of test4
         BugFix fix_1_4 = new BugFix(NODE_7_4); // 1st fix of test4
-        fix_1_4.addNodeFail(NODE_6_4);
-        fix_1_4.addNodeFail(NODE_5_4);
-        fix_1_4.addNodeFail(NODE_4_4);
-        fix_1_4.addNodeFail(NODE_3_4);
-        fix_1_4.addNodeFail(NODE_2_4);
+        fix_1_4.addFailedRevision(NODE_6_4);
+        fix_1_4.addFailedRevision(NODE_5_4);
+        fix_1_4.addFailedRevision(NODE_4_4);
+        fix_1_4.addFailedRevision(NODE_3_4);
+        fix_1_4.addFailedRevision(NODE_2_4);
         fixList_4.add(fix_1_4);
 
         List<BugFix> fixList_5 = new ArrayList<BugFix>(); // of test5
         BugFix fix_1_5 = new BugFix(NODE_7_4); // 1st fix of test5
-        fix_1_5.addNodeFail(NODE_6_4);
-        fix_1_5.addNodeFail(NODE_1_4);
+        fix_1_5.addFailedRevision(NODE_6_4);
+        fix_1_5.addFailedRevision(NODE_1_4);
         BugFix fix_2_5 = new BugFix(NODE_5_4); // 2nd fix of test5
-        fix_2_5.addNodeFail(NODE_4_4);
-        fix_2_5.addNodeFail(NODE_3_4);
-        fix_2_5.addNodeFail(NODE_2_4);
-        fix_2_5.addNodeFail(NODE_1_4);
+        fix_2_5.addFailedRevision(NODE_4_4);
+        fix_2_5.addFailedRevision(NODE_3_4);
+        fix_2_5.addFailedRevision(NODE_2_4);
+        fix_2_5.addFailedRevision(NODE_1_4);
         fixList_5.add(fix_1_5);
         fixList_5.add(fix_2_5);
 
         List<BugFix> fixList_6 = new ArrayList<BugFix>(); // of test6
         BugFix fix_1_6 = new BugFix(NODE_7_4); // 1st fix of test6
-        fix_1_6.addNodeFail(NODE_6_4);
-        fix_1_6.addNodeFail(NODE_5_4);
-        fix_1_6.addNodeFail(NODE_1_4);
-        fix_1_6.addNodeFail(NODE_4_4);
-        fix_1_6.addNodeFail(NODE_2_4);
+        fix_1_6.addFailedRevision(NODE_6_4);
+        fix_1_6.addFailedRevision(NODE_5_4);
+        fix_1_6.addFailedRevision(NODE_1_4);
+        fix_1_6.addFailedRevision(NODE_4_4);
+        fix_1_6.addFailedRevision(NODE_2_4);
         BugFix fix_2_6 = new BugFix(NODE_3_4); // 2nd fix of test6
-        fix_2_6.addNodeFail(NODE_2_4);
-        fix_2_6.addNodeFail(NODE_1_4);
+        fix_2_6.addFailedRevision(NODE_2_4);
+        fix_2_6.addFailedRevision(NODE_1_4);
         fixList_6.add(fix_1_6);
         fixList_6.add(fix_2_6);
 
         List<BugFix> fixList_7 = new ArrayList<BugFix>(); // of test7
         BugFix fix_1_7 = new BugFix(NODE_7_4); // 1st fix of test7
-        fix_1_7.addNodeFail(NODE_6_4);
-        fix_1_7.addNodeFail(NODE_5_4);
-        fix_1_7.addNodeFail(NODE_1_4);
-        fix_1_7.addNodeFail(NODE_4_4);
-        fix_1_7.addNodeFail(NODE_3_4);
+        fix_1_7.addFailedRevision(NODE_6_4);
+        fix_1_7.addFailedRevision(NODE_5_4);
+        fix_1_7.addFailedRevision(NODE_1_4);
+        fix_1_7.addFailedRevision(NODE_4_4);
+        fix_1_7.addFailedRevision(NODE_3_4);
         BugFix fix_2_7 = new BugFix(NODE_2_4); // 2nd fix of test7
-        fix_2_7.addNodeFail(NODE_1_4);
+        fix_2_7.addFailedRevision(NODE_1_4);
         fixList_7.add(fix_1_7);
         fixList_7.add(fix_2_7);
 
         List<BugFix> fixList_8 = new ArrayList<BugFix>(); // of test8
         BugFix fix_1_8 = new BugFix(NODE_7_4); // 1st fix of test8
-        fix_1_8.addNodeFail(NODE_5_4);
-        fix_1_8.addNodeFail(NODE_3_4);
-        fix_1_8.addNodeFail(NODE_2_4);
-        fix_1_8.addNodeFail(NODE_1_4);
+        fix_1_8.addFailedRevision(NODE_5_4);
+        fix_1_8.addFailedRevision(NODE_3_4);
+        fix_1_8.addFailedRevision(NODE_2_4);
+        fix_1_8.addFailedRevision(NODE_1_4);
         BugFix fix_2_8 = new BugFix(NODE_6_4); // 2nd fix of test8
-        fix_2_8.addNodeFail(NODE_1_4);
+        fix_2_8.addFailedRevision(NODE_1_4);
         BugFix fix_3_8 = new BugFix(NODE_4_4); // 3rd fix of test8
-        fix_3_8.addNodeFail(NODE_2_4);
-        fix_3_8.addNodeFail(NODE_1_4);
+        fix_3_8.addFailedRevision(NODE_2_4);
+        fix_3_8.addFailedRevision(NODE_1_4);
         fixList_8.add(fix_1_8);
         fixList_8.add(fix_2_8);
         fixList_8.add(fix_3_8);
 
         List<BugFix> fixList_9 = new ArrayList<BugFix>(); // of test9
         BugFix fix_1_9 = new BugFix(NODE_7_4); // 1st fix of test9
-        fix_1_9.addNodeFail(NODE_6_4);
-        fix_1_9.addNodeFail(NODE_1_4);
+        fix_1_9.addFailedRevision(NODE_6_4);
+        fix_1_9.addFailedRevision(NODE_1_4);
         BugFix fix_2_9 = new BugFix(NODE_5_4); // 2nd fix of test9
-        fix_2_9.addNodeFail(NODE_4_4);
-        fix_2_9.addNodeFail(NODE_2_4);
-        fix_2_9.addNodeFail(NODE_1_4);
+        fix_2_9.addFailedRevision(NODE_4_4);
+        fix_2_9.addFailedRevision(NODE_2_4);
+        fix_2_9.addFailedRevision(NODE_1_4);
         BugFix fix_3_9 = new BugFix(NODE_3_4); // 3rd fix of test9
-        fix_3_9.addNodeFail(NODE_2_4);
-        fix_3_9.addNodeFail(NODE_1_4);
+        fix_3_9.addFailedRevision(NODE_2_4);
+        fix_3_9.addFailedRevision(NODE_1_4);
         fixList_9.add(fix_1_9);
         fixList_9.add(fix_2_9);
         fixList_9.add(fix_3_9);
 
         List<BugFix> fixList_10 = new ArrayList<BugFix>(); // of test10
         BugFix fix_1_10 = new BugFix(NODE_7_4); // 1st fix of test10
-        fix_1_10.addNodeFail(NODE_5_4);
-        fix_1_10.addNodeFail(NODE_4_4);
-        fix_1_10.addNodeFail(NODE_3_4);
+        fix_1_10.addFailedRevision(NODE_5_4);
+        fix_1_10.addFailedRevision(NODE_4_4);
+        fix_1_10.addFailedRevision(NODE_3_4);
         BugFix fix_2_10 = new BugFix(NODE_6_4); // 2nd fix of test10
-        fix_2_10.addNodeFail(NODE_1_4);
+        fix_2_10.addFailedRevision(NODE_1_4);
         BugFix fix_3_10 = new BugFix(NODE_2_4); // 3rd fix of test10
-        fix_3_10.addNodeFail(NODE_1_4);
+        fix_3_10.addFailedRevision(NODE_1_4);
         fixList_10.add(fix_1_10);
         fixList_10.add(fix_2_10);
         fixList_10.add(fix_3_10);
@@ -734,8 +734,8 @@ public class HistoryGraphTest {
 
     private void checkHistoryGraph(String dir,
             Map<TestResult, List<TestResult>> map) {
-        Repository repo = new Repository(new File(dir));
-        HistoryGraph graph = new HistoryGraph(repo);
+        RepositoryOld repo = new RepositoryOld(new File(dir));
+        HistoryGraphOld graph = new HistoryGraphOld(repo);
 
         Iterator<TestResult> itr = graph.getNodeIterator();
         while (itr.hasNext()) {
@@ -749,7 +749,7 @@ public class HistoryGraphTest {
 
     @Test
     public void testAddBugFixesInfo1() {
-        HistoryGraph graph = new HistoryGraph();
+        HistoryGraphOld graph = new HistoryGraphOld();
         graph.addNode(NODE_1_1, PARENTS_1_1);
         graph.addNode(NODE_2_1, PARENTS_2_1);
 
@@ -759,7 +759,7 @@ public class HistoryGraphTest {
 
     @Test
     public void testAddBugFixesInfo2() {
-        HistoryGraph graph = new HistoryGraph();
+        HistoryGraphOld graph = new HistoryGraphOld();
         graph.addNode(NODE_1_2, PARENTS_1_2);
         graph.addNode(NODE_2_2, PARENTS_2_2);
         graph.addNode(NODE_3_2, PARENTS_3_2);
@@ -770,7 +770,7 @@ public class HistoryGraphTest {
 
     @Test
     public void testAddBugFixesInfo3() {
-        HistoryGraph graph = new HistoryGraph();
+        HistoryGraphOld graph = new HistoryGraphOld();
         graph.addNode(NODE_1_3, PARENTS_1_3);
         graph.addNode(NODE_2_3, PARENTS_2_3);
         graph.addNode(NODE_3_3, PARENTS_3_3);
@@ -782,7 +782,7 @@ public class HistoryGraphTest {
 
     @Test
     public void testAddBugFixesInfo4() {
-        HistoryGraph graph = new HistoryGraph();
+        HistoryGraphOld graph = new HistoryGraphOld();
         graph.addNode(NODE_1_4, PARENTS_1_4);
         graph.addNode(NODE_2_4, PARENTS_2_4);
         graph.addNode(NODE_3_4, PARENTS_3_4);
@@ -796,7 +796,7 @@ public class HistoryGraphTest {
     }
 
     private void checkBugFixes(Map<String, List<BugFix>> expected,
-            HistoryGraph graph) {
+            HistoryGraphOld graph) {
         Iterator<String> itr = graph.getBugIterator();
         int bugCount = 0;
         while (itr.hasNext()) {

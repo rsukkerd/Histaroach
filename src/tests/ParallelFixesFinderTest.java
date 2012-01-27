@@ -12,7 +12,7 @@ import java.util.Set;
 import org.junit.Test;
 
 import common.BugFix;
-import common.HistoryGraph;
+import common.HistoryGraphOld;
 import common.TestResult;
 
 public class ParallelFixesFinderTest {
@@ -278,9 +278,9 @@ public class ParallelFixesFinderTest {
     private static final Map<String, Set<BugFix>> EXPECTED_PARALLEL_FIXES_2 = new HashMap<String, Set<BugFix>>();
     static {
         BugFix fix_1_1 = new BugFix(NODE_3_2); // 1st fix of test1
-        fix_1_1.addNodeFail(NODE_1_2);
+        fix_1_1.addFailedRevision(NODE_1_2);
         BugFix fix_2_1 = new BugFix(NODE_2_2); // 2nd fix of test1
-        fix_2_1.addNodeFail(NODE_1_2);
+        fix_2_1.addFailedRevision(NODE_1_2);
 
         Set<BugFix> parallelNodes_1 = new HashSet<BugFix>(); // parallel nodes
                                                              // that fix test1
@@ -294,41 +294,41 @@ public class ParallelFixesFinderTest {
     private static final Map<String, Set<BugFix>> EXPECTED_PARALLEL_FIXES_3 = new HashMap<String, Set<BugFix>>();
     static {
         BugFix fix_1_1 = new BugFix(NODE_6_3); // 1st fix of test1
-        fix_1_1.addNodeFail(NODE_1_3);
+        fix_1_1.addFailedRevision(NODE_1_3);
         BugFix fix_2_1 = new BugFix(NODE_5_3); // 2nd fix of test1
-        fix_2_1.addNodeFail(NODE_4_3);
-        fix_2_1.addNodeFail(NODE_3_3);
-        fix_2_1.addNodeFail(NODE_2_3);
-        fix_2_1.addNodeFail(NODE_1_3);
+        fix_2_1.addFailedRevision(NODE_4_3);
+        fix_2_1.addFailedRevision(NODE_3_3);
+        fix_2_1.addFailedRevision(NODE_2_3);
+        fix_2_1.addFailedRevision(NODE_1_3);
 
         BugFix fix_1_2 = new BugFix(NODE_4_3); // 1st fix of test2
-        fix_1_2.addNodeFail(NODE_2_3);
-        fix_1_2.addNodeFail(NODE_1_3);
+        fix_1_2.addFailedRevision(NODE_2_3);
+        fix_1_2.addFailedRevision(NODE_1_3);
         BugFix fix_2_2 = new BugFix(NODE_3_3); // 2nd fix of test2
-        fix_2_2.addNodeFail(NODE_2_3);
-        fix_2_2.addNodeFail(NODE_1_3);
+        fix_2_2.addFailedRevision(NODE_2_3);
+        fix_2_2.addFailedRevision(NODE_1_3);
 
         BugFix fix_1_3 = new BugFix(NODE_6_3); // 1st fix of test3
-        fix_1_3.addNodeFail(NODE_1_3);
+        fix_1_3.addFailedRevision(NODE_1_3);
         BugFix fix_2_3 = new BugFix(NODE_2_3); // 2nd fix of test3
-        fix_2_3.addNodeFail(NODE_1_3);
+        fix_2_3.addFailedRevision(NODE_1_3);
 
         BugFix fix_1_4 = new BugFix(NODE_6_3); // 1st fix of test4
-        fix_1_4.addNodeFail(NODE_1_3);
+        fix_1_4.addFailedRevision(NODE_1_3);
         BugFix fix_2_4 = new BugFix(NODE_4_3); // 2nd fix of test4
-        fix_2_4.addNodeFail(NODE_2_3);
-        fix_2_4.addNodeFail(NODE_1_3);
+        fix_2_4.addFailedRevision(NODE_2_3);
+        fix_2_4.addFailedRevision(NODE_1_3);
         BugFix fix_3_4 = new BugFix(NODE_3_3); // 3rd fix of test4
-        fix_3_4.addNodeFail(NODE_2_3);
-        fix_3_4.addNodeFail(NODE_1_3);
+        fix_3_4.addFailedRevision(NODE_2_3);
+        fix_3_4.addFailedRevision(NODE_1_3);
 
         BugFix fix_1_8 = new BugFix(NODE_6_3); // 1st fix of test8
-        fix_1_8.addNodeFail(NODE_1_3);
+        fix_1_8.addFailedRevision(NODE_1_3);
         BugFix fix_2_8 = new BugFix(NODE_5_3); // 2nd fix of test8
-        fix_2_8.addNodeFail(NODE_4_3);
-        fix_2_8.addNodeFail(NODE_3_3);
+        fix_2_8.addFailedRevision(NODE_4_3);
+        fix_2_8.addFailedRevision(NODE_3_3);
         BugFix fix_3_8 = new BugFix(NODE_2_3); // 3rd fix of test8
-        fix_3_8.addNodeFail(NODE_1_3);
+        fix_3_8.addFailedRevision(NODE_1_3);
 
         Set<BugFix> parallelNodes_1 = new HashSet<BugFix>(); // parallel nodes
                                                              // that fix test1
@@ -366,7 +366,7 @@ public class ParallelFixesFinderTest {
 
     @Test
     public void testFindParallelFixes1() {
-        HistoryGraph graph = new HistoryGraph();
+        HistoryGraphOld graph = new HistoryGraphOld();
         graph.addNode(NODE_1_1, PARENTS_1_1);
         graph.addNode(NODE_2_1, PARENTS_2_1);
         graph.addNode(NODE_3_1, PARENTS_3_1);
@@ -379,7 +379,7 @@ public class ParallelFixesFinderTest {
 
     @Test
     public void testFindParallelFixes2() {
-        HistoryGraph graph = new HistoryGraph();
+        HistoryGraphOld graph = new HistoryGraphOld();
         graph.addNode(NODE_1_2, PARENTS_1_2);
         graph.addNode(NODE_2_2, PARENTS_2_2);
         graph.addNode(NODE_3_2, PARENTS_3_2);
@@ -392,7 +392,7 @@ public class ParallelFixesFinderTest {
 
     @Test
     public void testFindParallelFixes3() {
-        HistoryGraph graph = new HistoryGraph();
+        HistoryGraphOld graph = new HistoryGraphOld();
         graph.addNode(NODE_1_3, PARENTS_1_3);
         graph.addNode(NODE_2_3, PARENTS_2_3);
         graph.addNode(NODE_3_3, PARENTS_3_3);
@@ -407,7 +407,7 @@ public class ParallelFixesFinderTest {
     }
 
     private void checkParallelFixes(Map<String, Set<BugFix>> expected,
-            HistoryGraph graph) {
+            HistoryGraphOld graph) {
         Map<String, Set<BugFix>> actual = graph.findParallelFixes();
         assertEquals(expected, actual);
     }

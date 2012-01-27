@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import common.Repository;
+import common.RepositoryOld;
 import common.TestResult;
 
 public class ProcessResultTest {
@@ -144,7 +144,7 @@ public class ProcessResultTest {
 
         TestResult expectedTestResult = new TestResult("master", allTests,
                 failures);
-        Repository repo = new Repository(directory);
+        RepositoryOld repo = new RepositoryOld(directory);
 
         TestResult actualTestResult = repo.getTestResult("master");
 
