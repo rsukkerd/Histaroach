@@ -21,18 +21,29 @@ import voldemort.VoldemortTestResult;
  * 6. test result
  */
 public class Revision {
+	public enum COMPILABLE {
+		YES,
+		NO,
+		UNKNOWN
+	}
+	
     private final Repository repository;
     private final String commitID;
-    private boolean compilable;
     /** mapping : a parent commit id -> a list of files that are different between the parent and this revision **/
 	private final Map<String, List<String>> diffFiles;
-	private final /*@Nullable*/ TestResult testResult;
+	private COMPILABLE compilable;
+	private /*@Nullable*/ TestResult testResult;
 	
+	/**
+	 * create a revision
+	 * initially, compilable flag is unknown and test result is null
+	 */
     public Revision(Repository repository, String commitID, Map<String, List<String>> parentIDToDiffFiles) {
         this.repository = repository;
         this.commitID = commitID;
         diffFiles = parentIDToDiffFiles;
-        testResult = generateTestResult();
+        compilable = COMPILABLE.UNKNOWN;
+        testResult = null;
     }
 
     public String getCommitID() {
@@ -43,20 +54,32 @@ public class Revision {
         return diffFiles.keySet();
     }
     
-    public boolean isCompilable() {
+    public List<String> getDiffFiles(String parentID) {
+	    return diffFiles.get(parentID);
+	}
+
+	public COMPILABLE isCompilable() {
+    	if (compilable == COMPILABLE.UNKNOWN) {
+    		compileAndRunTests();
+    	}
+    	
     	return compilable;
     }
 
     public TestResult getTestResult() {
+    	if (compilable == COMPILABLE.UNKNOWN) {
+    		compileAndRunTests();
+    	}
+    	
         return testResult;
     }
 
     /**
-     * run all junit tests on this revision to generate TestResult
-     * 
-     * @return TestResult of this revision
+     * compile and run all junit tests on this revision to generate TestResult
+     * @modifies : set compilable flag to YES/NO,
+     *             generate test result if compilable
      */
-    public TestResult generateTestResult() {
+    private void compileAndRunTests() {
         int exitValue = repository.checkoutCommit(commitID);
         assert (exitValue == 0);
 
@@ -68,20 +91,21 @@ public class Revision {
         BufferedReader stdErrorReader = new BufferedReader(
                 new InputStreamReader(junitProcess.getErrorStream()));
         
-        TestResult testResult = null;
-        compilable = !buildFailed(stdErrorReader);
+        if (buildFailed(stdErrorReader)) {
+        	compilable = COMPILABLE.NO;
+        } else {
+        	compilable = COMPILABLE.YES;
+        }
         
-        if (compilable) {
+        if (compilable == COMPILABLE.YES) {
         	testResult = new VoldemortTestResult(commitID, stdOutputReader, stdErrorReader);
         }
-
-        return testResult;
     }
     
     /**
      * @return true iff build failed
      */
-    public boolean buildFailed(BufferedReader stdErrorReader) {
+    private boolean buildFailed(BufferedReader stdErrorReader) {
         Pattern buildFailedPattern = Pattern.compile("BUILD FAILED");
         String line = new String();
         
@@ -100,10 +124,6 @@ public class Revision {
         return false;
     }
 
-    public List<String> getDiffFiles(String parentID) {
-        return diffFiles.get(parentID);
-    }
-
     @Override
     public boolean equals(Object other) {
         if (other == null || !other.getClass().equals(this.getClass())) {
@@ -112,18 +132,18 @@ public class Revision {
 
         Revision revision = (Revision) other;
 
-        return repository.equals(revision.repository)
-                && commitID.equals(revision.commitID)
-                && testResult.equals(revision.testResult)
-                && diffFiles.equals(revision.diffFiles);
+        return repository.equals(revision.repository) && commitID.equals(revision.commitID)
+                && diffFiles.equals(revision.diffFiles) && compilable == revision.compilable
+                && ((testResult == null && revision.testResult == null) || 
+                		testResult.equals(revision.testResult));
     }
 
     @Override
     public int hashCode() {
         int code = 11 * repository.hashCode() + 13 * commitID.hashCode() 
-        			+ 17 * diffFiles.hashCode();
+        			+ 17 * diffFiles.hashCode() + 19 * compilable.hashCode();
         if (testResult != null) {
-        	code += 19 * testResult.hashCode();
+        	code += 23 * testResult.hashCode();
         }
         
         return code;
@@ -133,11 +153,13 @@ public class Revision {
     public String toString() {
         String result = "commit : " + commitID + "\n";
         result += "compilable : ";
-        if (compilable) {
+        if (compilable == COMPILABLE.YES) {
         	result += "yes\n";
         	result += testResult.toString();
-        } else {
+        } else if (compilable == COMPILABLE.NO) {
         	result += "no\n";
+        } else {
+        	result += "unknown\n";
         }
 
         for (String parentID : diffFiles.keySet()) {
