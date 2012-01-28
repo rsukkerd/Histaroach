@@ -30,7 +30,7 @@ public class Revision {
     private final Repository repository;
     private final String commitID;
     /** mapping : a parent commit id -> a list of files that are different between the parent and this revision **/
-	private final Map<String, List<String>> diffFiles;
+	private final Map<String, List<DiffFile>> diffFiles;
 	private COMPILABLE compilable;
 	private /*@Nullable*/ TestResult testResult;
 	
@@ -38,7 +38,7 @@ public class Revision {
 	 * create a revision
 	 * initially, compilable flag is unknown and test result is null
 	 */
-    public Revision(Repository repository, String commitID, Map<String, List<String>> parentIDToDiffFiles) {
+    public Revision(Repository repository, String commitID, Map<String, List<DiffFile>> parentIDToDiffFiles) {
         this.repository = repository;
         this.commitID = commitID;
         diffFiles = parentIDToDiffFiles;
@@ -54,7 +54,7 @@ public class Revision {
         return diffFiles.keySet();
     }
     
-    public List<String> getDiffFiles(String parentID) {
+    public List<DiffFile> getDiffFiles(String parentID) {
 	    return diffFiles.get(parentID);
 	}
 
@@ -165,9 +165,9 @@ public class Revision {
         for (String parentID : diffFiles.keySet()) {
             result += "parent : " + parentID + "\n";
             result += "diff files :\n";
-            List<String> files = getDiffFiles(parentID);
+            List<DiffFile> files = getDiffFiles(parentID);
 
-            for (String file : files) {
+            for (DiffFile file : files) {
                 result += file + "\n";
             }
         }

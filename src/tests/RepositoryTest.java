@@ -12,73 +12,76 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import common.DiffFile;
+import common.DiffFile.DiffType;
 import common.HistoryGraph;
 import common.Repository;
 import common.Revision;
 
 public class RepositoryTest {
-    private static final String[] DIRECTORIES = {"test/repository_samples/repo1", 
-    											"test/repository_samples/repo2",
-    											"test/repository_samples/repo3",
-    											"test/repository_samples/repo4",
-    											"test/repository_samples/repo5"};
-    
+    private static final String[] DIRECTORIES = {"test/sample_repositories/repo1", 
+    											"test/sample_repositories/repo2",
+    											"test/sample_repositories/repo3",
+    											"test/sample_repositories/repo4",
+    											"test/sample_repositories/repo5"};
+        
     private static final Repository REPOSITORY_1 = new Repository(DIRECTORIES[0]);
     private static final Repository REPOSITORY_2 = new Repository(DIRECTORIES[1]);
     private static final Repository REPOSITORY_3 = new Repository(DIRECTORIES[2]);
     private static final Repository REPOSITORY_4 = new Repository(DIRECTORIES[3]);
     private static final Repository REPOSITORY_5 = new Repository(DIRECTORIES[4]);
     
-	private static final List<String> DIFF_FILES = new ArrayList<String>();
+	private static final List<DiffFile> DIFF_FILES = new ArrayList<DiffFile>();
 	static {
-		DIFF_FILES.add("M	tmpfile");
+		DiffFile diffFile = new DiffFile(DiffType.MODIFIED, "tmpfile");
+		DIFF_FILES.add(diffFile);
 	}
 
 	/** revision -> parent -> diff files in hGraph 1 **/
 	private static final String COMMIT_1_1 = "8fa00ca";
-	private static final Map<String, List<String>> PARENT_TO_DIFF_FILES_1_1 = new HashMap<String, List<String>>();
+	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_1_1 = new HashMap<String, List<DiffFile>>();
 	
 	/** revision -> parent -> diff files in hGraph 2 **/
 	private static final String COMMIT_1_2 = "3e3a0ef";
-	private static final Map<String, List<String>> PARENT_TO_DIFF_FILES_1_2 = new HashMap<String, List<String>>();
+	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_1_2 = new HashMap<String, List<DiffFile>>();
 
 	private static final String COMMIT_2_2 = "a667caa";
-	private static final Map<String, List<String>> PARENT_TO_DIFF_FILES_2_2 = new HashMap<String, List<String>>();
+	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_2_2 = new HashMap<String, List<DiffFile>>();
 	static {
 		PARENT_TO_DIFF_FILES_2_2.put(COMMIT_1_2, DIFF_FILES);
 	}
 	
 	/** revision -> parent -> diff files in hGraph 3 **/
 	private static final String COMMIT_1_3 = "e082fcd";
-	private static final Map<String, List<String>> PARENT_TO_DIFF_FILES_1_3 = new HashMap<String, List<String>>();
+	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_1_3 = new HashMap<String, List<DiffFile>>();
 	
 	private static final String COMMIT_2_3 = "43c4a2e";
-	private static final Map<String, List<String>> PARENT_TO_DIFF_FILES_2_3 = new HashMap<String, List<String>>();
+	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_2_3 = new HashMap<String, List<DiffFile>>();
 	static {
 		PARENT_TO_DIFF_FILES_2_3.put(COMMIT_1_3, DIFF_FILES);
 	}
 	private static final String COMMIT_3_3 = "2512c4a";
-	private static final Map<String, List<String>> PARENT_TO_DIFF_FILES_3_3 = new HashMap<String, List<String>>();
+	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_3_3 = new HashMap<String, List<DiffFile>>();
 	static {
 		PARENT_TO_DIFF_FILES_3_3.put(COMMIT_2_3, DIFF_FILES);
 	}
 	
 	/** revision -> parent -> diff files in hGraph 4 **/
 	private static final String COMMIT_1_4 = "ce7fccb";
-	private static final Map<String, List<String>> PARENT_TO_DIFF_FILES_1_4 = new HashMap<String, List<String>>();
+	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_1_4 = new HashMap<String, List<DiffFile>>();
 	
 	private static final String COMMIT_2_4 = "50bb766";
-	private static final Map<String, List<String>> PARENT_TO_DIFF_FILES_2_4 = new HashMap<String, List<String>>();
+	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_2_4 = new HashMap<String, List<DiffFile>>();
 	static {
 		PARENT_TO_DIFF_FILES_2_4.put(COMMIT_1_4, DIFF_FILES);
 	}
 	private static final String COMMIT_3_4 = "8d4a966";
-	private static final Map<String, List<String>> PARENT_TO_DIFF_FILES_3_4 = new HashMap<String, List<String>>();
+	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_3_4 = new HashMap<String, List<DiffFile>>();
 	static {
 		PARENT_TO_DIFF_FILES_3_4.put(COMMIT_1_4, DIFF_FILES);
 	}
 	private static final String COMMIT_4_4 = "11f34d6";
-	private static final Map<String, List<String>> PARENT_TO_DIFF_FILES_4_4 = new HashMap<String, List<String>>();
+	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_4_4 = new HashMap<String, List<DiffFile>>();
 	static {
 		PARENT_TO_DIFF_FILES_4_4.put(COMMIT_2_4, DIFF_FILES);
 		PARENT_TO_DIFF_FILES_4_4.put(COMMIT_3_4, DIFF_FILES);
@@ -86,31 +89,31 @@ public class RepositoryTest {
 	
 	/** revision -> parent -> diff files in hGraph 5 **/
 	private static final String COMMIT_1_5 = "eab94e5";
-	private static final Map<String, List<String>> PARENT_TO_DIFF_FILES_1_5 = new HashMap<String, List<String>>();
+	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_1_5 = new HashMap<String, List<DiffFile>>();
 	
 	private static final String COMMIT_2_5 = "d863c56";
-	private static final Map<String, List<String>> PARENT_TO_DIFF_FILES_2_5 = new HashMap<String, List<String>>();
+	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_2_5 = new HashMap<String, List<DiffFile>>();
 	static {
 		PARENT_TO_DIFF_FILES_2_5.put(COMMIT_1_5, DIFF_FILES);
 	}
 	private static final String COMMIT_3_5 = "7d72bc0";
-	private static final Map<String, List<String>> PARENT_TO_DIFF_FILES_3_5 = new HashMap<String, List<String>>();
+	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_3_5 = new HashMap<String, List<DiffFile>>();
 	static {
 		PARENT_TO_DIFF_FILES_3_5.put(COMMIT_1_5, DIFF_FILES);
 	}
 	private static final String COMMIT_4_5 = "e14c9c6";
-	private static final Map<String, List<String>> PARENT_TO_DIFF_FILES_4_5 = new HashMap<String, List<String>>();
+	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_4_5 = new HashMap<String, List<DiffFile>>();
 	static {
 		PARENT_TO_DIFF_FILES_4_5.put(COMMIT_2_5, DIFF_FILES);
 		PARENT_TO_DIFF_FILES_4_5.put(COMMIT_3_5, DIFF_FILES);
 	}
 	private static final String COMMIT_5_5 = "35c25ec";
-	private static final Map<String, List<String>> PARENT_TO_DIFF_FILES_5_5 = new HashMap<String, List<String>>();
+	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_5_5 = new HashMap<String, List<DiffFile>>();
 	static {
 		PARENT_TO_DIFF_FILES_5_5.put(COMMIT_1_5, DIFF_FILES);
 	}
 	private static final String COMMIT_6_5 = "e654cdb";
-	private static final Map<String, List<String>> PARENT_TO_DIFF_FILES_6_5 = new HashMap<String, List<String>>();
+	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_6_5 = new HashMap<String, List<DiffFile>>();
 	static {
 		PARENT_TO_DIFF_FILES_6_5.put(COMMIT_4_5, DIFF_FILES);
 		PARENT_TO_DIFF_FILES_6_5.put(COMMIT_5_5, DIFF_FILES);
@@ -196,7 +199,7 @@ public class RepositoryTest {
 	private static final HistoryGraph[] EXPECTED_HGRAPHS = {HGRAPH_1, HGRAPH_2, HGRAPH_3, HGRAPH_4, HGRAPH_5};
 	
 	@Test
-	public void testBuildHistoryGraph() {
+	public void testBuildHistoryGraphOnSampleRepositories() {
 		for (int i = 0; i < DIRECTORIES.length; i++) {
 			Repository repo = new Repository(DIRECTORIES[i]);
 	
@@ -210,6 +213,11 @@ public class RepositoryTest {
 			
 			assertEquals("result mismatched on " + DIRECTORIES[i], EXPECTED_HGRAPHS[i], actualHGraph);
 		}
+	}
+	
+	@Test
+	public void testBuildHistoryGraphOnVoldemortRepository() {
+		// TODO : implement test
 	}
 
 	private static void buildHistoryGraph(HistoryGraph hGraph, List<Revision> revisions) {

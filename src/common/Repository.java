@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+import common.DiffFile.DiffType;
+
 /**
  * Repository represents a git repository.
  * Repository contains a reference to the directory associated with this Repository.
@@ -58,8 +60,8 @@ public class Repository {
      * @return a list of diff files between childCommit and parentCommit
      * @throws IOException
      */
-    public List<String> getDiffFiles(String childCommitID, String parentCommitID) throws IOException {
-        List<String> diffFiles = new ArrayList<String>();
+    public List<DiffFile> getDiffFiles(String childCommitID, String parentCommitID) throws IOException {
+        List<DiffFile> diffFiles = new ArrayList<DiffFile>();
 
         Process p = Util.runProcess(new String[] { "git", "diff", "--name-status", childCommitID, parentCommitID }, directory);
 
@@ -67,7 +69,20 @@ public class Repository {
 
         String line = new String();
         while ((line = reader.readLine()) != null) {
-            diffFiles.add(line);
+        	String[] tokens = line.split("\\s");
+        	
+        	DiffType type;
+        	if (tokens[0].equals("A")) {
+        		type = DiffType.ADDED;
+        	} else if (tokens[0].equals("M")) {
+        		type = DiffType.MODIFIED;
+        	} else {
+        		type = DiffType.DELETED;
+        	}
+        	
+        	DiffFile diffFile = new DiffFile(type, tokens[1]);
+        	
+            diffFiles.add(diffFile);
         }
         
         return diffFiles;
@@ -97,7 +112,7 @@ public class Repository {
             String[] hashes = line.split(" ");
 
             String commitID = hashes[0];
-            Map<String, List<String>> parentIDToDiffFiles = getParentIDToDiffFiles(commitID, hashes);
+            Map<String, List<DiffFile>> parentIDToDiffFiles = getParentIDToDiffFiles(commitID, hashes);
             
             Revision revision = new Revision(this, commitID, parentIDToDiffFiles);
             hGraph.addRevision(revision);
@@ -117,13 +132,13 @@ public class Repository {
      * @return a mapping : a parentCommitID -> a list of diff files
      * @throws IOException
      */
-    private Map<String, List<String>> getParentIDToDiffFiles(String commitID, String[] hashes) throws IOException {
-    	Map<String, List<String>> parentIDToDiffFiles = new HashMap<String, List<String>>();
+    private Map<String, List<DiffFile>> getParentIDToDiffFiles(String commitID, String[] hashes) throws IOException {
+    	Map<String, List<DiffFile>> parentIDToDiffFiles = new HashMap<String, List<DiffFile>>();
 
         if (hashes.length > 1) {
             for (int i = 1; i < hashes.length; i++) {
                 String parentID = hashes[i];
-                List<String> diffFiles = getDiffFiles(commitID, parentID);
+                List<DiffFile> diffFiles = getDiffFiles(commitID, parentID);
 
                 parentIDToDiffFiles.put(parentID, diffFiles);
             }
