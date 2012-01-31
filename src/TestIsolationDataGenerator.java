@@ -27,7 +27,7 @@ public class TestIsolationDataGenerator {
     /**
      * Full path to the serialized output file.
      */
-    @Option(value = "-o File to use for serialized output.", aliases = { "-serializedOutputFile" })
+    @Option(value = "-z File to use for serialized output.", aliases = { "-serializedOutputFile" })
     public static String serializedOutputFileName = null;
     
     /**
@@ -69,8 +69,7 @@ public class TestIsolationDataGenerator {
      * @throws IOException
      */
     public static void main(String[] args) throws IOException {
-        Options plumeOptions = new Options(
-                TestIsolationDataGenerator.usage_string);
+        Options plumeOptions = new Options(TestIsolationDataGenerator.usage_string, TestIsolationDataGenerator.class);
         plumeOptions.parse_or_usage(args);
 
         // Display the help screen.
