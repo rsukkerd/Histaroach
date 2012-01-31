@@ -150,33 +150,33 @@ public class RepositoryTest {
 	
 	private static final List<Revision> REVISIONS_2 = new ArrayList<Revision>();
 	static {
-		REVISIONS_2.add(REVISION_1_2);
 		REVISIONS_2.add(REVISION_2_2);
+		REVISIONS_2.add(REVISION_1_2);
 	}
 	
 	private static final List<Revision> REVISIONS_3 = new ArrayList<Revision>();
 	static {
-		REVISIONS_3.add(REVISION_1_3);
-		REVISIONS_3.add(REVISION_2_3);
 		REVISIONS_3.add(REVISION_3_3);
+		REVISIONS_3.add(REVISION_2_3);
+		REVISIONS_3.add(REVISION_1_3);
 	}
 	
 	private static final List<Revision> REVISIONS_4 = new ArrayList<Revision>();
 	static {
-		REVISIONS_4.add(REVISION_1_4);
-		REVISIONS_4.add(REVISION_2_4);
-		REVISIONS_4.add(REVISION_3_4);
 		REVISIONS_4.add(REVISION_4_4);
+		REVISIONS_4.add(REVISION_3_4);
+		REVISIONS_4.add(REVISION_2_4);
+		REVISIONS_4.add(REVISION_1_4);
 	}
 	
 	private static final List<Revision> REVISIONS_5 = new ArrayList<Revision>();
 	static {
-		REVISIONS_5.add(REVISION_1_5);
-		REVISIONS_5.add(REVISION_2_5);
-		REVISIONS_5.add(REVISION_3_5);
-		REVISIONS_5.add(REVISION_4_5);
-		REVISIONS_5.add(REVISION_5_5);
 		REVISIONS_5.add(REVISION_6_5);
+		REVISIONS_5.add(REVISION_5_5);
+		REVISIONS_5.add(REVISION_4_5);
+		REVISIONS_5.add(REVISION_3_5);
+		REVISIONS_5.add(REVISION_2_5);
+		REVISIONS_5.add(REVISION_1_5);
 	}
 	/***********************************************/
 	

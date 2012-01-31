@@ -1,14 +1,19 @@
-
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-
-import common.HistoryGraph;
-import common.Repository;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Iterator;
 
 import plume.Option;
 import plume.OptionGroup;
 import plume.Options;
+
+import common.HistoryGraph;
+import common.Repository;
+import common.Revision;
+import common.Util;
 
 public class TestIsolationDataGenerator {
 
@@ -52,6 +57,9 @@ public class TestIsolationDataGenerator {
 
     /** One line synopsis of usage */
     public static final String usage_string = "TestIsolationDataGenerator [options]";
+    
+    /** period of writing result to serialized file **/
+    public static final int PERIOD = 10;
 
     /**
      * Initial program entrance -- parses the arguments and runs the data
@@ -72,12 +80,8 @@ public class TestIsolationDataGenerator {
         }
 
         HistoryGraph historyGraph = extractData();
-        
-        // write historyGraph in human-readable form to output file
-        FileWriter outFileStream = new FileWriter(humanReadOutputFileName);
-        BufferedWriter outFileWriter = new BufferedWriter(outFileStream);
-        outFileWriter.write(historyGraph.toString());
-        outFileWriter.close();
+        writeToSerializedFile(historyGraph);
+        Util.writeToHumanReadableFile(humanReadOutputFileName, historyGraph);
     }
 
     /**
@@ -88,7 +92,84 @@ public class TestIsolationDataGenerator {
     	Repository repository = new Repository(repositoryDirName);
     	HistoryGraph historyGraph = repository.buildHistoryGraph(startCommitID, endCommitID);
     	
+    	if (historyGraph.iterator().hasNext()) {
+    		Revision startRevision = historyGraph.iterator().next();
+    		populateTestResults(historyGraph, startRevision);
+    	}
+    	
     	return historyGraph;
     }
+    
+    /**
+     * construct a TestResult instance for each revision in the historyGraph, 
+     * starting from startRevision
+     * 
+     * @modifies historyGraph
+     * @throws IOException 
+     * @throws FileNotFoundException 
+     */
+    public static void populateTestResults(HistoryGraph historyGraph, Revision startRevision) throws FileNotFoundException, IOException {
+    	Iterator<Revision> itr = historyGraph.iterator();
+    	
+    	int count = 0;
+    	Revision next = null;
+    	while (itr.hasNext() && !(next = itr.next()).equals(startRevision)) { /* search for startRevision */ }
+    	
+    	if (next != null && next.equals(startRevision)) {
+    		next.getTestResult();
+    		count++;
+    		
+	    	while (itr.hasNext()) {
+	    		Revision revision = itr.next();
+	    		revision.getTestResult();
+	    		count++;
+	    		
+	    		if (count % PERIOD == 0) {
+	    			writeToSerializedFile(historyGraph);
+	    		}
+	    	}
+    	}
+    }
+    
 
+    /**
+     * write historyGraph to a serialized file
+     */
+    public static void writeToSerializedFile(HistoryGraph historyGraph) {
+    	ObjectOutputStream output;
+    	
+    	try {
+			output = new ObjectOutputStream(new FileOutputStream(serializedOutputFileName));
+			output.writeObject(historyGraph);
+			output.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+    
+    /**
+     * read historyGraph from a serialized file
+     * 
+     * @return historyGraph
+     */
+    public static HistoryGraph readFromSerializedFile() {
+    	HistoryGraph hGraph = null;
+    	ObjectInputStream input;
+    	
+    	try {
+			input = new ObjectInputStream(new FileInputStream(serializedOutputFileName));
+			hGraph = (HistoryGraph) input.readObject();
+			input.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		return hGraph;
+    }
 }

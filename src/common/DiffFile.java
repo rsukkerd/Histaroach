@@ -1,10 +1,17 @@
 package common;
 
+import java.io.Serializable;
+
 /**
  * DiffFile represents a file that is different between a child revision and its parent revision.
  * DiffFile contains a file name and a type of difference: Added, Modified, or Deleted.
  */
-public class DiffFile {
+public class DiffFile implements Serializable {
+	/**
+	 * serial version ID
+	 */
+	private static final long serialVersionUID = 491368705717578455L;
+
 	public enum DiffType {
 		ADDED,
 		MODIFIED,

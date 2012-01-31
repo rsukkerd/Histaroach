@@ -1,6 +1,9 @@
 package common;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class Util {
 
@@ -23,5 +26,19 @@ public class Util {
         }
         return p;
     }
-
+    
+    /**
+     * write an object in a human-readable form to output file
+     */
+    public static void writeToHumanReadableFile(String fileName, Object object) {
+        BufferedWriter outFileWriter;
+        
+		try {
+			outFileWriter = new BufferedWriter(new FileWriter(fileName));
+			outFileWriter.write(object.toString());
+	        outFileWriter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
 }

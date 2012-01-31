@@ -10,6 +10,11 @@ import common.TestResult;
 public class VoldemortTestResult extends TestResult {
 	
     /**
+	 * serial version ID
+	 */
+	private static final long serialVersionUID = 5271469198946606556L;
+
+	/**
      * parse junit test results from standard output and standard error streams
      * @return TestResult instance of a given commit
      */

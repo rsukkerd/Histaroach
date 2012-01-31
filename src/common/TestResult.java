@@ -1,5 +1,6 @@
 package common;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -8,7 +9,12 @@ import java.util.Set;
  * TestResult has a commit id and contains 2 sets of tests: 
  * a set of all tests and a set of failed tests.
  */
-public class TestResult {
+public class TestResult implements Serializable {
+	/**
+	 * serial version ID
+	 */
+	private static final long serialVersionUID = 2210640650733708242L;
+	
 	private final String commitID;
     private /*@Non-Null*/ Set<String> allTests;
     private /*@Non-Null*/ Set<String> failedTests;

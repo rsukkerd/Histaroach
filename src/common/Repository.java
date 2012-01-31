@@ -4,10 +4,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -20,13 +20,18 @@ import common.DiffFile.DiffType;
  * Repository represents a git repository.
  * Repository contains a reference to the directory associated with this Repository.
  */
-public class Repository {
-    public static final String[] LOG_COMMAND = { "git", "log", "--pretty=format:%h %p" };
+public class Repository implements Serializable {
+    /**
+	 * serial version ID
+	 */
+	private static final long serialVersionUID = -2999033773371301088L;
+	
+	public static final String[] LOG_COMMAND = { "git", "log", "--pretty=format:%h %p" };
     public static final String[] JUNIT_COMMAND = { "ant", "junit" };
     public static final String SINGLE_TEST_COMMAND = "ant junit-test -Dtest.name=";
 
     private final File directory;
-
+    
     /**
      * create a repository instance
      * 
@@ -90,6 +95,7 @@ public class Repository {
 
     /**
      * build a history graph instance containing revisions from startCommit to endCommit
+     * initially, each revision in the history graph has compilable = UNKNOWN and TestResult = null
      * 
      * @param startCommitID
      * @param endCommitID
@@ -129,6 +135,8 @@ public class Repository {
     }
     
     /**
+     * Helper method for buildHistoryGraph
+     * 
      * @return a mapping : a parentCommitID -> a list of diff files
      * @throws IOException
      */
@@ -152,10 +160,8 @@ public class Repository {
 	 */
 	public Map<String, List<BugFix>> getAllBugFixes(HistoryGraph historyGraph) {
 		Map<String, List<BugFix>> map = new HashMap<String, List<BugFix>>();
-		Iterator<Revision> itr = historyGraph.getRevisionIterator();
 		
-		while (itr.hasNext()) {
-			Revision revision = itr.next();
+		for (Revision revision : historyGraph) {
 			List<String> fixedBugs = new ArrayList<String>(); // find all bugs that this revision fixed
 			Set<Revision> parents = historyGraph.getParents(revision);
 			

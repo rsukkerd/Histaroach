@@ -1,20 +1,32 @@
 package common;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
  * HistoryGraph represents a graph structure of a particular repository.
  */
-public class HistoryGraph {
+public class HistoryGraph implements Iterable<Revision>, Serializable {
+	/**
+	 * serial version ID
+	 */
+	private static final long serialVersionUID = 7286435306324502773L;
+	
 	/** mapping : a revision's commit id -> that revision **/
 	private final Map<String, Revision> map;
 	
+	/** revisions' order according to 'git log' **/
+	private final List<Revision> orderedRevisions;
+	
 	public HistoryGraph() {
 		map = new HashMap<String, Revision>();
+		orderedRevisions = new ArrayList<Revision>();
 	}
 	
 	/**
@@ -22,6 +34,7 @@ public class HistoryGraph {
 	 */
 	public void addRevision(Revision revision) {
 		map.put(revision.getCommitID(), revision);
+		orderedRevisions.add(revision);
 	}
 	
 	/**
@@ -37,13 +50,6 @@ public class HistoryGraph {
 		}
 		
 		return parents;
-	}
-	
-	/**
-	 * @return an iterator over all revisions in this history graph
-	 */
-	public Iterator<Revision> getRevisionIterator() {
-		return map.values().iterator();
 	}
 	
 	/**
@@ -94,21 +100,26 @@ public class HistoryGraph {
 
         HistoryGraph hGraph = (HistoryGraph) other;
 
-        return map.equals(hGraph.map);
+        return map.equals(hGraph.map) && orderedRevisions.equals(hGraph.orderedRevisions);
     }
     
     @Override
     public int hashCode() {
-    	return map.hashCode();
+    	return 11 * map.hashCode() + 13 * orderedRevisions.hashCode();
     }
     
     @Override
     public String toString() {
     	String str = "";
-    	for (Revision revision : map.values()) {
+    	for (Revision revision : orderedRevisions) {
     		str += revision.toString() + "\n";
     	}
     	
     	return str;
     }
+
+	@Override
+	public Iterator<Revision> iterator() {
+		return orderedRevisions.iterator();
+	}
 }
