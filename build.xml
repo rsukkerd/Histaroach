@@ -15,6 +15,7 @@
     <path id="project499.classpath">
         <pathelement location="bin"/>
 	<pathelement location="lib/junit-4.9b2.jar"/>
+	<pathelement location="lib/plume.jar"/>
     </path>
 
     <!--=====================================================================-->
