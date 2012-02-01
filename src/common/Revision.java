@@ -1,7 +1,6 @@
 package common;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.List;
@@ -91,40 +90,33 @@ public class Revision implements Serializable {
 
         Process junitProcess = Util.runProcess(Repository.JUNIT_COMMAND,
                 repository.getDirectory());
+        
         BufferedReader stdOutputReader = new BufferedReader(
                 new InputStreamReader(junitProcess.getInputStream()));
 
         BufferedReader stdErrorReader = new BufferedReader(
                 new InputStreamReader(junitProcess.getErrorStream()));
         
-        if (buildFailed(stdErrorReader)) {
+        List<String> streamContent = Util.getOutputErrorStreamContent(stdOutputReader, stdErrorReader);
+        
+        if (buildFailed(streamContent)) {
         	compilable = COMPILABLE.NO;
         } else {
         	compilable = COMPILABLE.YES;
-        }
-        
-        if (compilable == COMPILABLE.YES) {
-        	testResult = new VoldemortTestResult(commitID, stdOutputReader, stdErrorReader);
+        	testResult = new VoldemortTestResult(commitID, streamContent);
         }
     }
     
     /**
      * @return true iff build failed
      */
-    private boolean buildFailed(BufferedReader stdErrorReader) {
+    private boolean buildFailed(List<String> streamContent) {
         Pattern buildFailedPattern = Pattern.compile("BUILD FAILED");
-        String line = new String();
-        
-        try {
-            while ((line = stdErrorReader.readLine()) != null) {
-            	Matcher buildFailedMatcher = buildFailedPattern.matcher(line);
-                if (buildFailedMatcher.find()) {
-                    return true;
-                }
+        for (String line : streamContent) {
+        	Matcher buildFailedMatcher = buildFailedPattern.matcher(line);
+            if (buildFailedMatcher.find()) {
+                return true;
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(-1);
         }
         
         return false;

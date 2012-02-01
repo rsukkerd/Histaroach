@@ -59,7 +59,7 @@ public class TestIsolationDataGenerator {
     public static final String usage_string = "TestIsolationDataGenerator [options]";
     
     /** period of writing result to serialized file **/
-    public static final int PERIOD = 10;
+    public static final int PERIOD = 5;
 
     /**
      * Initial program entrance -- parses the arguments and runs the data
@@ -123,6 +123,7 @@ public class TestIsolationDataGenerator {
 	    		revision.getTestResult();
 	    		count++;
 	    		
+	    		/* write the progress periodically */
 	    		if (count % PERIOD == 0) {
 	    			writeToSerializedFile(historyGraph);
 	    		}
@@ -130,7 +131,6 @@ public class TestIsolationDataGenerator {
     	}
     }
     
-
     /**
      * write historyGraph to a serialized file
      */
