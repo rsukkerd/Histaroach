@@ -3,8 +3,11 @@ package common;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,6 +61,23 @@ public class Util {
 		}
     	
     	return lines;
+    }
+    
+    /**
+     * write an object to serialized output file
+     */
+    public static void writeToSerializedFile(String fileName, Object object) {
+    	ObjectOutputStream output;
+    	
+    	try {
+			output = new ObjectOutputStream(new FileOutputStream(fileName));
+			output.writeObject(object);
+			output.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     }
     
     /**

@@ -1,9 +1,4 @@
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.Iterator;
 
 import plume.Option;
@@ -24,43 +19,48 @@ public class TestIsolationDataGenerator {
     @Option(value = "-h Print short usage message", aliases = { "-help" })
     public static boolean showHelp = false;
 
+    public static final String SERIALIZED_OUTPUT_FILE_NAME = "historyGraph.ser";
+    public static final String HUMAN_READ_OUTPUT_FILE_NAME = "historyGraph.log";
+
     /**
-     * Full path to the serialized output file.
+     * The commit ID from which to begin the HistoryGraph analysis (inclusive).
      */
-    @Option(value = "-z File to use for serialized output.", aliases = { "-serializedOutputFile" })
-    public static String serializedOutputFileName = null;
+    @Option(value = "-S Starting commit ID (HistoryGraph)", aliases = { "-startHGraphID" })
+    public static String startHGraphID = null;
+
+    /**
+     * The commit ID where the HistoryGraph analysis should terminate (inclusive).
+     */
+    @Option(value = "-E Ending commit ID (HistoryGraph)", aliases = { "-endHGraphID" })
+    public static String endHGraphID = null;
     
     /**
-     * Full path to the human-readable output file.
+     * The commit ID from which to begin the TestResult analysis (inclusive).
      */
-    @Option(value = "-o File to use for human-readable output.", aliases = { "-humanReadOutputFile" })
-    public static String humanReadOutputFileName = null;
+    @Option(value = "-s Starting commit ID (TestResult)", aliases = { "-startTResultID" })
+    public static String startTResultID = null;
 
     /**
-     * The commit ID from which to begin the analysis.
+     * The commit ID where the TestResult analysis should terminate (exclusive).
      */
-    @Option(value = "-s Starting commit id")
-    public static String startCommitID = null;
-
-    /**
-     * The commit ID where the analysis should terminate.
-     */
-    @Option(value = "-e Ending commit id")
-    public static String endCommitID = null;
-
+    @Option(value = "-e Ending commit ID (TestResult)", aliases = { "-endTResultID" })
+    public static String endTResultID = null;
+    
     /**
      * Full path to the repository directory.
      */
-    @Option(value = "-r Full path to the repository directory.",
-            aliases = { "-repodir" })
+    @Option(value = "-r Full path to the repository directory", aliases = { "-repoDir" })
     public static String repositoryDirName = null;
+    
+    /**
+     * Full path to the output directory.
+     */
+    @Option(value = "-o Full path to the output directory", aliases = { "-outputDir" })
+    public static String outputDirName = null;
 
     /** One line synopsis of usage */
     public static final String usage_string = "TestIsolationDataGenerator [options]";
     
-    /** period of writing result to serialized file **/
-    public static final int PERIOD = 5;
-
     /**
      * Initial program entrance -- parses the arguments and runs the data
      * extraction.
@@ -79,8 +79,10 @@ public class TestIsolationDataGenerator {
         }
 
         HistoryGraph historyGraph = extractData();
-        writeToSerializedFile(historyGraph);
-        Util.writeToHumanReadableFile(humanReadOutputFileName, historyGraph);
+        populateTestResults(historyGraph);
+        
+        Util.writeToSerializedFile(outputDirName + "/" + SERIALIZED_OUTPUT_FILE_NAME, historyGraph);
+        Util.writeToHumanReadableFile(outputDirName + "/" + HUMAN_READ_OUTPUT_FILE_NAME, historyGraph);
     }
 
     /**
@@ -89,86 +91,31 @@ public class TestIsolationDataGenerator {
      */
     public static HistoryGraph extractData() throws IOException {
     	Repository repository = new Repository(repositoryDirName);
-    	HistoryGraph historyGraph = repository.buildHistoryGraph(startCommitID, endCommitID);
-    	
-    	if (historyGraph.iterator().hasNext()) {
-    		Revision startRevision = historyGraph.iterator().next();
-    		populateTestResults(historyGraph, startRevision);
-    	}
+    	HistoryGraph historyGraph = repository.buildHistoryGraph(startHGraphID, endHGraphID);
     	
     	return historyGraph;
     }
     
     /**
-     * construct a TestResult instance for each revision in the historyGraph, 
-     * starting from startRevision
+     * construct a TestResult instance for each revision in 
+     * a specified range in historyGraph
      * 
      * @modifies historyGraph
-     * @throws IOException 
-     * @throws FileNotFoundException 
      */
-    public static void populateTestResults(HistoryGraph historyGraph, Revision startRevision) throws FileNotFoundException, IOException {
+    public static void populateTestResults(HistoryGraph historyGraph) {
     	Iterator<Revision> itr = historyGraph.iterator();
+    	Revision revision = null;
+    	while (itr.hasNext() && !(revision = itr.next()).getCommitID().equals(startTResultID)) { /* search for start revision */ }
     	
-    	int count = 0;
-    	Revision next = null;
-    	while (itr.hasNext() && !(next = itr.next()).equals(startRevision)) { /* search for startRevision */ }
-    	
-    	if (next != null && next.equals(startRevision)) {
-    		next.getTestResult();
-    		count++;
+    	if (revision != null && revision.getCommitID().equals(startTResultID)) {
+    		revision.getTestResult();
     		
-	    	while (itr.hasNext()) {
-	    		Revision revision = itr.next();
+	    	while (itr.hasNext() && !(revision = itr.next()).getCommitID().equals(endTResultID)) {
 	    		revision.getTestResult();
-	    		count++;
 	    		
-	    		/* write the progress periodically */
-	    		if (count % PERIOD == 0) {
-	    			writeToSerializedFile(historyGraph);
-	    		}
+	    		String filename = outputDirName + "/" + revision.getCommitID() + ".ser";
+	    		Util.writeToSerializedFile(filename, revision);
 	    	}
     	}
-    }
-    
-    /**
-     * write historyGraph to a serialized file
-     */
-    public static void writeToSerializedFile(HistoryGraph historyGraph) {
-    	ObjectOutputStream output;
-    	
-    	try {
-			output = new ObjectOutputStream(new FileOutputStream(serializedOutputFileName));
-			output.writeObject(historyGraph);
-			output.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-    }
-    
-    /**
-     * read historyGraph from a serialized file
-     * 
-     * @return historyGraph
-     */
-    public static HistoryGraph readFromSerializedFile() {
-    	HistoryGraph hGraph = null;
-    	ObjectInputStream input;
-    	
-    	try {
-			input = new ObjectInputStream(new FileInputStream(serializedOutputFileName));
-			hGraph = (HistoryGraph) input.readObject();
-			input.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		
-		return hGraph;
     }
 }
