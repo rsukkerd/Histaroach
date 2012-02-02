@@ -23,25 +23,25 @@ public class TestIsolationDataGenerator {
     public static final String HUMAN_READ_OUTPUT_FILE_NAME = "historyGraph.log";
 
     /**
-     * The commit ID from which to begin the HistoryGraph analysis (inclusive).
+     * The commit ID from which to begin the HistoryGraph analysis.
      */
     @Option(value = "-S Starting commit ID (HistoryGraph)", aliases = { "-startHGraphID" })
     public static String startHGraphID = null;
 
     /**
-     * The commit ID where the HistoryGraph analysis should terminate (inclusive).
+     * The commit ID where the HistoryGraph analysis should terminate.
      */
     @Option(value = "-E Ending commit ID (HistoryGraph)", aliases = { "-endHGraphID" })
     public static String endHGraphID = null;
     
     /**
-     * The commit ID from which to begin the TestResult analysis (inclusive).
+     * The commit ID from which to begin the TestResult analysis.
      */
     @Option(value = "-s Starting commit ID (TestResult)", aliases = { "-startTResultID" })
     public static String startTResultID = null;
 
     /**
-     * The commit ID where the TestResult analysis should terminate (exclusive).
+     * The commit ID where the TestResult analysis should terminate.
      */
     @Option(value = "-e Ending commit ID (TestResult)", aliases = { "-endTResultID" })
     public static String endTResultID = null;
@@ -81,8 +81,8 @@ public class TestIsolationDataGenerator {
         HistoryGraph historyGraph = extractData();
         populateTestResults(historyGraph);
         
-        Util.writeToSerializedFile(outputDirName + "/" + SERIALIZED_OUTPUT_FILE_NAME, historyGraph);
-        Util.writeToHumanReadableFile(outputDirName + "/" + HUMAN_READ_OUTPUT_FILE_NAME, historyGraph);
+        Util.writeToSerializedFile(outputDirName + SERIALIZED_OUTPUT_FILE_NAME, historyGraph);
+        Util.writeToHumanReadableFile(outputDirName + HUMAN_READ_OUTPUT_FILE_NAME, historyGraph);
     }
 
     /**
@@ -110,11 +110,23 @@ public class TestIsolationDataGenerator {
     	if (revision != null && revision.getCommitID().equals(startTResultID)) {
     		revision.getTestResult();
     		
-	    	while (itr.hasNext() && !(revision = itr.next()).getCommitID().equals(endTResultID)) {
+    		String filename = outputDirName + revision.getCommitID() + ".ser";
+    		Util.writeToSerializedFile(filename, revision);
+    		
+    		if (revision.getCommitID().equals(endTResultID)) {
+    			return;
+    		}
+    		
+	    	while (itr.hasNext()) {
+	    		revision = itr.next();
 	    		revision.getTestResult();
 	    		
-	    		String filename = outputDirName + "/" + revision.getCommitID() + ".ser";
+	    		filename = outputDirName + revision.getCommitID() + ".ser";
 	    		Util.writeToSerializedFile(filename, revision);
+	    		
+	    		if (revision.getCommitID().equals(endTResultID)) {
+	    			return;
+	    		}
 	    	}
     	}
     }
