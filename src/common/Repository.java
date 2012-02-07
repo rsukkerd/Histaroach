@@ -112,9 +112,10 @@ public class Repository implements Serializable {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(
                 logProcess.getInputStream()));
+        
+        List<String> lines = Util.getStreamContent(reader);
 
-        String line = new String();
-        while ((line = reader.readLine()) != null) {
+        for (String line : lines) {
             String[] hashes = line.split(" ");
 
             String commitID = hashes[0];

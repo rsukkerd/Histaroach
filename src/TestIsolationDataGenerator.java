@@ -79,7 +79,7 @@ public class TestIsolationDataGenerator {
         }
 
         HistoryGraph historyGraph = extractData();
-        populateTestResults(historyGraph);
+        //populateTestResults(historyGraph);
         
         Util.writeToSerializedFile(outputDirName + SERIALIZED_OUTPUT_FILE_NAME, historyGraph);
         Util.writeToHumanReadableFile(outputDirName + HUMAN_READ_OUTPUT_FILE_NAME, historyGraph);

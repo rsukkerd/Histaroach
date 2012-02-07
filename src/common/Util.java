@@ -63,6 +63,17 @@ public class Util {
     	return lines;
     }
     
+    public static List<String> getStreamContent(BufferedReader reader) throws IOException {
+    	List<String> lines = new ArrayList<String>();
+    	
+    	String line = new String();
+    	while ((line = reader.readLine()) != null) {
+    		lines.add(line);
+    	}
+    	
+    	return lines;
+    }
+    
     /**
      * write an object to serialized output file
      */
