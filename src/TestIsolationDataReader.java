@@ -1,9 +1,14 @@
-import common.HistoryGraph;
-import common.HistoryGraphReader;
+import java.util.Set;
 
 import plume.Option;
 import plume.OptionGroup;
 import plume.Options;
+
+import common.HistoryGraph;
+import common.HistoryGraphReader;
+import common.Revision;
+
+import static org.junit.Assert.assertNotNull;
 
 public class TestIsolationDataReader {
 
@@ -41,7 +46,16 @@ public class TestIsolationDataReader {
         
         HistoryGraphReader hGraphReader = new HistoryGraphReader(serializedInputFileName);
         HistoryGraph reconstructedHGraph = hGraphReader.readHistoryGraph();
-        System.out.println(reconstructedHGraph.toString());
+        
+        verifyHistoryGraph(reconstructedHGraph);
 	}
 
+	public static void verifyHistoryGraph(HistoryGraph historyGraph) {
+		for (Revision revision : historyGraph) {
+			Set<Revision> parents = historyGraph.getParents(revision);
+			for (Revision parent : parents) {
+				assertNotNull("null parent at " + revision.getCommitID(), parent);
+			}
+		}
+	}
 }
