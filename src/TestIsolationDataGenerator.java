@@ -12,17 +12,20 @@ import common.Util;
 
 public class TestIsolationDataGenerator {
 
-    /**
-     * Print the short usage message.
-     */
-    @OptionGroup("General Options")
-    @Option(value = "-h Print short usage message", aliases = { "-help" })
-    public static boolean showHelp = false;
-
     public static final String SERIALIZED_OUTPUT_FILE_NAME = "historyGraph.ser";
     public static final String HUMAN_READ_OUTPUT_FILE_NAME = "historyGraph.log";
 
     /**
+	 * Print the short usage message.
+	 */
+	@OptionGroup("General Options")
+	@Option(value = "-h Print short usage message", aliases = { "-help" })
+	public static boolean showHelp = false;
+	
+	@Option(value = "-p Populate test results", aliases = { "-populateTestResults" })
+	public static boolean populateTestResults = false;
+
+	/**
      * The commit ID from which to begin the HistoryGraph analysis.
      */
     @Option(value = "-S Starting commit ID (HistoryGraph)", aliases = { "-startHGraphID" })
@@ -73,7 +76,10 @@ public class TestIsolationDataGenerator {
         }
 
         HistoryGraph historyGraph = extractData();
-        //populateTestResults(historyGraph);
+        
+        if (populateTestResults) {
+        	populateTestResults(historyGraph);
+        }
         
         Util.writeToSerializedFile(outputDirName + SERIALIZED_OUTPUT_FILE_NAME, historyGraph);
         Util.writeToHumanReadableFile(outputDirName + HUMAN_READ_OUTPUT_FILE_NAME, historyGraph);
