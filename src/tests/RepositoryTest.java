@@ -2,9 +2,7 @@ package tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -181,7 +179,6 @@ public class RepositoryTest {
 	/***********************************************/
 	
 	private static final String[] START_COMMIT_IDS = {COMMIT_1_1, COMMIT_2_2, COMMIT_3_3, COMMIT_4_4, COMMIT_6_5};
-	private static final String[] END_COMMIT_IDS = {COMMIT_1_1, COMMIT_1_2, COMMIT_1_3, COMMIT_1_4, COMMIT_1_5};
 	
 	private static final HistoryGraph HGRAPH_1 = new HistoryGraph();
 	private static final HistoryGraph HGRAPH_2 = new HistoryGraph();
@@ -204,13 +201,9 @@ public class RepositoryTest {
 			Repository repo = new Repository(DIRECTORIES[i]);
 	
 			HistoryGraph actualHGraph = null;
-			try {
-				actualHGraph = repo.buildHistoryGraph(START_COMMIT_IDS[i], END_COMMIT_IDS[i]);
-				assertNotNull("constructor returns null on " + DIRECTORIES[i], actualHGraph);
-			} catch (IOException e) {
-				fail("IOException thrown on " + DIRECTORIES[i]);
-			}
+			actualHGraph = repo.buildHistoryGraph(START_COMMIT_IDS[i]);
 			
+			assertNotNull("constructor returns null on " + DIRECTORIES[i], actualHGraph);
 			assertEquals("result mismatched on " + DIRECTORIES[i], EXPECTED_HGRAPHS[i], actualHGraph);
 		}
 	}

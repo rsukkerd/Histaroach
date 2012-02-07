@@ -76,7 +76,7 @@ public class ParallelBugFixesFinder {
     	Set<ParallelBugFixes> allParallelFixing = new HashSet<ParallelBugFixes>();
         
         Repository repository = new Repository(repositoryDirName);
-        HistoryGraph historyGraph = repository.buildHistoryGraph(startCommitID, endCommitID);
+        HistoryGraph historyGraph = repository.buildHistoryGraph(startCommitID);
         Map<String, List<BugFix>> allBugFixes = repository.getAllBugFixes(historyGraph);
         
         for (String bug : allBugFixes.keySet()) {

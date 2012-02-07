@@ -29,12 +29,6 @@ public class TestIsolationDataGenerator {
     public static String startHGraphID = null;
 
     /**
-     * The commit ID where the HistoryGraph analysis should terminate.
-     */
-    @Option(value = "-E Ending commit ID (HistoryGraph)", aliases = { "-endHGraphID" })
-    public static String endHGraphID = null;
-    
-    /**
      * The commit ID from which to begin the TestResult analysis.
      */
     @Option(value = "-s Starting commit ID (TestResult)", aliases = { "-startTResultID" })
@@ -91,7 +85,7 @@ public class TestIsolationDataGenerator {
      */
     public static HistoryGraph extractData() throws IOException {
     	Repository repository = new Repository(repositoryDirName);
-    	HistoryGraph historyGraph = repository.buildHistoryGraph(startHGraphID, endHGraphID);
+    	HistoryGraph historyGraph = repository.buildHistoryGraph(startHGraphID);
     	
     	return historyGraph;
     }

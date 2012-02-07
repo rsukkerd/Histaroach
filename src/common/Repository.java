@@ -93,14 +93,12 @@ public class Repository implements Serializable {
     }
 
     /**
-     * build a history graph instance containing revisions from startCommit to endCommit
+     * build a history graph instance containing revisions from startCommit to the root commit
      * initially, each revision in the history graph has compilable = UNKNOWN and TestResult = null
      * 
-     * @param startCommitID
-     * @param endCommitID
      * @return a history graph of this repository
      */
-    public HistoryGraph buildHistoryGraph(String startCommitID, String endCommitID) {
+    public HistoryGraph buildHistoryGraph(String startCommitID) {
         HistoryGraph hGraph = new HistoryGraph();
 
         int exitValue = checkoutCommit(startCommitID);
@@ -124,10 +122,6 @@ public class Repository implements Serializable {
             
             /* print progress to standard output */
             System.out.println(revision);
-
-            if (commitID.equals(endCommitID)) {
-                break;
-            }
         }
 
         return hGraph;
