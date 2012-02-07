@@ -2,7 +2,6 @@ package common;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -63,17 +62,17 @@ public class Repository implements Serializable {
      * @param childCommitID
      * @param parentCommitID
      * @return a list of diff files between childCommit and parentCommit
-     * @throws IOException
      */
-    public List<DiffFile> getDiffFiles(String childCommitID, String parentCommitID) throws IOException {
+    public List<DiffFile> getDiffFiles(String childCommitID, String parentCommitID) {
         List<DiffFile> diffFiles = new ArrayList<DiffFile>();
 
         Process p = Util.runProcess(new String[] { "git", "diff", "--name-status", childCommitID, parentCommitID }, directory);
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        
+        List<String> lines = Util.getStreamContent(reader);
 
-        String line = new String();
-        while ((line = reader.readLine()) != null) {
+        for (String line : lines) {
         	String[] tokens = line.split("\\s");
         	
         	DiffType type;
@@ -100,9 +99,8 @@ public class Repository implements Serializable {
      * @param startCommitID
      * @param endCommitID
      * @return a history graph of this repository
-     * @throws IOException
      */
-    public HistoryGraph buildHistoryGraph(String startCommitID, String endCommitID) throws IOException {
+    public HistoryGraph buildHistoryGraph(String startCommitID, String endCommitID) {
         HistoryGraph hGraph = new HistoryGraph();
 
         int exitValue = checkoutCommit(startCommitID);
@@ -139,9 +137,8 @@ public class Repository implements Serializable {
      * Helper method for buildHistoryGraph
      * 
      * @return a mapping : a parentCommitID -> a list of diff files
-     * @throws IOException
      */
-    private Map<String, List<DiffFile>> getParentIDToDiffFiles(String commitID, String[] hashes) throws IOException {
+    private Map<String, List<DiffFile>> getParentIDToDiffFiles(String commitID, String[] hashes) {
     	Map<String, List<DiffFile>> parentIDToDiffFiles = new HashMap<String, List<DiffFile>>();
 
         if (hashes.length > 1) {

@@ -97,13 +97,14 @@ public class Revision implements Serializable {
         BufferedReader stdErrorReader = new BufferedReader(
                 new InputStreamReader(junitProcess.getErrorStream()));
         
-        List<String> streamContent = Util.getOutputErrorStreamContent(stdOutputReader, stdErrorReader);
+        List<String> outputStreamContent = Util.getStreamContent(stdOutputReader);
+        List<String> errorStreamContent = Util.getStreamContent(stdErrorReader);
         
-        if (buildFailed(streamContent)) {
+        if (buildFailed(errorStreamContent)) {
         	compilable = COMPILABLE.NO;
         } else {
         	compilable = COMPILABLE.YES;
-        	testResult = new VoldemortTestResult(commitID, streamContent);
+        	testResult = new VoldemortTestResult(commitID, outputStreamContent, errorStreamContent);
         }
     }
     

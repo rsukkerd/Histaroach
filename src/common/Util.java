@@ -34,42 +34,22 @@ public class Util {
     }
     
     /**
-     * read and cache content from stdOutputReader and stdErrorReader
-     * 
-     * @return a list of content from stdOutputReader and stdErrorReader
+     * read and cache content from reader
+     * @return a list of lines obtained by reader.readline()
+     * @throws IOException
      */
-    public static List<String> getOutputErrorStreamContent(BufferedReader stdOutputReader, BufferedReader stdErrorReader) {
+    public static List<String> getStreamContent(BufferedReader reader) {
     	List<String> lines = new ArrayList<String>();
     	
     	String line = new String();
     	try {
-			while ((line = stdOutputReader.readLine()) != null) {
+			while ((line = reader.readLine()) != null) {
 				lines.add(line);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
-		
-		try {
-			while ((line = stdErrorReader.readLine()) != null) {
-				lines.add(line);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}
-    	
-    	return lines;
-    }
-    
-    public static List<String> getStreamContent(BufferedReader reader) throws IOException {
-    	List<String> lines = new ArrayList<String>();
-    	
-    	String line = new String();
-    	while ((line = reader.readLine()) != null) {
-    		lines.add(line);
-    	}
     	
     	return lines;
     }

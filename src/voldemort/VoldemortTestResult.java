@@ -19,19 +19,21 @@ public class VoldemortTestResult extends TestResult {
      * 
      * @return TestResult instance of a given commit
      */
-    public VoldemortTestResult(String commitID, List<String> outputErrorStreamContent) {
+    public VoldemortTestResult(String commitID, List<String> outputStreamContent, List<String> errorStreamContent) {
         super(commitID);
         
     	Pattern testPattern = Pattern.compile("\\s*\\[junit\\] Running (\\S+)");
     	Pattern failedTestPattern = Pattern.compile("\\s*\\[junit\\] Test (\\S+) FAILED");
     	
-    	for (String line : outputErrorStreamContent) {
+    	for (String line : outputStreamContent) {
     		Matcher testMatcher = testPattern.matcher(line);
-    		Matcher failedTestMatcher = failedTestPattern.matcher(line);
-    		
             if (testMatcher.find()) {
                 this.addTest(testMatcher.group(1));
             }
+    	}
+    	
+    	for (String line : errorStreamContent) {
+    		Matcher failedTestMatcher = failedTestPattern.matcher(line);
             if (failedTestMatcher.find()) {
                 this.addFailedTest(failedTestMatcher.group(1));
             }
