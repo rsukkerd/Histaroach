@@ -2,7 +2,11 @@ package tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,8 +19,15 @@ import common.DiffFile.DiffType;
 import common.HistoryGraph;
 import common.Repository;
 import common.Revision;
+import common.Util;
+
+import org.apache.commons.io.FileUtils;
 
 public class RepositoryTest {
+	private static final String TAR_FILE = "test/sample_repositories.tar";
+	private static final String DEST_DIR = "test";
+	private static final String SAMPLE_REPOSITORIES = "test/sample_repositories";
+	
     private static final String[] DIRECTORIES = {"test/sample_repositories/repo1", 
     											"test/sample_repositories/repo2",
     											"test/sample_repositories/repo3",
@@ -196,7 +207,9 @@ public class RepositoryTest {
 	private static final HistoryGraph[] EXPECTED_HGRAPHS = {HGRAPH_1, HGRAPH_2, HGRAPH_3, HGRAPH_4, HGRAPH_5};
 	
 	@Test
-	public void testBuildHistoryGraphOnSampleRepositories() {
+	public void testBuildHistoryGraphOnSampleRepositories() throws FileNotFoundException, IOException {
+		assertTrue(untarSampleRepositories());
+		
 		for (int i = 0; i < DIRECTORIES.length; i++) {
 			Repository repo = new Repository(DIRECTORIES[i]);
 	
@@ -206,6 +219,8 @@ public class RepositoryTest {
 			assertNotNull("constructor returns null on " + DIRECTORIES[i], actualHGraph);
 			assertEquals("result mismatched on " + DIRECTORIES[i], EXPECTED_HGRAPHS[i], actualHGraph);
 		}
+		
+		assertTrue(deleteSampleRepositores());
 	}
 	
 	@Test
@@ -219,4 +234,27 @@ public class RepositoryTest {
 		}
 	}
 
+	private static boolean untarSampleRepositories() {
+		try {
+			Util.untar(TAR_FILE, DEST_DIR);
+			return true;
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return false;
+	}
+	
+	private static boolean deleteSampleRepositores() {
+		File target = new File(SAMPLE_REPOSITORIES);
+		try {
+			FileUtils.deleteDirectory(target);
+			return true;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
 }

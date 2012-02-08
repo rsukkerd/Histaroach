@@ -1,8 +1,11 @@
 package common;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -10,6 +13,12 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.xeustechnologies.jtar.TarEntry;
+import org.xeustechnologies.jtar.TarInputStream;
+
+//import org.apache.tools.tar.TarEntry;
+//import org.apache.tools.tar.TarInputStream;
 
 public class Util {
 
@@ -85,4 +94,40 @@ public class Util {
 			e.printStackTrace();
 		}
     }
+    
+    /**
+     * untar a repoTarFile and put its entries in repoDir
+     * 
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    public static void untar(String repoTarFile, String repoDir) throws FileNotFoundException, IOException {
+    	File dest = new File(repoDir);
+    	dest.mkdir();
+    	
+    	TarInputStream tis = new TarInputStream(new BufferedInputStream(new FileInputStream(repoTarFile)));
+		TarEntry entry;
+		while((entry = tis.getNextEntry()) != null) {
+			File destPath = new File(dest.toString() + File.separatorChar + entry.getName());
+			
+			if (entry.isDirectory()) {
+				destPath.mkdirs();
+			} else {
+				int count;
+				byte data[] = new byte[2048];
+				
+				FileOutputStream fos = new FileOutputStream(destPath);
+				BufferedOutputStream bos = new BufferedOutputStream(fos);
+
+				while ((count = tis.read(data)) != -1) {
+					bos.write(data, 0, count);
+				}
+				
+				bos.flush();
+				bos.close();
+			}
+		}
+		
+		tis.close();
+	}
 }
