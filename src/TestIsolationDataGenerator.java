@@ -22,9 +22,6 @@ public class TestIsolationDataGenerator {
 	@Option(value = "-h Print short usage message", aliases = { "-help" })
 	public static boolean showHelp = false;
 	
-	@Option(value = "-p Populate test results", aliases = { "-populateTestResults" })
-	public static boolean populateTestResults = false;
-
 	/**
      * The commit ID from which to begin the HistoryGraph analysis.
      */
@@ -77,7 +74,7 @@ public class TestIsolationDataGenerator {
 
         HistoryGraph historyGraph = extractData();
         
-        if (populateTestResults) {
+        if (startTResultID != null && endTResultID != null) {
         	populateTestResults(historyGraph);
         }
         
