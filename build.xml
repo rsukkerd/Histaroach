@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 
-<project basedir="." default="build" name="project499">
+<project basedir="." default="build" name="Histaroach">
     <description>
       This build file is used to build the project499 project. It can
       also be used to run the test suite.
@@ -12,7 +12,7 @@
     <property name="target" value="1.6"/>
     <property name="source" value="1.6"/>
 
-    <path id="project499.classpath">
+    <path id="Histaroach.classpath">
         <pathelement location="bin"/>
 		<pathelement location="lib/junit-4.9b2.jar"/>
 		<pathelement location="lib/plume.jar"/>
@@ -40,7 +40,7 @@
         <echo message="${ant.project.name}: ${ant.file}"/>
         <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
             <src path="src"/>
-            <classpath refid="project499.classpath"/>
+            <classpath refid="Histaroach.classpath"/>
         </javac>
     </target>
 
