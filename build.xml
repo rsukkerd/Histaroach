@@ -2,7 +2,7 @@
 
 <project basedir="." default="build" name="Histaroach">
     <description>
-      This build file is used to build the project499 project. It can
+      This build file is used to build the Histaroach project. It can
       also be used to run the test suite.
     </description>
 
@@ -47,7 +47,7 @@
     <!--=====================================================================-->
     <target name="run" depends="build">
         <java classname="TestIsolationDataGenerator" failonerror="true" fork="yes">
-            <classpath refid="project499.classpath"/>
+            <classpath refid="Histaroach.classpath"/>
         </java>
     </target>
 
@@ -55,7 +55,7 @@
     <target name="tests" depends="build">
         <mkdir dir="${junit.output.dir}"/>
         <junit fork="no" printsummary="withOutAndErr" showoutput="true">
-          <classpath refid="project499.classpath"/>
+          <classpath refid="Histaroach.classpath"/>
 	  <formatter type="xml"/>
 
 	  <batchtest fork="no" todir="${junit.output.dir}">
