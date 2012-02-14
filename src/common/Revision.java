@@ -88,7 +88,7 @@ public class Revision implements Serializable {
         int exitValue = repository.checkoutCommit(commitID);
         assert (exitValue == 0);
 
-        Process junitProcess = Util.runProcess(Repository.JUNIT_COMMAND,
+        Process junitProcess = Util.runProcess(repository.getAntCommand(),
                 repository.getDirectory());
         
         BufferedReader stdOutputReader = new BufferedReader(

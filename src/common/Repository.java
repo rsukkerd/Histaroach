@@ -27,17 +27,24 @@ public class Repository implements Serializable {
 	
 	public static final String[] LOG_COMMAND = { "git", "log", "--pretty=format:%h %p" };
     public static final String[] JUNIT_COMMAND = { "ant", "junit" };
+    public static final String[] ANT_COMMAND = { "ant" };
     public static final String SINGLE_TEST_COMMAND = "ant junit-test -Dtest.name=";
 
     private final File directory;
+    private final String[] antCommand;
     
     /**
      * create a repository instance
      * 
      * @param pathname : full path to the repository directory
      */
-    public Repository(String pathname) {
+    public Repository(String pathname, String[] antCommand) {
         directory = new File(pathname);
+        this.antCommand = antCommand == null ? ANT_COMMAND : antCommand;
+    }
+    
+    public String[] getAntCommand() {
+    	return antCommand;
     }
 
     /**

@@ -45,7 +45,7 @@ public class TestIsolationDataReader {
         }
         
         HistoryGraph hGraph = Util.reconstructHistoryGraph(serializedRevisionsDirName);
-        verifyHistoryGraph(hGraph);
+        //verifyHistoryGraph(hGraph);
         
         System.out.println(hGraph);
 	}

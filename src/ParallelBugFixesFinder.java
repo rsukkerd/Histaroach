@@ -20,6 +20,12 @@ public class ParallelBugFixesFinder {
     @OptionGroup("General Options")
     @Option(value = "-h Print short usage message", aliases = { "-help" })
     public static boolean showHelp = false;
+    
+    /**
+	 * run ant command
+	 */
+	@Option(value = "-a ant command", aliases = { "-antCommand" })
+    public static String antCommandString = null;
 
     /**
      * Full path to the serialized output file.
@@ -75,7 +81,8 @@ public class ParallelBugFixesFinder {
     public static Set<ParallelBugFixes> findAllParallelBugFixes() throws IOException {
     	Set<ParallelBugFixes> allParallelFixing = new HashSet<ParallelBugFixes>();
         
-        Repository repository = new Repository(repositoryDirName);
+    	String[] antCommand = antCommandString.split(" ");
+        Repository repository = new Repository(repositoryDirName, antCommand);
         HistoryGraph historyGraph = repository.buildHistoryGraph(startCommitID);
         Map<String, List<BugFix>> allBugFixes = repository.getAllBugFixes(historyGraph);
         

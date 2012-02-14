@@ -23,6 +23,12 @@ public class TestIsolationDataGenerator {
 	public static boolean showHelp = false;
 	
 	/**
+	 * run ant command
+	 */
+	@Option(value = "-a ant command", aliases = { "-antCommand" })
+    public static String antCommandString = null;
+	
+	/**
      * The commit ID from which to begin the HistoryGraph analysis.
      */
     @Option(value = "-S Starting commit ID (HistoryGraph)", aliases = { "-startHGraphID" })
@@ -92,7 +98,8 @@ public class TestIsolationDataGenerator {
      * @return HistoryGraph
      */
     public static HistoryGraph extractData() throws IOException {
-    	Repository repository = new Repository(repositoryDirName);
+    	String[] antCommand = antCommandString.split(" ");
+    	Repository repository = new Repository(repositoryDirName, antCommand);
     	HistoryGraph historyGraph = repository.buildHistoryGraph(startHGraphID);
     	
     	return historyGraph;
