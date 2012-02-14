@@ -5,8 +5,8 @@ import plume.OptionGroup;
 import plume.Options;
 
 import common.HistoryGraph;
-import common.HistoryGraphReader;
 import common.Revision;
+import common.Util;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -20,10 +20,10 @@ public class TestIsolationDataReader {
     public static boolean showHelp = false;
 
     /**
-     * Full path to the serialized input file.
+     * Full path to the directory containing serialized revision files
      */
-    @Option(value = "-z File to use as serialized input.", aliases = { "-serializedInputFile" })
-    public static String serializedInputFileName = null;
+    @Option(value = "-z Directory containing serialized revision files.", aliases = { "-serializedRevisionsDir" })
+    public static String serializedRevisionsDirName = null;
     
     /** One line synopsis of usage */
     public static final String usage_string = "TestIsolationDataReader [options]";
@@ -44,10 +44,10 @@ public class TestIsolationDataReader {
             return;
         }
         
-        HistoryGraphReader hGraphReader = new HistoryGraphReader(serializedInputFileName);
-        HistoryGraph reconstructedHGraph = hGraphReader.readHistoryGraph();
+        HistoryGraph hGraph = Util.reconstructHistoryGraph(serializedRevisionsDirName);
+        verifyHistoryGraph(hGraph);
         
-        verifyHistoryGraph(reconstructedHGraph);
+        System.out.println(hGraph);
 	}
 
 	public static void verifyHistoryGraph(HistoryGraph historyGraph) {

@@ -11,9 +11,9 @@ import common.Revision;
 import common.Util;
 
 public class TestIsolationDataGenerator {
-
-    public static final String SERIALIZED_OUTPUT_FILE_NAME = "historyGraph.ser";
-    public static final String HUMAN_READ_OUTPUT_FILE_NAME = "historyGraph.log";
+	public static final String FILE_PREFIX = "historyGraph";
+    public static final String SERIALIZED_EXTENSION = ".ser";
+    public static final String HUMAN_READ_EXTENSION = ".log";
 
     /**
 	 * Print the short usage message.
@@ -78,8 +78,13 @@ public class TestIsolationDataGenerator {
         	populateTestResults(historyGraph);
         }
         
-        Util.writeToSerializedFile(outputDirName + SERIALIZED_OUTPUT_FILE_NAME, historyGraph);
-        Util.writeToHumanReadableFile(outputDirName + HUMAN_READ_OUTPUT_FILE_NAME, historyGraph);
+        String fileName = "";
+        if (startTResultID != null && endTResultID != null) {
+        	fileName = "_" + startHGraphID + "_" + endTResultID;
+        }
+        
+        Util.writeToSerializedFile(outputDirName + FILE_PREFIX + fileName + SERIALIZED_EXTENSION, historyGraph);
+        Util.writeToHumanReadableFile(outputDirName + FILE_PREFIX + fileName + HUMAN_READ_EXTENSION, historyGraph);
     }
 
     /**

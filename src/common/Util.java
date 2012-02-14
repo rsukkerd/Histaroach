@@ -5,14 +5,18 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.xeustechnologies.jtar.TarEntry;
 import org.xeustechnologies.jtar.TarInputStream;
@@ -61,7 +65,7 @@ public class Util {
     }
     
     /**
-     * write an object to serialized output file
+     * write an object to a serialized output file
      */
     public static void writeToSerializedFile(String fileName, Object object) {
     	ObjectOutputStream output;
@@ -78,7 +82,7 @@ public class Util {
     }
     
     /**
-     * write an object in a human-readable form to output file
+     * write an object in a human-readable form to an output file
      */
     public static void writeToHumanReadableFile(String fileName, Object object) {
         BufferedWriter outFileWriter;
@@ -90,6 +94,29 @@ public class Util {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+    }
+    
+    /**
+     * read an object from a serialized input file
+     * @return an object of type T
+     */
+    public static <T> T readObject(Class<T> type, String fileName) {
+    	T object = null;
+    	ObjectInputStream input;
+    	
+    	try {
+			input = new ObjectInputStream(new FileInputStream(fileName));
+			object = (T) input.readObject();
+			input.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		return object;
     }
     
     /**
@@ -127,4 +154,39 @@ public class Util {
 		
 		tis.close();
 	}
+    
+    public static class RevisionFileFilter implements FileFilter {
+    	private static final int LENGTH = 11;
+    	private static final Pattern REVISION_PATTERN = Pattern.compile("[a-f0-9]{7}.ser");
+    	
+		@Override
+		public boolean accept(File pathname) {
+			String fileName = pathname.getName();
+			Matcher revisionMatcher = REVISION_PATTERN.matcher(fileName);
+			
+			return fileName.length() == LENGTH && revisionMatcher.find();
+		}
+    }
+    
+    /**
+     * reconstruct HistoryGraph instance from serialized revision files
+     * 
+     * @param dirPath : full path to the directory containing serialized revision files
+     * @return a HistoryGraph instance containing all revisions corresponding to 
+     * 			serialized revision files in dirPath
+     */
+    public static HistoryGraph reconstructHistoryGraph(String dirPath) {
+    	HistoryGraph hGraph = new HistoryGraph();
+
+    	File dir = new File(dirPath);
+    	FileFilter filter = new RevisionFileFilter();
+    	File[] revisionFiles = dir.listFiles(filter);
+    	
+    	for (File revisionFile : revisionFiles) {
+    		Revision revision = readObject(Revision.class, revisionFile.getPath());
+    		hGraph.addRevision(revision);
+    	}
+    	
+    	return hGraph;
+    }
 }
