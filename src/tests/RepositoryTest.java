@@ -24,6 +24,8 @@ import common.Util;
 import org.apache.commons.io.FileUtils;
 
 public class RepositoryTest {
+	public static final String ANT_COMMAND = "ant";
+
 	private static final String TAR_FILE = "test/sample_repositories.tar";
 	private static final String DEST_DIR = "test";
 	private static final String SAMPLE_REPOSITORIES = "test/sample_repositories";
@@ -34,11 +36,11 @@ public class RepositoryTest {
     											"test/sample_repositories/repo4",
     											"test/sample_repositories/repo5"};
         
-    private static final Repository REPOSITORY_1 = new Repository(DIRECTORIES[0]);
-    private static final Repository REPOSITORY_2 = new Repository(DIRECTORIES[1]);
-    private static final Repository REPOSITORY_3 = new Repository(DIRECTORIES[2]);
-    private static final Repository REPOSITORY_4 = new Repository(DIRECTORIES[3]);
-    private static final Repository REPOSITORY_5 = new Repository(DIRECTORIES[4]);
+    private static final Repository REPOSITORY_1 = new Repository(DIRECTORIES[0], ANT_COMMAND);
+    private static final Repository REPOSITORY_2 = new Repository(DIRECTORIES[1], ANT_COMMAND);
+    private static final Repository REPOSITORY_3 = new Repository(DIRECTORIES[2], ANT_COMMAND);
+    private static final Repository REPOSITORY_4 = new Repository(DIRECTORIES[3], ANT_COMMAND);
+    private static final Repository REPOSITORY_5 = new Repository(DIRECTORIES[4], ANT_COMMAND);
     
 	private static final List<DiffFile> DIFF_FILES = new ArrayList<DiffFile>();
 	static {
@@ -211,7 +213,7 @@ public class RepositoryTest {
 		assertTrue(untarSampleRepositories());
 		
 		for (int i = 0; i < DIRECTORIES.length; i++) {
-			Repository repo = new Repository(DIRECTORIES[i]);
+			Repository repo = new Repository(DIRECTORIES[i], ANT_COMMAND);
 	
 			HistoryGraph actualHGraph = null;
 			actualHGraph = repo.buildHistoryGraph(START_COMMIT_IDS[i]);

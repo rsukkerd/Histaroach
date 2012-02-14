@@ -26,7 +26,7 @@ public class TestIsolationDataGenerator {
 	 * run ant command
 	 */
 	@Option(value = "-a ant command", aliases = { "-antCommand" })
-    public static String antCommandString = null;
+    public static String antCommand = null;
 	
 	/**
      * The commit ID from which to begin the HistoryGraph analysis.
@@ -98,7 +98,6 @@ public class TestIsolationDataGenerator {
      * @return HistoryGraph
      */
     public static HistoryGraph extractData() throws IOException {
-    	String[] antCommand = antCommandString.split(" ");
     	Repository repository = new Repository(repositoryDirName, antCommand);
     	HistoryGraph historyGraph = repository.buildHistoryGraph(startHGraphID);
     	

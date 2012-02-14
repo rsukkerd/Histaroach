@@ -1,3 +1,5 @@
+import static org.junit.Assert.assertNotNull;
+
 import java.util.Set;
 
 import plume.Option;
@@ -7,8 +9,6 @@ import plume.Options;
 import common.HistoryGraph;
 import common.Revision;
 import common.Util;
-
-import static org.junit.Assert.assertNotNull;
 
 public class TestIsolationDataReader {
 
@@ -45,7 +45,7 @@ public class TestIsolationDataReader {
         }
         
         HistoryGraph hGraph = Util.reconstructHistoryGraph(serializedRevisionsDirName);
-        //verifyHistoryGraph(hGraph);
+        verifyHistoryGraph(hGraph);
         
         System.out.println(hGraph);
 	}

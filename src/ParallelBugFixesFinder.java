@@ -25,7 +25,7 @@ public class ParallelBugFixesFinder {
 	 * run ant command
 	 */
 	@Option(value = "-a ant command", aliases = { "-antCommand" })
-    public static String antCommandString = null;
+    public static String antCommand = null;
 
     /**
      * Full path to the serialized output file.
@@ -81,7 +81,6 @@ public class ParallelBugFixesFinder {
     public static Set<ParallelBugFixes> findAllParallelBugFixes() throws IOException {
     	Set<ParallelBugFixes> allParallelFixing = new HashSet<ParallelBugFixes>();
         
-    	String[] antCommand = antCommandString.split(" ");
         Repository repository = new Repository(repositoryDirName, antCommand);
         HistoryGraph historyGraph = repository.buildHistoryGraph(startCommitID);
         Map<String, List<BugFix>> allBugFixes = repository.getAllBugFixes(historyGraph);
