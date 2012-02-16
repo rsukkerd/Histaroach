@@ -14,6 +14,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import common.DiffFile.DiffType;
+import common.Flip.FlipType;
 
 /**
  * Repository represents a git repository.
@@ -243,6 +244,43 @@ public class Repository implements Serializable {
         }
 		
 		return new ParallelBugFixes(bug, parallelFixes);
+	}
+	
+	/**
+	 * @return a set of all flips in a given historyGraph
+	 */
+	public Set<Flip> getAllFlips(HistoryGraph historyGraph) {
+		Set<Flip> flips = new HashSet<Flip>();
+		
+		for (Revision revision : historyGraph) {
+			TestResult result = revision.getTestResult();
+			
+			if (result != null) {
+				Set<String> allTests = result.getAllTests();
+				Set<Revision> parents = historyGraph.getParents(revision);
+				
+				for (Revision parent : parents) {
+					TestResult parentResult = parent.getTestResult();
+					
+					if (parentResult != null) {
+						Map<String, FlipType> testToFlipType = new HashMap<String, Flip.FlipType>();
+						
+						for (String test : allTests) {
+							if (result.pass(test) && parentResult.fail(test)) {
+								testToFlipType.put(test, FlipType.FIX);
+							} else if (result.fail(test) && parentResult.pass(test)) {
+								testToFlipType.put(test, FlipType.FAIL);
+							}
+						}
+						
+						Flip flip = new Flip(revision, parent, testToFlipType);
+						flips.add(flip);
+					}
+				}
+			}
+		}
+		
+		return flips;
 	}
 
     @Override
