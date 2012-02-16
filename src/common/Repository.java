@@ -27,7 +27,6 @@ public class Repository implements Serializable {
 	private static final long serialVersionUID = -2999033773371301088L;
 	
 	public static final String[] LOG_COMMAND = { "git", "log", "--pretty=format:%h %p" };
-    public static final String DEFAULT_ANT_COMMAND = "ant";
     public static final String JUNIT_COMMAND = "junit";
     public static final String SINGLE_TEST_COMMAND = "ant junit-test -Dtest.name=";
 
@@ -42,7 +41,7 @@ public class Repository implements Serializable {
      */
     public Repository(String pathname, String antCommand) {
         directory = new File(pathname);
-        this.antCommand = antCommand == null ? DEFAULT_ANT_COMMAND : antCommand;
+        this.antCommand = antCommand;
     }
     
     public String[] getRunJunitCommand() {

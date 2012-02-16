@@ -10,14 +10,14 @@ import common.Repository;
 import common.Revision;
 import common.Util;
 
-// TODO: add class level comment description of what this class does.
+/**
+ * TestIsolationDataGenerator builds a HistoryGraph from voldemort 
+ * repository and writes each Revision in the graph to a serialized file.
+ */
 public class TestIsolationDataGenerator {
-    // TODO: What is this used for/by? Describe.
-	public static final String FILE_PREFIX = "historyGraph";
-    public static final String SERIALIZED_EXTENSION = ".ser";
-    public static final String HUMAN_READ_EXTENSION = ".log";
-
-    // TODO: for each option, you must specify whether the option is required, or optional in the description text.
+	public static final String FILE_PREFIX = "historyGraph";	// prefix of files to which HistoryGraph instances are written
+    public static final String SERIALIZED_EXTENSION = ".ser";	// extension of serialized files
+    public static final String HUMAN_READ_EXTENSION = ".log";	// extension of human-readable files
 
     /**
 	 * Print the short usage message.
@@ -29,37 +29,37 @@ public class TestIsolationDataGenerator {
 	/**
 	 * The ant command used for running ant. By default this is just 'ant'.
 	 */
-	@Option(value = "-a ant command", aliases = { "-antCommand" })
+	@Option(value = "-a ant command (Optional)", aliases = { "-antCommand" })
     public static String antCommand = "ant";
 	
 	/**
      * The commit ID from which to begin the HistoryGraph analysis.
      */
-    @Option(value = "-S Starting commit ID (HistoryGraph)", aliases = { "-startHGraphID" })
+    @Option(value = "-S Starting commit ID for HistoryGraph analysis (Required)", aliases = { "-startHGraphID" })
     public static String startHGraphID = null;
 
     /**
      * The commit ID from which to begin the TestResult analysis.
      */
-    @Option(value = "-s Starting commit ID (TestResult)", aliases = { "-startTResultID" })
+    @Option(value = "-s Starting commit ID for TestResult analysis (Optional)", aliases = { "-startTResultID" })
     public static String startTResultID = null;
 
     /**
      * The commit ID where the TestResult analysis should terminate.
      */
-    @Option(value = "-e Ending commit ID (TestResult)", aliases = { "-endTResultID" })
+    @Option(value = "-e Ending commit ID for TestResult analysis (Optional)", aliases = { "-endTResultID" })
     public static String endTResultID = null;
     
     /**
      * Full path to the repository directory.
      */
-    @Option(value = "-r Full path to the repository directory", aliases = { "-repoDir" })
+    @Option(value = "-r Full path to the repository directory (Required)", aliases = { "-repoDir" })
     public static String repositoryDirName = null;
     
     /**
      * Full path to the output directory.
      */
-    @Option(value = "-o Full path to the output directory", aliases = { "-outputDir" })
+    @Option(value = "-o Full path to the output directory (Required)", aliases = { "-outputDir" })
     public static String outputDirName = null;
 
     /** One line synopsis of usage */
@@ -82,9 +82,10 @@ public class TestIsolationDataGenerator {
             return;
         }
         
-        // TODO: What if repositoryDirName is not specified, and is null? Then this crashes with a null pointer exception error.
-        // To avoid this and similar issues, check that ALL required options are specified, and show an error message if any
-        // are not specified.
+        if (startHGraphID == null || repositoryDirName == null || outputDirName == null) {
+        	plumeOptions.print_usage();
+        	return;
+        }
 
         Repository repository = new Repository(repositoryDirName, antCommand);
         HistoryGraph historyGraph = repository.buildHistoryGraph(startHGraphID);
@@ -97,10 +98,6 @@ public class TestIsolationDataGenerator {
         if (startTResultID != null && endTResultID != null) {
         	fileName = "_" + startHGraphID + "_" + endTResultID;
         }
-        
-        // TODO: so if startTResultID and endTResultID are both null, then filename is the empty string?? Shouldn't there
-        // be some sort of default start/end resultID that you can use for the filename? Certainly an empty string
-        // filename doesn't make sense.
         
         Util.writeToSerializedFile(outputDirName + FILE_PREFIX + fileName + SERIALIZED_EXTENSION, historyGraph);
         Util.writeToHumanReadableFile(outputDirName + FILE_PREFIX + fileName + HUMAN_READ_EXTENSION, historyGraph);
@@ -116,14 +113,11 @@ public class TestIsolationDataGenerator {
     	Iterator<Revision> itr = historyGraph.iterator();
     	Revision revision = null;
     	while (itr.hasNext() && !(revision = itr.next()).getCommitID().equals(startTResultID)) { /* search for start revision */ }
-    	
-        // TODO: Isn't the condition of this if statement the same as the while condition? Please refactor this so that you
-        // do not duplicate this logic. Also, do you need the same logic in the if condition? I'm not sure.
         
     	if (revision != null && revision.getCommitID().equals(startTResultID)) {
     		revision.getTestResult();
     		
-    		String filename = outputDirName + revision.getCommitID() + ".ser";
+    		String filename = outputDirName + revision.getCommitID() + SERIALIZED_EXTENSION;
     		Util.writeToSerializedFile(filename, revision);
     		
     		if (revision.getCommitID().equals(endTResultID)) {
@@ -134,7 +128,7 @@ public class TestIsolationDataGenerator {
 	    		revision = itr.next();
 	    		revision.getTestResult();
 	    		
-	    		filename = outputDirName + revision.getCommitID() + ".ser";
+	    		filename = outputDirName + revision.getCommitID() + SERIALIZED_EXTENSION;
 	    		Util.writeToSerializedFile(filename, revision);
 	    		
 	    		if (revision.getCommitID().equals(endTResultID)) {
