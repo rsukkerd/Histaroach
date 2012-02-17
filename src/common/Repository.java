@@ -17,43 +17,46 @@ import common.DiffFile.DiffType;
 import common.Flip.FlipType;
 
 /**
- * Repository represents a git repository.
- * Repository contains a reference to the directory associated with this Repository.
+ * Repository represents a git repository. Repository contains a reference to
+ * the directory associated with this Repository.
  */
 public class Repository implements Serializable {
     /**
-	 * serial version ID
-	 */
-	private static final long serialVersionUID = -2999033773371301088L;
-	
-	public static final String[] LOG_COMMAND = { "git", "log", "--pretty=format:%h %p" };
+     * serial version ID
+     */
+    private static final long serialVersionUID = -2999033773371301088L;
+
+    public static final String[] LOG_COMMAND = { "git", "log",
+            "--pretty=format:%h %p" };
     public static final String JUNIT_COMMAND = "junit";
     public static final String SINGLE_TEST_COMMAND = "ant junit-test -Dtest.name=";
 
     private final File directory;
     private final String antCommand;
-    
+
     /**
      * create a repository instance
      * 
-     * @param pathname : full path to the repository directory
-     * @param antCommand : ant command
+     * @param pathname
+     *            : full path to the repository directory
+     * @param antCommand
+     *            : ant command
      */
     public Repository(String pathname, String antCommand) {
         directory = new File(pathname);
         this.antCommand = antCommand;
     }
-    
+
     public String[] getRunJunitCommand() {
-    	String[] ant = antCommand.split(" ");
-    	String[] antJunit = new String[ant.length + 1];
-    	
-    	for (int i = 0; i < ant.length; i++) {
-    		antJunit[i] = ant[i];
-    	}
-    	
-    	antJunit[antJunit.length - 1] = JUNIT_COMMAND;
-    	return antJunit;
+        String[] ant = antCommand.split(" ");
+        String[] antJunit = new String[ant.length + 1];
+
+        for (int i = 0; i < ant.length; i++) {
+            antJunit[i] = ant[i];
+        }
+
+        antJunit[antJunit.length - 1] = JUNIT_COMMAND;
+        return antJunit;
     }
 
     /**
@@ -70,7 +73,8 @@ public class Repository implements Serializable {
      * @return exit value of 'git checkout' process
      */
     public int checkoutCommit(String commitID) {
-        Process p = Util.runProcess(new String[] { "git", "checkout", commitID }, directory);
+        Process p = Util.runProcess(
+                new String[] { "git", "checkout", commitID }, directory);
         return p.exitValue();
     }
 
@@ -79,38 +83,42 @@ public class Repository implements Serializable {
      * @param parentCommitID
      * @return a list of diff files between childCommit and parentCommit
      */
-    public List<DiffFile> getDiffFiles(String childCommitID, String parentCommitID) {
+    public List<DiffFile> getDiffFiles(String childCommitID,
+            String parentCommitID) {
         List<DiffFile> diffFiles = new ArrayList<DiffFile>();
 
-        Process p = Util.runProcess(new String[] { "git", "diff", "--name-status", childCommitID, parentCommitID }, directory);
+        Process p = Util.runProcess(new String[] { "git", "diff",
+                "--name-status", childCommitID, parentCommitID }, directory);
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        
+        BufferedReader reader = new BufferedReader(new InputStreamReader(
+                p.getInputStream()));
+
         List<String> lines = Util.getStreamContent(reader);
 
         for (String line : lines) {
-        	String[] tokens = line.split("\\s");
-        	
-        	DiffType type;
-        	if (tokens[0].equals("A")) {
-        		type = DiffType.ADDED;
-        	} else if (tokens[0].equals("M")) {
-        		type = DiffType.MODIFIED;
-        	} else {
-        		type = DiffType.DELETED;
-        	}
-        	
-        	DiffFile diffFile = new DiffFile(type, tokens[1]);
-        	
+            String[] tokens = line.split("\\s");
+
+            DiffType type;
+            if (tokens[0].equals("A")) {
+                type = DiffType.ADDED;
+            } else if (tokens[0].equals("M")) {
+                type = DiffType.MODIFIED;
+            } else {
+                type = DiffType.DELETED;
+            }
+
+            DiffFile diffFile = new DiffFile(type, tokens[1]);
+
             diffFiles.add(diffFile);
         }
-        
+
         return diffFiles;
     }
 
     /**
-     * build a history graph instance containing revisions from startCommit to the root commit
-     * initially, each revision in the history graph has compilable = UNKNOWN and TestResult = null
+     * build a history graph instance containing revisions from startCommit to
+     * the root commit initially, each revision in the history graph has
+     * compilable = UNKNOWN and TestResult = null
      * 
      * @return a history graph of this repository
      */
@@ -124,32 +132,35 @@ public class Repository implements Serializable {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(
                 logProcess.getInputStream()));
-        
+
         List<String> lines = Util.getStreamContent(reader);
 
         for (String line : lines) {
             String[] hashes = line.split(" ");
 
             String commitID = hashes[0];
-            Map<String, List<DiffFile>> parentIDToDiffFiles = getParentIDToDiffFiles(commitID, hashes);
-            
-            Revision revision = new Revision(this, commitID, parentIDToDiffFiles);
+            Map<String, List<DiffFile>> parentIDToDiffFiles = getParentIDToDiffFiles(
+                    commitID, hashes);
+
+            Revision revision = new Revision(this, commitID,
+                    parentIDToDiffFiles);
             hGraph.addRevision(revision);
-            
+
             /* print progress to standard output */
             System.out.println(revision);
         }
 
         return hGraph;
     }
-    
+
     /**
      * Helper method for buildHistoryGraph
      * 
      * @return a mapping : a parentCommitID -> a list of diff files
      */
-    private Map<String, List<DiffFile>> getParentIDToDiffFiles(String commitID, String[] hashes) {
-    	Map<String, List<DiffFile>> parentIDToDiffFiles = new HashMap<String, List<DiffFile>>();
+    private Map<String, List<DiffFile>> getParentIDToDiffFiles(String commitID,
+            String[] hashes) {
+        Map<String, List<DiffFile>> parentIDToDiffFiles = new HashMap<String, List<DiffFile>>();
 
         if (hashes.length > 1) {
             for (int i = 1; i < hashes.length; i++) {
@@ -159,31 +170,35 @@ public class Repository implements Serializable {
                 parentIDToDiffFiles.put(parentID, diffFiles);
             }
         }
-        
+
         return parentIDToDiffFiles;
     }
-    
+
     /**
-	 * @return a mapping : a test name (bug) -> a list of all its fixes
-	 */
-	public Map<String, List<BugFix>> getAllBugFixes(HistoryGraph historyGraph) {
-		Map<String, List<BugFix>> map = new HashMap<String, List<BugFix>>();
-		
-		for (Revision revision : historyGraph) {
-			List<String> fixedBugs = new ArrayList<String>(); // find all bugs that this revision fixed
-			Set<Revision> parents = historyGraph.getParents(revision);
-			
-			for (Revision parent : parents) {
-				for (String failedTest : parent.getTestResult().getFailedTests()) {
-					if (revision.getTestResult().pass(failedTest)) {
-						fixedBugs.add(failedTest);
-					}
-				}
-			}
-			
-			for (String test : fixedBugs) {
-				// BFS to find all consecutive revisions, start from this revision, that fail this test
-				Queue<Revision> queue = new LinkedList<Revision>();
+     * @return a mapping : a test name (bug) -> a list of all its fixes
+     */
+    public Map<String, List<BugFix>> getAllBugFixes(HistoryGraph historyGraph) {
+        Map<String, List<BugFix>> map = new HashMap<String, List<BugFix>>();
+
+        for (Revision revision : historyGraph) {
+            List<String> fixedBugs = new ArrayList<String>(); // find all bugs
+                                                              // that this
+                                                              // revision fixed
+            Set<Revision> parents = historyGraph.getParents(revision);
+
+            for (Revision parent : parents) {
+                for (String failedTest : parent.getTestResult()
+                        .getFailedTests()) {
+                    if (revision.getTestResult().pass(failedTest)) {
+                        fixedBugs.add(failedTest);
+                    }
+                }
+            }
+
+            for (String test : fixedBugs) {
+                // BFS to find all consecutive revisions, start from this
+                // revision, that fail this test
+                Queue<Revision> queue = new LinkedList<Revision>();
                 BugFix bugFix = new BugFix(test, revision);
 
                 Set<Revision> visited = new HashSet<Revision>();
@@ -199,88 +214,116 @@ public class Repository implements Serializable {
                 while (!queue.isEmpty()) {
                     Revision nextRevision = queue.poll();
 
-                    for (Revision parent : historyGraph.getParents(nextRevision)) {
-                        if (!visited.contains(parent) && parent.getTestResult().fail(test)) {
+                    for (Revision parent : historyGraph
+                            .getParents(nextRevision)) {
+                        if (!visited.contains(parent)
+                                && parent.getTestResult().fail(test)) {
                             queue.add(parent);
                             bugFix.addFailedRevision(parent);
                             visited.add(parent);
                         }
                     }
                 }
-                
+
                 if (map.containsKey(test)) {
-                	map.get(test).add(bugFix);
+                    map.get(test).add(bugFix);
                 } else {
-                	List<BugFix> list = new ArrayList<BugFix>();
-                	list.add(bugFix);
-                	map.put(test, list);
+                    List<BugFix> list = new ArrayList<BugFix>();
+                    list.add(bugFix);
+                    map.put(test, list);
                 }
-			}
-		}
-		
-		return map;
-	}
-	
-	/**
-	 * @return a ParallelBugFixes instance of a given bug
-	 */
-	public ParallelBugFixes getParallelBugFixes(HistoryGraph historyGraph, String bug, List<BugFix> allFixes) {
-		Set<BugFix> parallelFixes = new HashSet<BugFix>();
-		
-		for (int i = 0; i < allFixes.size() - 1; i++) {
-			for (int j = i + 1; j < allFixes.size(); j++) {
-				BugFix fix_A = allFixes.get(i);
+            }
+        }
+
+        return map;
+    }
+
+    /**
+     * @return a ParallelBugFixes instance of a given bug
+     */
+    public ParallelBugFixes getParallelBugFixes(HistoryGraph historyGraph,
+            String bug, List<BugFix> allFixes) {
+        Set<BugFix> parallelFixes = new HashSet<BugFix>();
+
+        for (int i = 0; i < allFixes.size() - 1; i++) {
+            for (int j = i + 1; j < allFixes.size(); j++) {
+                BugFix fix_A = allFixes.get(i);
                 BugFix fix_B = allFixes.get(j);
 
                 Revision revision_A = fix_A.getPassedRevision();
                 Revision revision_B = fix_B.getPassedRevision();
 
                 if (historyGraph.parallel(revision_A, revision_B)) {
-                	parallelFixes.add(fix_A);
-                	parallelFixes.add(fix_B);
+                    parallelFixes.add(fix_A);
+                    parallelFixes.add(fix_B);
                 }
             }
         }
-		
-		return new ParallelBugFixes(bug, parallelFixes);
-	}
-	
-	/**
-	 * @return a set of all flips in a given historyGraph
-	 */
-	public Set<Flip> getAllFlips(HistoryGraph historyGraph) {
-		Set<Flip> flips = new HashSet<Flip>();
-		
-		for (Revision revision : historyGraph) {
-			TestResult result = revision.getTestResult();
-			
-			if (result != null) {
-				Set<String> allTests = result.getAllTests();
-				Set<Revision> parents = historyGraph.getParents(revision);
-				
-				for (Revision parent : parents) {
-					TestResult parentResult = parent.getTestResult();
-					
-					if (parentResult != null) {
-						Map<String, FlipType> testToFlipType = new HashMap<String, Flip.FlipType>();
-						
-						for (String test : allTests) {
-							if (result.pass(test) && parentResult.fail(test)) {
-								testToFlipType.put(test, FlipType.FIX);
-							} else if (result.fail(test) && parentResult.pass(test)) {
-								testToFlipType.put(test, FlipType.FAIL);
-							}
-						}
-						
-						Flip flip = new Flip(revision, parent, testToFlipType);
-						flips.add(flip);
-					}
-				}
-			}
-		}
-		
-		return flips;
-	}
+
+        return new ParallelBugFixes(bug, parallelFixes);
+    }
+
+    // TODO: Why is this method part of Repository? It seems like it should
+    // instead be a part of HistoryGraph, since it uses the passed historyGraph
+    // extensively, and doesn't use `this` Repository at all.
+
+    /**
+     * @return a set of all flips in a given historyGraph
+     */
+    public Set<Flip> getAllFlips(HistoryGraph historyGraph) {
+        Set<Flip> flips = new HashSet<Flip>();
+
+        for (Revision revision : historyGraph) {
+            // TODO: Rename this to childResult for clarity.
+            TestResult result = revision.getTestResult();
+
+            // TODO: Avoid deeply nested control flow, as it is difficult to
+            // understand and follow. Here, instead change the if statement to:
+            // if (result == null) { continue; }
+
+            if (result != null) {
+                Set<String> allTests = result.getAllTests();
+
+                // TODO: A revision should know its parents. You shouldn't need
+                // to use the history graph for this.
+
+                Set<Revision> parents = historyGraph.getParents(revision);
+
+                for (Revision parent : parents) {
+                    TestResult parentResult = parent.getTestResult();
+
+                    // TODO: Avoid deeply nested control flow, as it is
+                    // difficult to understand and follow. Here, instead change
+                    // the if statement to:
+                    // if (parentResult == null) { continue; }
+
+                    if (parentResult != null) {
+                        Map<String, FlipType> testToFlipType = new HashMap<String, Flip.FlipType>();
+
+                        for (String test : allTests) {
+                            if (result.pass(test) && parentResult.fail(test)) {
+                                testToFlipType.put(test, FlipType.FIX);
+                            } else if (result.fail(test)
+                                    && parentResult.pass(test)) {
+                                testToFlipType.put(test, FlipType.FAIL);
+                            }
+                        }
+
+                        // TODO: If there were no flips, then this associates an
+                        // empty HashMap with (revision,parent). This is
+                        // wasteful, and misleading -- a Flip should represent
+                        // an actual flip. Refactor this so that a flip is only
+                        // created if a flip occurred.
+
+                        Flip flip = new Flip(revision, parent, testToFlipType);
+                        flips.add(flip);
+                    }
+                }
+            }
+        }
+
+        return flips;
+    }
 
     @Override
     public boolean equals(Object other) {

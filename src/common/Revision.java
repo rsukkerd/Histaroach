@@ -12,38 +12,40 @@ import java.util.regex.Pattern;
 import voldemort.VoldemortTestResult;
 
 /**
- * Revision contains
- * 1. a reference to its repository
- * 2. commit id
- * 3. a set of its parents' commit ids
- * 4. diff files between this revision and each of its parent
- * 5. compilable flag
- * 6. test result
+ * Revision contains 1. a reference to its repository 2. commit id 3. a set of
+ * its parents' commit ids 4. diff files between this revision and each of its
+ * parent 5. compilable flag 6. test result
  */
 public class Revision implements Serializable {
-	/**
-	 * serial version ID
-	 */
-	private static final long serialVersionUID = -4044614975764741642L;
+    /**
+     * serial version ID
+     */
+    private static final long serialVersionUID = -4044614975764741642L;
 
-	public enum COMPILABLE {
-		YES,
-		NO,
-		UNKNOWN
-	}
-	
+    public enum COMPILABLE {
+        YES, NO, UNKNOWN
+    }
+
+    // TODO: A revision should know about its parents -- i.e., a list of
+    // Revision objects that have it as a child. And, a Revision should know
+    // about its children, too.
+
     private final Repository repository;
     private final String commitID;
-    /** mapping : a parent commit id -> a list of files that are different between the parent and this revision **/
-	private final Map<String, List<DiffFile>> diffFiles;
-	private COMPILABLE compilable;
-	private /*@Nullable*/ TestResult testResult;
-	
-	/**
-	 * create a revision
-	 * initially, compilable flag is unknown and test result is null
-	 */
-    public Revision(Repository repository, String commitID, Map<String, List<DiffFile>> parentIDToDiffFiles) {
+    /**
+     * mapping : a parent commit id -> a list of files that are different
+     * between the parent and this revision
+     **/
+    private final Map<String, List<DiffFile>> diffFiles;
+    private COMPILABLE compilable;
+    private/* @Nullable */TestResult testResult;
+
+    /**
+     * create a revision initially, compilable flag is unknown and test result
+     * is null
+     */
+    public Revision(Repository repository, String commitID,
+            Map<String, List<DiffFile>> parentIDToDiffFiles) {
         this.repository = repository;
         this.commitID = commitID;
         diffFiles = parentIDToDiffFiles;
@@ -58,31 +60,32 @@ public class Revision implements Serializable {
     public Set<String> getParentIDs() {
         return diffFiles.keySet();
     }
-    
-    public List<DiffFile> getDiffFiles(String parentID) {
-	    return diffFiles.get(parentID);
-	}
 
-	public COMPILABLE isCompilable() {
-    	if (compilable == COMPILABLE.UNKNOWN) {
-    		compileAndRunTests();
-    	}
-    	
-    	return compilable;
+    public List<DiffFile> getDiffFiles(String parentID) {
+        return diffFiles.get(parentID);
+    }
+
+    public COMPILABLE isCompilable() {
+        if (compilable == COMPILABLE.UNKNOWN) {
+            compileAndRunTests();
+        }
+
+        return compilable;
     }
 
     public TestResult getTestResult() {
-    	if (compilable == COMPILABLE.UNKNOWN) {
-    		compileAndRunTests();
-    	}
-    	
+        if (compilable == COMPILABLE.UNKNOWN) {
+            compileAndRunTests();
+        }
+
         return testResult;
     }
 
     /**
      * compile and run all junit tests on this revision to generate TestResult
-     * @modifies : set compilable flag to YES/NO,
-     *             generate test result if compilable
+     * 
+     * @modifies : set compilable flag to YES/NO, generate test result if
+     *           compilable
      */
     private void compileAndRunTests() {
         int exitValue = repository.checkoutCommit(commitID);
@@ -90,36 +93,38 @@ public class Revision implements Serializable {
 
         Process junitProcess = Util.runProcess(repository.getRunJunitCommand(),
                 repository.getDirectory());
-        
+
         BufferedReader stdOutputReader = new BufferedReader(
                 new InputStreamReader(junitProcess.getInputStream()));
 
         BufferedReader stdErrorReader = new BufferedReader(
                 new InputStreamReader(junitProcess.getErrorStream()));
-        
-        List<String> outputStreamContent = Util.getStreamContent(stdOutputReader);
+
+        List<String> outputStreamContent = Util
+                .getStreamContent(stdOutputReader);
         List<String> errorStreamContent = Util.getStreamContent(stdErrorReader);
-        
+
         if (buildFailed(errorStreamContent)) {
-        	compilable = COMPILABLE.NO;
+            compilable = COMPILABLE.NO;
         } else {
-        	compilable = COMPILABLE.YES;
-        	testResult = new VoldemortTestResult(commitID, outputStreamContent, errorStreamContent);
+            compilable = COMPILABLE.YES;
+            testResult = new VoldemortTestResult(commitID, outputStreamContent,
+                    errorStreamContent);
         }
     }
-    
+
     /**
      * @return true iff build failed
      */
     private boolean buildFailed(List<String> streamContent) {
         Pattern buildFailedPattern = Pattern.compile("BUILD FAILED");
         for (String line : streamContent) {
-        	Matcher buildFailedMatcher = buildFailedPattern.matcher(line);
+            Matcher buildFailedMatcher = buildFailedPattern.matcher(line);
             if (buildFailedMatcher.find()) {
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -131,20 +136,22 @@ public class Revision implements Serializable {
 
         Revision revision = (Revision) other;
 
-        return repository.equals(revision.repository) && commitID.equals(revision.commitID)
-                && diffFiles.equals(revision.diffFiles) && compilable == revision.compilable
-                && ((testResult == null && revision.testResult == null) || 
-                		testResult.equals(revision.testResult));
+        return repository.equals(revision.repository)
+                && commitID.equals(revision.commitID)
+                && diffFiles.equals(revision.diffFiles)
+                && compilable == revision.compilable
+                && ((testResult == null && revision.testResult == null) || testResult
+                        .equals(revision.testResult));
     }
 
     @Override
     public int hashCode() {
-        int code = 11 * repository.hashCode() + 13 * commitID.hashCode() 
-        			+ 17 * diffFiles.hashCode() + 19 * compilable.hashCode();
+        int code = 11 * repository.hashCode() + 13 * commitID.hashCode() + 17
+                * diffFiles.hashCode() + 19 * compilable.hashCode();
         if (testResult != null) {
-        	code += 23 * testResult.hashCode();
+            code += 23 * testResult.hashCode();
         }
-        
+
         return code;
     }
 
@@ -153,12 +160,12 @@ public class Revision implements Serializable {
         String result = "commit : " + commitID + "\n";
         result += "compilable : ";
         if (compilable == COMPILABLE.YES) {
-        	result += "yes\n";
-        	result += testResult.toString();
+            result += "yes\n";
+            result += testResult.toString();
         } else if (compilable == COMPILABLE.NO) {
-        	result += "no\n";
+            result += "no\n";
         } else {
-        	result += "unknown\n";
+            result += "unknown\n";
         }
 
         for (String parentID : diffFiles.keySet()) {
@@ -170,7 +177,7 @@ public class Revision implements Serializable {
                 result += file + "\n";
             }
         }
-        
+
         return result;
     }
 }
