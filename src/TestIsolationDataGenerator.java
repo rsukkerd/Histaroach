@@ -111,6 +111,7 @@ public class TestIsolationDataGenerator {
 
         String fileName = "";
         if (startTResultID != null && endTResultID != null) {
+            // TODO: Bug -- startHGraphID should be startTResultID.
             fileName = "_" + startHGraphID + "_" + endTResultID;
         }
 
