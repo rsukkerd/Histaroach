@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import common.Flip.FlipType;
+
 /**
  * HistoryGraph represents a graph structure of a particular repository.
  */
@@ -98,6 +100,55 @@ public class HistoryGraph implements Iterable<Revision>, Serializable {
         }
 
         return false;
+    }
+    
+    /**
+     * @return a set of all flips in this historyGraph
+     */
+    public Set<Flip> getAllFlips() {
+        Set<Flip> flips = new HashSet<Flip>();
+
+        for (Revision revision : orderedRevisions) {
+            TestResult childResult = revision.getTestResult();
+            
+            if (childResult == null) { continue; }
+
+            Set<String> allTests = childResult.getAllTests();
+
+            // TODO: A revision should know its parents. You shouldn't need
+            // to use the history graph for this.
+
+            Set<Revision> parents = getParents(revision);
+
+            for (Revision parent : parents) {
+                TestResult parentResult = parent.getTestResult();
+                
+                if (parentResult == null) { continue; }
+
+                Map<String, FlipType> testToFlipType = null;
+
+                for (String test : allTests) {
+                    if (childResult.pass(test) && parentResult.fail(test)) {
+                    	if (testToFlipType == null) {
+                    		testToFlipType = new HashMap<String, Flip.FlipType>();
+                    	}
+                        testToFlipType.put(test, FlipType.TO_FIX);
+                    } else if (childResult.fail(test) && parentResult.pass(test)) {
+                    	if (testToFlipType == null) {
+                    		testToFlipType = new HashMap<String, Flip.FlipType>();
+                    	}
+                        testToFlipType.put(test, FlipType.TO_FAIL);
+                    }
+                }
+
+                if (testToFlipType != null) {
+	                Flip flip = new Flip(revision, parent, testToFlipType);
+	                flips.add(flip);
+                }
+            }
+        }
+
+        return flips;
     }
 
     @Override

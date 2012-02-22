@@ -263,68 +263,6 @@ public class Repository implements Serializable {
         return new ParallelBugFixes(bug, parallelFixes);
     }
 
-    // TODO: Why is this method part of Repository? It seems like it should
-    // instead be a part of HistoryGraph, since it uses the passed historyGraph
-    // extensively, and doesn't use `this` Repository at all.
-
-    /**
-     * @return a set of all flips in a given historyGraph
-     */
-    public Set<Flip> getAllFlips(HistoryGraph historyGraph) {
-        Set<Flip> flips = new HashSet<Flip>();
-
-        for (Revision revision : historyGraph) {
-            // TODO: Rename this to childResult for clarity.
-            TestResult result = revision.getTestResult();
-
-            // TODO: Avoid deeply nested control flow, as it is difficult to
-            // understand and follow. Here, instead change the if statement to:
-            // if (result == null) { continue; }
-
-            if (result != null) {
-                Set<String> allTests = result.getAllTests();
-
-                // TODO: A revision should know its parents. You shouldn't need
-                // to use the history graph for this.
-
-                Set<Revision> parents = historyGraph.getParents(revision);
-
-                for (Revision parent : parents) {
-                    TestResult parentResult = parent.getTestResult();
-
-                    // TODO: Avoid deeply nested control flow, as it is
-                    // difficult to understand and follow. Here, instead change
-                    // the if statement to:
-                    // if (parentResult == null) { continue; }
-
-                    if (parentResult != null) {
-                        Map<String, FlipType> testToFlipType = new HashMap<String, Flip.FlipType>();
-
-                        for (String test : allTests) {
-                            if (result.pass(test) && parentResult.fail(test)) {
-                                testToFlipType.put(test, FlipType.FIX);
-                            } else if (result.fail(test)
-                                    && parentResult.pass(test)) {
-                                testToFlipType.put(test, FlipType.FAIL);
-                            }
-                        }
-
-                        // TODO: If there were no flips, then this associates an
-                        // empty HashMap with (revision,parent). This is
-                        // wasteful, and misleading -- a Flip should represent
-                        // an actual flip. Refactor this so that a flip is only
-                        // created if a flip occurred.
-
-                        Flip flip = new Flip(revision, parent, testToFlipType);
-                        flips.add(flip);
-                    }
-                }
-            }
-        }
-
-        return flips;
-    }
-
     @Override
     public boolean equals(Object other) {
         if (other == null || !other.getClass().equals(this.getClass())) {

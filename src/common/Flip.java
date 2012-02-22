@@ -9,10 +9,8 @@ import java.util.Map;
  */
 public class Flip {
     public enum FlipType {
-        // TODO: Rename to TO_FAIL
-        FAIL,
-        // TODO: Rename to TO_PASS
-        FIX
+        TO_FAIL,
+        TO_FIX
     }
 
     private final Revision child;
