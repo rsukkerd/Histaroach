@@ -1,11 +1,12 @@
 package common;
 
+import static org.junit.Assert.fail;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,10 +34,11 @@ public class Revision implements Serializable {
     private final Repository repository;
     private final String commitID;
     /**
-     * mapping : a parent commit id -> a list of files that are different
+     * index mapping : a parent revision -> a list of files that are different
      * between the parent and this revision
      **/
-    private final Map<String, List<DiffFile>> diffFiles;
+    private final List<Revision> parents;
+    private final List<List<DiffFile>> diffFiles;
     private COMPILABLE compilable;
     private/* @Nullable */TestResult testResult;
 
@@ -44,87 +46,155 @@ public class Revision implements Serializable {
      * create a revision initially, compilable flag is unknown and test result
      * is null
      */
-    public Revision(Repository repository, String commitID,
-            Map<String, List<DiffFile>> parentIDToDiffFiles) {
+    public Revision(Repository repository, String commitID) {
         this.repository = repository;
         this.commitID = commitID;
-        diffFiles = parentIDToDiffFiles;
+        this.parents = new ArrayList<Revision>();
+        this.diffFiles = new ArrayList<List<DiffFile>>();
         compilable = COMPILABLE.UNKNOWN;
         testResult = null;
+    }
+    
+    public Repository getRepository() {
+    	return repository;
     }
 
     public String getCommitID() {
         return commitID;
     }
-
-    public Set<String> getParentIDs() {
-        return diffFiles.keySet();
+    
+    public void addParent(Revision parent, List<DiffFile> files) {
+    	parents.add(parent);
+    	diffFiles.add(files);
+    }
+    
+    public List<Revision> getParents() {
+    	return parents;
     }
 
-    public List<DiffFile> getDiffFiles(String parentID) {
-        return diffFiles.get(parentID);
+    public List<DiffFile> getDiffFiles(Revision parent) {
+    	int i = parents.indexOf(parent);
+    	assert i >= 0;
+        return diffFiles.get(i);
     }
 
     public COMPILABLE isCompilable() {
-        if (compilable == COMPILABLE.UNKNOWN) {
-            compileAndRunTests();
-        }
-
-        return compilable;
+    	if (compilable == COMPILABLE.UNKNOWN) {
+			compile();
+		}
+		return compilable;
     }
-
+    
     public TestResult getTestResult() {
-        if (compilable == COMPILABLE.UNKNOWN) {
-            compileAndRunTests();
-        }
-
-        return testResult;
-    }
-
+		if (compilable == COMPILABLE.UNKNOWN || 
+				(compilable == COMPILABLE.YES && testResult == null)) {
+			runAllTests();
+		}
+		return testResult;
+	}
+	
     /**
-     * compile and run all junit tests on this revision to generate TestResult
-     * 
-     * @modifies : set compilable flag to YES/NO, generate test result if
-     *           compilable
+     * compile this revision and set compilable flag
      */
-    private void compileAndRunTests() {
-        int exitValue = repository.checkoutCommit(commitID);
+	public void compile() {
+		boolean build =  build(repository.getBuildCommand());
+		boolean buildtest = build(repository.getBuildtestCommand());
+		
+		if (build && buildtest) {
+			compilable = COMPILABLE.YES;
+		} else {
+			compilable = COMPILABLE.NO;
+		}
+	}
+	
+	/**
+	 * run all junit tests on this revision, set compilable flag and test result
+	 */
+	public void runAllTests() {
+		testResult = run(repository.getRunJunitCommand());
+		
+		if (testResult == null) {
+			compilable = COMPILABLE.NO;
+		} else {
+			compilable = COMPILABLE.YES;
+		}
+	}
+	
+	/**
+	 * Helper method for compile()
+	 * @param command
+	 * @return true if build successful, false if build failed
+	 */
+	private boolean build(String[] command) {
+		int exitValue = repository.checkoutCommit(commitID);
         assert (exitValue == 0);
 
-        Process junitProcess = Util.runProcess(repository.getRunJunitCommand(),
+        Process process = Util.runProcess(command,
                 repository.getDirectory());
 
         BufferedReader stdOutputReader = new BufferedReader(
-                new InputStreamReader(junitProcess.getInputStream()));
+                new InputStreamReader(process.getInputStream()));
 
         BufferedReader stdErrorReader = new BufferedReader(
-                new InputStreamReader(junitProcess.getErrorStream()));
+                new InputStreamReader(process.getErrorStream()));
 
-        List<String> outputStreamContent = Util
-                .getStreamContent(stdOutputReader);
+        List<String> outputStreamContent = Util.getStreamContent(stdOutputReader);
         List<String> errorStreamContent = Util.getStreamContent(stdErrorReader);
+        
+        return buildSuccessful(outputStreamContent, errorStreamContent);
+	}
+	
+	/**
+	 * Helper method for runAllTests()
+	 * @param command
+	 * @return test result
+	 */
+	private TestResult run(String[] command) {
+		int exitValue = repository.checkoutCommit(commitID);
+        assert (exitValue == 0);
 
-        if (buildFailed(errorStreamContent)) {
-            compilable = COMPILABLE.NO;
-        } else {
-            compilable = COMPILABLE.YES;
-            testResult = new VoldemortTestResult(commitID, outputStreamContent,
-                    errorStreamContent);
+        Process process = Util.runProcess(command,
+                repository.getDirectory());
+
+        BufferedReader stdOutputReader = new BufferedReader(
+                new InputStreamReader(process.getInputStream()));
+
+        BufferedReader stdErrorReader = new BufferedReader(
+                new InputStreamReader(process.getErrorStream()));
+
+        List<String> outputStreamContent = Util.getStreamContent(stdOutputReader);
+        List<String> errorStreamContent = Util.getStreamContent(stdErrorReader);
+        
+        if (buildSuccessful(outputStreamContent, errorStreamContent)) {
+        	return new VoldemortTestResult(commitID, outputStreamContent, errorStreamContent);
         }
-    }
-
-    /**
-     * @return true iff build failed
+        
+        return null;
+	}
+	
+	/**
+	 * Helper method for build(command)
+     * @return true if build successful, false if build failed
      */
-    private boolean buildFailed(List<String> streamContent) {
+    private boolean buildSuccessful(List<String> outputStreamContent, List<String> errorStreamContent) {
+    	Pattern buildSuccessfulPattern = Pattern.compile("BUILD SUCCESSFUL");
         Pattern buildFailedPattern = Pattern.compile("BUILD FAILED");
-        for (String line : streamContent) {
-            Matcher buildFailedMatcher = buildFailedPattern.matcher(line);
-            if (buildFailedMatcher.find()) {
+        
+        for (String line : outputStreamContent) {
+            Matcher buildSuccessfulMatcher = buildSuccessfulPattern.matcher(line);
+            if (buildSuccessfulMatcher.find()) {
                 return true;
             }
         }
+        
+        for (String line : errorStreamContent) {
+            Matcher buildFailedMatcher = buildFailedPattern.matcher(line);
+            if (buildFailedMatcher.find()) {
+                return false;
+            }
+        }
 
+        fail("Neither BUILD SUCCESSFUL nor BUILD FAILED found");
         return false;
     }
 
@@ -167,13 +237,13 @@ public class Revision implements Serializable {
         } else {
             result += "unknown\n";
         }
-
-        for (String parentID : diffFiles.keySet()) {
-            result += "parent : " + parentID + "\n";
-            result += "diff files :\n";
-            List<DiffFile> files = getDiffFiles(parentID);
-
-            for (DiffFile file : files) {
+        
+        for (int i = 0; i < parents.size(); i++) {
+        	result += "parent : " + parents.get(i).getCommitID() + "\n";
+        	result += "diff files :\n";
+        	List<DiffFile> files = diffFiles.get(i);
+        	
+        	for (DiffFile file : files) {
                 result += file + "\n";
             }
         }

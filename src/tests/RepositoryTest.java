@@ -8,9 +8,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Test;
 
@@ -48,109 +46,75 @@ public class RepositoryTest {
 		DIFF_FILES.add(diffFile);
 	}
 
-	/** revision -> parent -> diff files in hGraph 1 **/
+	/** commit ids in hGraph 1 **/
 	private static final String COMMIT_1_1 = "8fa00ca";
-	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_1_1 = new HashMap<String, List<DiffFile>>();
 	
-	/** revision -> parent -> diff files in hGraph 2 **/
+	/** commit ids in hGraph 2 **/
 	private static final String COMMIT_1_2 = "3e3a0ef";
-	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_1_2 = new HashMap<String, List<DiffFile>>();
-
 	private static final String COMMIT_2_2 = "a667caa";
-	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_2_2 = new HashMap<String, List<DiffFile>>();
-	static {
-		PARENT_TO_DIFF_FILES_2_2.put(COMMIT_1_2, DIFF_FILES);
-	}
 	
-	/** revision -> parent -> diff files in hGraph 3 **/
+	/** commit ids in hGraph 3 **/
 	private static final String COMMIT_1_3 = "e082fcd";
-	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_1_3 = new HashMap<String, List<DiffFile>>();
-	
 	private static final String COMMIT_2_3 = "43c4a2e";
-	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_2_3 = new HashMap<String, List<DiffFile>>();
-	static {
-		PARENT_TO_DIFF_FILES_2_3.put(COMMIT_1_3, DIFF_FILES);
-	}
 	private static final String COMMIT_3_3 = "2512c4a";
-	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_3_3 = new HashMap<String, List<DiffFile>>();
-	static {
-		PARENT_TO_DIFF_FILES_3_3.put(COMMIT_2_3, DIFF_FILES);
-	}
 	
-	/** revision -> parent -> diff files in hGraph 4 **/
+	/** commit ids in hGraph 4 **/
 	private static final String COMMIT_1_4 = "ce7fccb";
-	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_1_4 = new HashMap<String, List<DiffFile>>();
-	
 	private static final String COMMIT_2_4 = "50bb766";
-	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_2_4 = new HashMap<String, List<DiffFile>>();
-	static {
-		PARENT_TO_DIFF_FILES_2_4.put(COMMIT_1_4, DIFF_FILES);
-	}
 	private static final String COMMIT_3_4 = "8d4a966";
-	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_3_4 = new HashMap<String, List<DiffFile>>();
-	static {
-		PARENT_TO_DIFF_FILES_3_4.put(COMMIT_1_4, DIFF_FILES);
-	}
 	private static final String COMMIT_4_4 = "11f34d6";
-	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_4_4 = new HashMap<String, List<DiffFile>>();
-	static {
-		PARENT_TO_DIFF_FILES_4_4.put(COMMIT_2_4, DIFF_FILES);
-		PARENT_TO_DIFF_FILES_4_4.put(COMMIT_3_4, DIFF_FILES);
-	}
 	
-	/** revision -> parent -> diff files in hGraph 5 **/
+	/** commit ids in hGraph 5 **/
 	private static final String COMMIT_1_5 = "eab94e5";
-	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_1_5 = new HashMap<String, List<DiffFile>>();
-	
 	private static final String COMMIT_2_5 = "d863c56";
-	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_2_5 = new HashMap<String, List<DiffFile>>();
-	static {
-		PARENT_TO_DIFF_FILES_2_5.put(COMMIT_1_5, DIFF_FILES);
-	}
 	private static final String COMMIT_3_5 = "7d72bc0";
-	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_3_5 = new HashMap<String, List<DiffFile>>();
-	static {
-		PARENT_TO_DIFF_FILES_3_5.put(COMMIT_1_5, DIFF_FILES);
-	}
 	private static final String COMMIT_4_5 = "e14c9c6";
-	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_4_5 = new HashMap<String, List<DiffFile>>();
-	static {
-		PARENT_TO_DIFF_FILES_4_5.put(COMMIT_2_5, DIFF_FILES);
-		PARENT_TO_DIFF_FILES_4_5.put(COMMIT_3_5, DIFF_FILES);
-	}
 	private static final String COMMIT_5_5 = "35c25ec";
-	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_5_5 = new HashMap<String, List<DiffFile>>();
-	static {
-		PARENT_TO_DIFF_FILES_5_5.put(COMMIT_1_5, DIFF_FILES);
-	}
 	private static final String COMMIT_6_5 = "e654cdb";
-	private static final Map<String, List<DiffFile>> PARENT_TO_DIFF_FILES_6_5 = new HashMap<String, List<DiffFile>>();
-	static {
-		PARENT_TO_DIFF_FILES_6_5.put(COMMIT_4_5, DIFF_FILES);
-		PARENT_TO_DIFF_FILES_6_5.put(COMMIT_5_5, DIFF_FILES);
-	}
 	
 	/** a revision in a particular hGraph **/
-	private static final Revision REVISION_1_1 = new Revision(REPOSITORY_1, COMMIT_1_1, PARENT_TO_DIFF_FILES_1_1);
+	private static final Revision REVISION_1_1 = new Revision(REPOSITORY_1, COMMIT_1_1);
 	
-	private static final Revision REVISION_1_2 = new Revision(REPOSITORY_2, COMMIT_1_2, PARENT_TO_DIFF_FILES_1_2);
-	private static final Revision REVISION_2_2 = new Revision(REPOSITORY_2, COMMIT_2_2, PARENT_TO_DIFF_FILES_2_2);
+	private static final Revision REVISION_1_2 = new Revision(REPOSITORY_2, COMMIT_1_2);
+	private static final Revision REVISION_2_2 = new Revision(REPOSITORY_2, COMMIT_2_2);
+	static {
+		REVISION_2_2.addParent(REVISION_1_2, DIFF_FILES);
+	}
 	
-	private static final Revision REVISION_1_3 = new Revision(REPOSITORY_3, COMMIT_1_3, PARENT_TO_DIFF_FILES_1_3);
-	private static final Revision REVISION_2_3 = new Revision(REPOSITORY_3, COMMIT_2_3, PARENT_TO_DIFF_FILES_2_3);
-	private static final Revision REVISION_3_3 = new Revision(REPOSITORY_3, COMMIT_3_3, PARENT_TO_DIFF_FILES_3_3);
+	private static final Revision REVISION_1_3 = new Revision(REPOSITORY_3, COMMIT_1_3);
+	private static final Revision REVISION_2_3 = new Revision(REPOSITORY_3, COMMIT_2_3);
+	private static final Revision REVISION_3_3 = new Revision(REPOSITORY_3, COMMIT_3_3);
+	static {
+		REVISION_2_3.addParent(REVISION_1_3, DIFF_FILES);
+		REVISION_3_3.addParent(REVISION_2_3, DIFF_FILES);
+	}
 	
-	private static final Revision REVISION_1_4 = new Revision(REPOSITORY_4, COMMIT_1_4, PARENT_TO_DIFF_FILES_1_4);
-	private static final Revision REVISION_2_4 = new Revision(REPOSITORY_4, COMMIT_2_4, PARENT_TO_DIFF_FILES_2_4);
-	private static final Revision REVISION_3_4 = new Revision(REPOSITORY_4, COMMIT_3_4, PARENT_TO_DIFF_FILES_3_4);
-	private static final Revision REVISION_4_4 = new Revision(REPOSITORY_4, COMMIT_4_4, PARENT_TO_DIFF_FILES_4_4);
+	private static final Revision REVISION_1_4 = new Revision(REPOSITORY_4, COMMIT_1_4);
+	private static final Revision REVISION_2_4 = new Revision(REPOSITORY_4, COMMIT_2_4);
+	private static final Revision REVISION_3_4 = new Revision(REPOSITORY_4, COMMIT_3_4);
+	private static final Revision REVISION_4_4 = new Revision(REPOSITORY_4, COMMIT_4_4);
+	static {
+		REVISION_2_4.addParent(REVISION_1_4, DIFF_FILES);
+		REVISION_3_4.addParent(REVISION_1_4, DIFF_FILES);
+		REVISION_4_4.addParent(REVISION_2_4, DIFF_FILES);
+		REVISION_4_4.addParent(REVISION_3_4, DIFF_FILES);
+	}
 	
-	private static final Revision REVISION_1_5 = new Revision(REPOSITORY_5, COMMIT_1_5, PARENT_TO_DIFF_FILES_1_5);
-	private static final Revision REVISION_2_5 = new Revision(REPOSITORY_5, COMMIT_2_5, PARENT_TO_DIFF_FILES_2_5);
-	private static final Revision REVISION_3_5 = new Revision(REPOSITORY_5, COMMIT_3_5, PARENT_TO_DIFF_FILES_3_5);
-	private static final Revision REVISION_4_5 = new Revision(REPOSITORY_5, COMMIT_4_5, PARENT_TO_DIFF_FILES_4_5);
-	private static final Revision REVISION_5_5 = new Revision(REPOSITORY_5, COMMIT_5_5, PARENT_TO_DIFF_FILES_5_5);
-	private static final Revision REVISION_6_5 = new Revision(REPOSITORY_5, COMMIT_6_5, PARENT_TO_DIFF_FILES_6_5);
+	private static final Revision REVISION_1_5 = new Revision(REPOSITORY_5, COMMIT_1_5);
+	private static final Revision REVISION_2_5 = new Revision(REPOSITORY_5, COMMIT_2_5);
+	private static final Revision REVISION_3_5 = new Revision(REPOSITORY_5, COMMIT_3_5);
+	private static final Revision REVISION_4_5 = new Revision(REPOSITORY_5, COMMIT_4_5);
+	private static final Revision REVISION_5_5 = new Revision(REPOSITORY_5, COMMIT_5_5);
+	private static final Revision REVISION_6_5 = new Revision(REPOSITORY_5, COMMIT_6_5);
+	static {
+		REVISION_2_5.addParent(REVISION_1_5, DIFF_FILES);
+		REVISION_3_5.addParent(REVISION_1_5, DIFF_FILES);
+		REVISION_4_5.addParent(REVISION_2_5, DIFF_FILES);
+		REVISION_4_5.addParent(REVISION_3_5, DIFF_FILES);
+		REVISION_5_5.addParent(REVISION_1_5, DIFF_FILES);
+		REVISION_6_5.addParent(REVISION_4_5, DIFF_FILES);
+		REVISION_6_5.addParent(REVISION_5_5, DIFF_FILES);
+	}
 	/***************************************/
 		
 	/** a set of revisions in a particular hGraph **/
@@ -209,7 +173,7 @@ public class RepositoryTest {
 	private static final HistoryGraph[] EXPECTED_HGRAPHS = {HGRAPH_1, HGRAPH_2, HGRAPH_3, HGRAPH_4, HGRAPH_5};
 	
 	@Test
-	public void testBuildHistoryGraphOnSampleRepositories() throws FileNotFoundException, IOException {
+	public void testBuildHistoryGraphOnSampleRepositories() {
 		assertTrue(untarSampleRepositories());
 		
 		for (int i = 0; i < DIRECTORIES.length; i++) {

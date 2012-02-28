@@ -1,14 +1,16 @@
 import static org.junit.Assert.assertNotNull;
 
+import java.util.List;
 import java.util.Set;
+
+import common.Flip;
+import common.HistoryGraph;
+import common.Revision;
+import common.Util;
 
 import plume.Option;
 import plume.OptionGroup;
 import plume.Options;
-
-import common.HistoryGraph;
-import common.Revision;
-import common.Util;
 
 public class TestIsolationDataReader {
 
@@ -45,14 +47,17 @@ public class TestIsolationDataReader {
         }
         
         HistoryGraph hGraph = Util.reconstructHistoryGraph(serializedRevisionsDirName);
-        verifyHistoryGraph(hGraph);
+        // verifyHistoryGraph(hGraph);
         
-        System.out.println(hGraph);
+        Set<Flip> flips = hGraph.getAllFlips();
+        for (Flip flip : flips) {
+        	System.out.println(flip);
+        }
 	}
 
 	public static void verifyHistoryGraph(HistoryGraph historyGraph) {
 		for (Revision revision : historyGraph) {
-			Set<Revision> parents = historyGraph.getParents(revision);
+			List<Revision> parents = revision.getParents();
 			for (Revision parent : parents) {
 				assertNotNull("null parent at " + revision.getCommitID(), parent);
 			}

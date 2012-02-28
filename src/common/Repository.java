@@ -2,19 +2,17 @@ package common;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+
+import org.apache.commons.io.FileUtils;
 
 import common.DiffFile.DiffType;
-import common.Flip.FlipType;
 
 /**
  * Repository represents a git repository. Repository contains a reference to
@@ -28,11 +26,15 @@ public class Repository implements Serializable {
 
     public static final String[] LOG_COMMAND = { "git", "log",
             "--pretty=format:%h %p" };
+    public static final String BUILD_COMMAND = "build";
+    public static final String BUILDTEST_COMMAND = "buildtest";
     public static final String JUNIT_COMMAND = "junit";
-    public static final String SINGLE_TEST_COMMAND = "ant junit-test -Dtest.name=";
+    public static final String JUNIT_TEST_COMMAND = "junit-test -Dtest.name=";
 
     private final File directory;
-    private final String antCommand;
+    private final String[] antJunit;
+    private final String[] antBuild;
+    private final String[] antBuildtest;
 
     /**
      * create a repository instance
@@ -44,19 +46,38 @@ public class Repository implements Serializable {
      */
     public Repository(String pathname, String antCommand) {
         directory = new File(pathname);
-        this.antCommand = antCommand;
-    }
-
-    public String[] getRunJunitCommand() {
+        
         String[] ant = antCommand.split(" ");
-        String[] antJunit = new String[ant.length + 1];
+        antJunit = new String[ant.length + 1];
+        antBuild = new String[ant.length + 1];
+        antBuildtest = new String[ant.length + 1];
 
         for (int i = 0; i < ant.length; i++) {
-            antJunit[i] = ant[i];
+        	antJunit[i] = ant[i];
+        	antBuild[i] = ant[i];
+        	antBuildtest[i] = ant[i];
         }
 
         antJunit[antJunit.length - 1] = JUNIT_COMMAND;
+        antBuild[antBuild.length - 1] = BUILD_COMMAND;
+        antBuildtest[antBuildtest.length - 1] = BUILDTEST_COMMAND;
+    }
+
+    public String[] getRunJunitCommand() {
         return antJunit;
+    }
+    
+    public String[] getRunJunitTestCommand(String testName) {
+    	String junitTest = JUNIT_TEST_COMMAND + testName;
+    	return junitTest.split(" ");
+    }
+    
+    public String[] getBuildCommand() {
+    	return antBuild;
+    }
+    
+    public String[] getBuildtestCommand() {
+    	return antBuildtest;
     }
 
     /**
@@ -135,132 +156,56 @@ public class Repository implements Serializable {
 
         List<String> lines = Util.getStreamContent(reader);
 
+        Map<String, List<Revision>> parentIDToChildRevisions = new HashMap<String, List<Revision>>();
+        
         for (String line : lines) {
             String[] hashes = line.split(" ");
 
             String commitID = hashes[0];
-            Map<String, List<DiffFile>> parentIDToDiffFiles = getParentIDToDiffFiles(
-                    commitID, hashes);
 
-            Revision revision = new Revision(this, commitID,
-                    parentIDToDiffFiles);
+            Revision revision = new Revision(this, commitID);
             hGraph.addRevision(revision);
+            
+            for (int i = 1; i < hashes.length; i++) {
+            	if (parentIDToChildRevisions.containsKey(hashes[i])) {
+            		parentIDToChildRevisions.get(hashes[i]).add(revision);
+            	} else {
+            		List<Revision> childRevisions = new ArrayList<Revision>();
+            		childRevisions.add(revision);
+            		parentIDToChildRevisions.put(hashes[i], childRevisions);
+            	}
+            }
 
             /* print progress to standard output */
             System.out.println(revision);
+        }
+        
+        for (Revision revision : hGraph) {
+        	String commitID = revision.getCommitID();
+        	
+        	if (parentIDToChildRevisions.containsKey(commitID)) {
+        		List<Revision> childRevisions = parentIDToChildRevisions.get(commitID);
+        		
+        		for (Revision childRevision : childRevisions) {
+        			String childID = childRevision.getCommitID();
+        			List<DiffFile> files = getDiffFiles(childID, commitID);
+        			
+        			childRevision.addParent(revision, files);
+        		}
+        	}
         }
 
         return hGraph;
     }
 
-    /**
-     * Helper method for buildHistoryGraph
-     * 
-     * @return a mapping : a parentCommitID -> a list of diff files
-     */
-    private Map<String, List<DiffFile>> getParentIDToDiffFiles(String commitID,
-            String[] hashes) {
-        Map<String, List<DiffFile>> parentIDToDiffFiles = new HashMap<String, List<DiffFile>>();
-
-        if (hashes.length > 1) {
-            for (int i = 1; i < hashes.length; i++) {
-                String parentID = hashes[i];
-                List<DiffFile> diffFiles = getDiffFiles(commitID, parentID);
-
-                parentIDToDiffFiles.put(parentID, diffFiles);
-            }
-        }
-
-        return parentIDToDiffFiles;
+    public void copyFile(String filename, File srcDir, File destDir) throws IOException {
+    	File srcFile = new File(srcDir.getAbsolutePath() + File.separatorChar + filename);
+    	FileUtils.copyFileToDirectory(srcFile, destDir);
     }
-
-    /**
-     * @return a mapping : a test name (bug) -> a list of all its fixes
-     */
-    public Map<String, List<BugFix>> getAllBugFixes(HistoryGraph historyGraph) {
-        Map<String, List<BugFix>> map = new HashMap<String, List<BugFix>>();
-
-        for (Revision revision : historyGraph) {
-            List<String> fixedBugs = new ArrayList<String>(); // find all bugs
-                                                              // that this
-                                                              // revision fixed
-            Set<Revision> parents = historyGraph.getParents(revision);
-
-            for (Revision parent : parents) {
-                for (String failedTest : parent.getTestResult()
-                        .getFailedTests()) {
-                    if (revision.getTestResult().pass(failedTest)) {
-                        fixedBugs.add(failedTest);
-                    }
-                }
-            }
-
-            for (String test : fixedBugs) {
-                // BFS to find all consecutive revisions, start from this
-                // revision, that fail this test
-                Queue<Revision> queue = new LinkedList<Revision>();
-                BugFix bugFix = new BugFix(test, revision);
-
-                Set<Revision> visited = new HashSet<Revision>();
-
-                for (Revision parent : parents) {
-                    if (parent.getTestResult().fail(test)) {
-                        queue.add(parent);
-                        bugFix.addFailedRevision(parent);
-                        visited.add(parent);
-                    }
-                }
-
-                while (!queue.isEmpty()) {
-                    Revision nextRevision = queue.poll();
-
-                    for (Revision parent : historyGraph
-                            .getParents(nextRevision)) {
-                        if (!visited.contains(parent)
-                                && parent.getTestResult().fail(test)) {
-                            queue.add(parent);
-                            bugFix.addFailedRevision(parent);
-                            visited.add(parent);
-                        }
-                    }
-                }
-
-                if (map.containsKey(test)) {
-                    map.get(test).add(bugFix);
-                } else {
-                    List<BugFix> list = new ArrayList<BugFix>();
-                    list.add(bugFix);
-                    map.put(test, list);
-                }
-            }
-        }
-
-        return map;
-    }
-
-    /**
-     * @return a ParallelBugFixes instance of a given bug
-     */
-    public ParallelBugFixes getParallelBugFixes(HistoryGraph historyGraph,
-            String bug, List<BugFix> allFixes) {
-        Set<BugFix> parallelFixes = new HashSet<BugFix>();
-
-        for (int i = 0; i < allFixes.size() - 1; i++) {
-            for (int j = i + 1; j < allFixes.size(); j++) {
-                BugFix fix_A = allFixes.get(i);
-                BugFix fix_B = allFixes.get(j);
-
-                Revision revision_A = fix_A.getPassedRevision();
-                Revision revision_B = fix_B.getPassedRevision();
-
-                if (historyGraph.parallel(revision_A, revision_B)) {
-                    parallelFixes.add(fix_A);
-                    parallelFixes.add(fix_B);
-                }
-            }
-        }
-
-        return new ParallelBugFixes(bug, parallelFixes);
+    
+    public void deleteFile(String filename, File dir) throws IOException {
+    	File file = new File(dir.getAbsolutePath() + File.separatorChar + filename);
+    	FileUtils.forceDelete(file);
     }
 
     @Override
