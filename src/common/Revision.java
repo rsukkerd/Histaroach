@@ -208,6 +208,7 @@ public class Revision implements Serializable {
 
         return repository.equals(revision.repository)
                 && commitID.equals(revision.commitID)
+                && parents.equals(revision.parents)
                 && diffFiles.equals(revision.diffFiles)
                 && compilable == revision.compilable
                 && ((testResult == null && revision.testResult == null) || testResult
@@ -216,10 +217,10 @@ public class Revision implements Serializable {
 
     @Override
     public int hashCode() {
-        int code = 11 * repository.hashCode() + 13 * commitID.hashCode() + 17
-                * diffFiles.hashCode() + 19 * compilable.hashCode();
+        int code = 11 * repository.hashCode() + 13 * commitID.hashCode() 
+        		+ 17 * parents.hashCode() + 19 * diffFiles.hashCode() + 23 * compilable.hashCode();
         if (testResult != null) {
-            code += 23 * testResult.hashCode();
+            code += 29 * testResult.hashCode();
         }
 
         return code;

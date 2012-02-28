@@ -96,8 +96,8 @@ public class RepositoryTest {
 	static {
 		REVISION_2_4.addParent(REVISION_1_4, DIFF_FILES);
 		REVISION_3_4.addParent(REVISION_1_4, DIFF_FILES);
-		REVISION_4_4.addParent(REVISION_2_4, DIFF_FILES);
 		REVISION_4_4.addParent(REVISION_3_4, DIFF_FILES);
+		REVISION_4_4.addParent(REVISION_2_4, DIFF_FILES);
 	}
 	
 	private static final Revision REVISION_1_5 = new Revision(REPOSITORY_5, COMMIT_1_5);
@@ -109,11 +109,11 @@ public class RepositoryTest {
 	static {
 		REVISION_2_5.addParent(REVISION_1_5, DIFF_FILES);
 		REVISION_3_5.addParent(REVISION_1_5, DIFF_FILES);
-		REVISION_4_5.addParent(REVISION_2_5, DIFF_FILES);
 		REVISION_4_5.addParent(REVISION_3_5, DIFF_FILES);
+		REVISION_4_5.addParent(REVISION_2_5, DIFF_FILES);
 		REVISION_5_5.addParent(REVISION_1_5, DIFF_FILES);
-		REVISION_6_5.addParent(REVISION_4_5, DIFF_FILES);
 		REVISION_6_5.addParent(REVISION_5_5, DIFF_FILES);
+		REVISION_6_5.addParent(REVISION_4_5, DIFF_FILES);
 	}
 	/***************************************/
 		
