@@ -175,10 +175,10 @@ public class Util {
      * @return a HistoryGraph instance containing all revisions corresponding to 
      * 			serialized revision files in dirPath
      */
-    public static HistoryGraph reconstructHistoryGraph(String dirPath) {
-    	HistoryGraph hGraph = new HistoryGraph();
+    public static HistoryGraph reconstructHistoryGraph(Repository repository) {
+    	HistoryGraph hGraph = new HistoryGraph(repository);
 
-    	File dir = new File(dirPath);
+    	File dir = repository.getDirectory();
     	FileFilter filter = new RevisionFileFilter();
     	File[] revisionFiles = dir.listFiles(filter);
     	

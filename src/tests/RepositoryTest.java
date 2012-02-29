@@ -157,11 +157,11 @@ public class RepositoryTest {
 	
 	private static final String[] START_COMMIT_IDS = {COMMIT_1_1, COMMIT_2_2, COMMIT_3_3, COMMIT_4_4, COMMIT_6_5};
 	
-	private static final HistoryGraph HGRAPH_1 = new HistoryGraph();
-	private static final HistoryGraph HGRAPH_2 = new HistoryGraph();
-	private static final HistoryGraph HGRAPH_3 = new HistoryGraph();
-	private static final HistoryGraph HGRAPH_4 = new HistoryGraph();
-	private static final HistoryGraph HGRAPH_5 = new HistoryGraph();
+	private static final HistoryGraph HGRAPH_1 = new HistoryGraph(REPOSITORY_1);
+	private static final HistoryGraph HGRAPH_2 = new HistoryGraph(REPOSITORY_2);
+	private static final HistoryGraph HGRAPH_3 = new HistoryGraph(REPOSITORY_3);
+	private static final HistoryGraph HGRAPH_4 = new HistoryGraph(REPOSITORY_4);
+	private static final HistoryGraph HGRAPH_5 = new HistoryGraph(REPOSITORY_5);
 	static {
 		buildHistoryGraph(HGRAPH_1, REVISIONS_1);
 		buildHistoryGraph(HGRAPH_2, REVISIONS_2);

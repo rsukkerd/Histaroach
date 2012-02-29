@@ -1,5 +1,7 @@
 package common;
 
+import static org.junit.Assert.fail;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -9,14 +11,30 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 
+import voldemort.VoldemortTestResult;
+
 import common.DiffFile.DiffType;
+import common.Revision.COMPILABLE;
 
 /**
- * Repository represents a git repository. Repository contains a reference to
- * the directory associated with this Repository.
+ * Repository represents a git repository.
+ * 
+ * Repository has access to the directory associated with it,
+ * and the revision that is currently checked out.
+ * 
+ * Repository contains methods to check out a revision, compile 
+ * it and run test(s) on that revision. These methods { compile(), 
+ * compileAndRunAllTests(), and compileAndRunTest(test) } modify 
+ * the state of the revision.
+ * 
+ * Repository also contains public methods that compile and run 
+ * test(s) on the current revision but do not modify the revision. 
+ * These methods are build(command) and run(command).
  */
 public class Repository implements Serializable {
     /**
@@ -35,6 +53,8 @@ public class Repository implements Serializable {
     private final String[] antJunit;
     private final String[] antBuild;
     private final String[] antBuildtest;
+    
+    private Revision currRevision;
 
     /**
      * create a repository instance
@@ -63,23 +83,6 @@ public class Repository implements Serializable {
         antBuildtest[antBuildtest.length - 1] = BUILDTEST_COMMAND;
     }
 
-    public String[] getRunJunitCommand() {
-        return antJunit;
-    }
-    
-    public String[] getRunJunitTestCommand(String testName) {
-    	String junitTest = JUNIT_TEST_COMMAND + testName;
-    	return junitTest.split(" ");
-    }
-    
-    public String[] getBuildCommand() {
-    	return antBuild;
-    }
-    
-    public String[] getBuildtestCommand() {
-    	return antBuildtest;
-    }
-
     /**
      * @return directory of this repository
      */
@@ -88,63 +91,15 @@ public class Repository implements Serializable {
     }
 
     /**
-     * Checks out a particular commit from this repository.
-     * 
-     * @param commitID
-     * @return exit value of 'git checkout' process
-     */
-    public int checkoutCommit(String commitID) {
-        Process p = Util.runProcess(
-                new String[] { "git", "checkout", commitID }, directory);
-        return p.exitValue();
-    }
-
-    /**
-     * @param childCommitID
-     * @param parentCommitID
-     * @return a list of diff files between childCommit and parentCommit
-     */
-    public List<DiffFile> getDiffFiles(String childCommitID,
-            String parentCommitID) {
-        List<DiffFile> diffFiles = new ArrayList<DiffFile>();
-
-        Process p = Util.runProcess(new String[] { "git", "diff",
-                "--name-status", childCommitID, parentCommitID }, directory);
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(
-                p.getInputStream()));
-
-        List<String> lines = Util.getStreamContent(reader);
-
-        for (String line : lines) {
-            String[] tokens = line.split("\\s");
-
-            DiffType type;
-            if (tokens[0].equals("A")) {
-                type = DiffType.ADDED;
-            } else if (tokens[0].equals("M")) {
-                type = DiffType.MODIFIED;
-            } else {
-                type = DiffType.DELETED;
-            }
-
-            DiffFile diffFile = new DiffFile(type, tokens[1]);
-
-            diffFiles.add(diffFile);
-        }
-
-        return diffFiles;
-    }
-
-    /**
-     * build a history graph instance containing revisions from startCommit to
-     * the root commit initially, each revision in the history graph has
+     * Build a HistoryGraph instance containing revisions from startCommit 
+     * to the root commit.
+     * Initially, each revision in the HistoryGraph has
      * compilable = UNKNOWN and TestResult = null
      * 
      * @return a history graph of this repository
      */
     public HistoryGraph buildHistoryGraph(String startCommitID) {
-        HistoryGraph hGraph = new HistoryGraph();
+        HistoryGraph hGraph = new HistoryGraph(this);
 
         int exitValue = checkoutCommit(startCommitID);
         assert (exitValue == 0);
@@ -198,33 +153,202 @@ public class Repository implements Serializable {
         return hGraph;
     }
 
-    public void copyFile(String filename, File srcDir, File destDir) throws IOException {
-    	File srcFile = new File(srcDir.getAbsolutePath() + File.separatorChar + filename);
-    	FileUtils.copyFileToDirectory(srcFile, destDir);
-    }
-    
-    public void deleteFile(String filename, File dir) throws IOException {
-    	File file = new File(dir.getAbsolutePath() + File.separatorChar + filename);
-    	FileUtils.forceDelete(file);
-    }
+    /**
+     * Helper method for buildHistoryGraph
+	 * Checks out a particular commit from this repository.
+	 * 
+	 * @return exit value of 'git checkout' process
+	 */
+	private int checkoutCommit(String commitID) {
+	    Process p = Util.runProcess(
+	            new String[] { "git", "checkout", commitID }, directory);
+	    return p.exitValue();
+	}
 
-    @Override
-    public boolean equals(Object other) {
-        if (other == null || !other.getClass().equals(this.getClass())) {
-            return false;
-        }
+	/**
+	 * Helper method for buildHistoryGraph
+	 * 
+	 * @return a list of diff files between childCommit and parentCommit
+	 */
+	private List<DiffFile> getDiffFiles(String childCommitID,
+	        String parentCommitID) {
+	    List<DiffFile> diffFiles = new ArrayList<DiffFile>();
+	
+	    Process p = Util.runProcess(new String[] { "git", "diff",
+	            "--name-status", childCommitID, parentCommitID }, directory);
+	
+	    BufferedReader reader = new BufferedReader(new InputStreamReader(
+	            p.getInputStream()));
+	
+	    List<String> lines = Util.getStreamContent(reader);
+	
+	    for (String line : lines) {
+	        String[] tokens = line.split("\\s");
+	
+	        DiffType type;
+	        if (tokens[0].equals("A")) {
+	            type = DiffType.ADDED;
+	        } else if (tokens[0].equals("M")) {
+	            type = DiffType.MODIFIED;
+	        } else {
+	            type = DiffType.DELETED;
+	        }
+	
+	        DiffFile diffFile = new DiffFile(type, tokens[1]);
+	
+	        diffFiles.add(diffFile);
+	    }
+	
+	    return diffFiles;
+	}
 
-        Repository repository = (Repository) other;
-        return directory.equals(repository.directory);
-    }
+	/**
+	 * check out the revision from this repository
+	 * @return exit value of the check out process
+	 */
+	public int checkoutRevision(Revision revision) {
+		currRevision = revision;
+		return checkoutCommit(currRevision.getCommitID());
+	}
 
-    @Override
-    public int hashCode() {
-        return directory.hashCode();
-    }
+	/**
+	 * compile the current revision
+	 * @modifies compilable flag of the current revision
+	 */
+	public void compile() {
+		if (build(antBuild) && build(antBuildtest)) {
+			currRevision.setCompilableFlag(COMPILABLE.YES);
+		} else {
+			currRevision.setCompilableFlag(COMPILABLE.NO);
+		}
+	}
 
-    @Override
-    public String toString() {
-        return "repository location : " + directory.getAbsolutePath();
-    }
+	/**
+	 * compile and run all tests on the current revision
+	 * @modifies compilable flag and test result of the current revision
+	 */
+	public void compileAndRunAllTests() {
+		/*@Nullable*/TestResult testResult = run(antJunit);
+		currRevision.setTestResult(testResult);
+		
+		if (testResult != null) {
+			currRevision.setCompilableFlag(COMPILABLE.YES);
+		} else {
+			currRevision.setCompilableFlag(COMPILABLE.NO);
+		}
+	}
+
+	/**
+	 * compile and run a specific test on the current revision
+	 * @modifies test result and compilable flag of the current revision
+	 */
+	public void compildAndRunTest(String testName) {
+		String[] antJunitTest = (JUNIT_TEST_COMMAND + testName).split(" ");
+		TestResult result = run(antJunitTest);
+		
+		if (result != null) {
+			currRevision.addTestResult(result);
+			currRevision.setCompilableFlag(COMPILABLE.YES);
+		} else {
+			currRevision.setCompilableFlag(COMPILABLE.NO);
+		}
+	}
+
+	/**
+	 * build the current revision using a given command
+	 * @return true if build successful, false if build failed
+	 */
+	public boolean build(String[] command) {
+	    Process process = Util.runProcess(command, directory);
+	
+	    BufferedReader stdOutputReader = new BufferedReader(
+	            new InputStreamReader(process.getInputStream()));
+	
+	    BufferedReader stdErrorReader = new BufferedReader(
+	            new InputStreamReader(process.getErrorStream()));
+	
+	    List<String> outputStreamContent = Util.getStreamContent(stdOutputReader);
+	    List<String> errorStreamContent = Util.getStreamContent(stdErrorReader);
+	    
+	    return buildSuccessful(outputStreamContent, errorStreamContent);
+	}
+
+	/**
+	 * run a given test command on the current revision
+	 * @return a TestResult of the test command
+	 */
+	public TestResult run(String[] testCommand) {
+	    Process process = Util.runProcess(testCommand, directory);
+	
+	    BufferedReader stdOutputReader = new BufferedReader(
+	            new InputStreamReader(process.getInputStream()));
+	
+	    BufferedReader stdErrorReader = new BufferedReader(
+	            new InputStreamReader(process.getErrorStream()));
+	
+	    List<String> outputStreamContent = Util.getStreamContent(stdOutputReader);
+	    List<String> errorStreamContent = Util.getStreamContent(stdErrorReader);
+	    
+	    if (buildSuccessful(outputStreamContent, errorStreamContent)) {
+	    	return new VoldemortTestResult(currRevision.getCommitID(), outputStreamContent, errorStreamContent);
+	    }
+	    
+	    return null;
+	}
+
+	/**
+	 * Helper method for build(command) and run(command)
+	 * @return true if build successful, false if build failed
+	 */
+	private boolean buildSuccessful(List<String> outputStreamContent, List<String> errorStreamContent) {
+		Pattern buildSuccessfulPattern = Pattern.compile("BUILD SUCCESSFUL");
+	    Pattern buildFailedPattern = Pattern.compile("BUILD FAILED");
+	    
+	    for (String line : outputStreamContent) {
+	        Matcher buildSuccessfulMatcher = buildSuccessfulPattern.matcher(line);
+	        if (buildSuccessfulMatcher.find()) {
+	            return true;
+	        }
+	    }
+	    
+	    for (String line : errorStreamContent) {
+	        Matcher buildFailedMatcher = buildFailedPattern.matcher(line);
+	        if (buildFailedMatcher.find()) {
+	            return false;
+	        }
+	    }
+	
+	    fail("Neither BUILD SUCCESSFUL nor BUILD FAILED found");
+	    return false;
+	}
+
+	public void copyFile(String filename, File srcDir, File destDir) throws IOException {
+		File srcFile = new File(srcDir.getAbsolutePath() + File.separatorChar + filename);
+		FileUtils.copyFileToDirectory(srcFile, destDir);
+	}
+
+	public void deleteFile(String filename, File dir) throws IOException {
+		File file = new File(dir.getAbsolutePath() + File.separatorChar + filename);
+		FileUtils.forceDelete(file);
+	}
+
+	@Override
+	public boolean equals(Object other) {
+	    if (other == null || !other.getClass().equals(this.getClass())) {
+	        return false;
+	    }
+	
+	    Repository repository = (Repository) other;
+	    return directory.equals(repository.directory);
+	}
+
+	@Override
+	public int hashCode() {
+	    return directory.hashCode();
+	}
+
+	@Override
+	public String toString() {
+	    return "repository location : " + directory.getAbsolutePath();
+	}
 }

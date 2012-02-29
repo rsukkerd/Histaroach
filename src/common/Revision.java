@@ -1,21 +1,17 @@
 package common;
 
-import static org.junit.Assert.fail;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import voldemort.VoldemortTestResult;
 
 /**
- * Revision contains 1. a reference to its repository 2. commit id 3. a set of
- * its parents' commit ids 4. diff files between this revision and each of its
- * parent 5. compilable flag 6. test result
+ * Revision represents a state of a particular revision.
+ * 
+ * Revision has access to its repository, a commit ID, 
+ * a list of its parents and their corresponding diff files.
+ * 
+ * Revision knows its compilable state and its test result. 
+ * These information can be set by other classes.
  */
 public class Revision implements Serializable {
     /**
@@ -26,11 +22,7 @@ public class Revision implements Serializable {
     public enum COMPILABLE {
         YES, NO, UNKNOWN
     }
-
-    // TODO: A revision should know about its parents -- i.e., a list of
-    // Revision objects that have it as a child. And, a Revision should know
-    // about its children, too.
-
+    
     private final Repository repository;
     private final String commitID;
     /**
@@ -43,8 +35,8 @@ public class Revision implements Serializable {
     private/* @Nullable */TestResult testResult;
 
     /**
-     * create a revision initially, compilable flag is unknown and test result
-     * is null
+     * Create a revision 
+     * Initially, compilable flag is unknown and test result is null
      */
     public Revision(Repository repository, String commitID) {
         this.repository = repository;
@@ -55,147 +47,81 @@ public class Revision implements Serializable {
         testResult = null;
     }
     
+    /**
+     * @return repository of this revision
+     */
     public Repository getRepository() {
     	return repository;
     }
 
+    /**
+     * @return commit ID of this revision
+     */
     public String getCommitID() {
         return commitID;
     }
     
+    /**
+     * add a parent revision and its corresponding diff files
+     */
     public void addParent(Revision parent, List<DiffFile> files) {
     	parents.add(parent);
     	diffFiles.add(files);
     }
     
+    /**
+     * @return list of parents of this revision
+     */
     public List<Revision> getParents() {
     	return parents;
     }
 
+    /**
+     * @return list of diff files corresponding to the given parent
+     */
     public List<DiffFile> getDiffFiles(Revision parent) {
     	int i = parents.indexOf(parent);
     	assert i >= 0;
         return diffFiles.get(i);
     }
-
+    
+    /**
+     * set this revision's compilable flag
+     */
+    public void setCompilableFlag(COMPILABLE compilable) {
+    	this.compilable = compilable;
+    }
+    
+    /**
+     * set this revisions's test result
+     */
+    public void setTestResult(/*@Nullable*/TestResult testResult) {
+    	this.testResult = testResult;
+    }
+    
+    /**
+     * combine the given test result into this revision's test result
+     * @requires result != null
+     */
+    public void addTestResult(/*@NonNull*/TestResult result) {
+    	if (this.testResult == null) {
+    		this.testResult = result;
+    	} else {
+    		for (String test : result.getAllTests()) {
+    			this.testResult.addTest(test);
+    		}
+    		for (String failedTest : result.getFailedTests()) {
+    			this.testResult.addFailedTest(failedTest);
+    		}
+    	}
+    }
+    
     public COMPILABLE isCompilable() {
-    	if (compilable == COMPILABLE.UNKNOWN) {
-			compile();
-		}
-		return compilable;
+    	return compilable;
     }
     
     public TestResult getTestResult() {
-		if (compilable == COMPILABLE.UNKNOWN || 
-				(compilable == COMPILABLE.YES && testResult == null)) {
-			runAllTests();
-		}
-		return testResult;
-	}
-	
-    /**
-     * compile this revision and set compilable flag
-     */
-	public void compile() {
-		boolean build =  build(repository.getBuildCommand());
-		boolean buildtest = build(repository.getBuildtestCommand());
-		
-		if (build && buildtest) {
-			compilable = COMPILABLE.YES;
-		} else {
-			compilable = COMPILABLE.NO;
-		}
-	}
-	
-	/**
-	 * run all junit tests on this revision, set compilable flag and test result
-	 */
-	public void runAllTests() {
-		testResult = run(repository.getRunJunitCommand());
-		
-		if (testResult == null) {
-			compilable = COMPILABLE.NO;
-		} else {
-			compilable = COMPILABLE.YES;
-		}
-	}
-	
-	/**
-	 * Helper method for compile()
-	 * @param command
-	 * @return true if build successful, false if build failed
-	 */
-	private boolean build(String[] command) {
-		int exitValue = repository.checkoutCommit(commitID);
-        assert (exitValue == 0);
-
-        Process process = Util.runProcess(command,
-                repository.getDirectory());
-
-        BufferedReader stdOutputReader = new BufferedReader(
-                new InputStreamReader(process.getInputStream()));
-
-        BufferedReader stdErrorReader = new BufferedReader(
-                new InputStreamReader(process.getErrorStream()));
-
-        List<String> outputStreamContent = Util.getStreamContent(stdOutputReader);
-        List<String> errorStreamContent = Util.getStreamContent(stdErrorReader);
-        
-        return buildSuccessful(outputStreamContent, errorStreamContent);
-	}
-	
-	/**
-	 * Helper method for runAllTests()
-	 * @param command
-	 * @return test result
-	 */
-	private TestResult run(String[] command) {
-		int exitValue = repository.checkoutCommit(commitID);
-        assert (exitValue == 0);
-
-        Process process = Util.runProcess(command,
-                repository.getDirectory());
-
-        BufferedReader stdOutputReader = new BufferedReader(
-                new InputStreamReader(process.getInputStream()));
-
-        BufferedReader stdErrorReader = new BufferedReader(
-                new InputStreamReader(process.getErrorStream()));
-
-        List<String> outputStreamContent = Util.getStreamContent(stdOutputReader);
-        List<String> errorStreamContent = Util.getStreamContent(stdErrorReader);
-        
-        if (buildSuccessful(outputStreamContent, errorStreamContent)) {
-        	return new VoldemortTestResult(commitID, outputStreamContent, errorStreamContent);
-        }
-        
-        return null;
-	}
-	
-	/**
-	 * Helper method for build(command)
-     * @return true if build successful, false if build failed
-     */
-    private boolean buildSuccessful(List<String> outputStreamContent, List<String> errorStreamContent) {
-    	Pattern buildSuccessfulPattern = Pattern.compile("BUILD SUCCESSFUL");
-        Pattern buildFailedPattern = Pattern.compile("BUILD FAILED");
-        
-        for (String line : outputStreamContent) {
-            Matcher buildSuccessfulMatcher = buildSuccessfulPattern.matcher(line);
-            if (buildSuccessfulMatcher.find()) {
-                return true;
-            }
-        }
-        
-        for (String line : errorStreamContent) {
-            Matcher buildFailedMatcher = buildFailedPattern.matcher(line);
-            if (buildFailedMatcher.find()) {
-                return false;
-            }
-        }
-
-        fail("Neither BUILD SUCCESSFUL nor BUILD FAILED found");
-        return false;
+    	return testResult;
     }
 
     @Override

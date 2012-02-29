@@ -5,6 +5,7 @@ import java.util.Set;
 
 import common.Flip;
 import common.HistoryGraph;
+import common.Repository;
 import common.Revision;
 import common.Util;
 
@@ -27,6 +28,12 @@ public class TestIsolationDataReader {
     @Option(value = "-z Directory containing serialized revision files.", aliases = { "-serializedRevisionsDir" })
     public static String serializedRevisionsDirName = null;
     
+    /**
+     * The ant command used for running ant. By default this is just 'ant'.
+     */
+    @Option(value = "-a ant command (Optional)", aliases = { "-antCommand" })
+    public static String antCommand = "ant";
+    
     /** One line synopsis of usage */
     public static final String usage_string = "TestIsolationDataReader [options]";
     
@@ -46,7 +53,8 @@ public class TestIsolationDataReader {
             return;
         }
         
-        HistoryGraph hGraph = Util.reconstructHistoryGraph(serializedRevisionsDirName);
+        Repository repository = new Repository(serializedRevisionsDirName, antCommand);
+        HistoryGraph hGraph = Util.reconstructHistoryGraph(repository);
         // verifyHistoryGraph(hGraph);
         
         Set<Flip> flips = hGraph.getAllFlips();

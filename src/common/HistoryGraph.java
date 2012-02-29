@@ -20,14 +20,12 @@ public class HistoryGraph implements Iterable<Revision>, Serializable {
      */
     private static final long serialVersionUID = 7286435306324502773L;
 
-    /** mapping : a revision's commit id -> that revision **/
-    private final Map<String, Revision> map;
-
     /** revisions' order according to 'git log' **/
     private final List<Revision> orderedRevisions;
+    private final Repository repository;
 
-    public HistoryGraph() {
-        map = new HashMap<String, Revision>();
+    public HistoryGraph(Repository repository) {
+    	this.repository = repository;
         orderedRevisions = new ArrayList<Revision>();
     }
 
@@ -35,7 +33,6 @@ public class HistoryGraph implements Iterable<Revision>, Serializable {
      * add a revision to this history graph
      */
     public void addRevision(Revision revision) {
-        map.put(revision.getCommitID(), revision);
         orderedRevisions.add(revision);
     }
 
@@ -232,18 +229,18 @@ public class HistoryGraph implements Iterable<Revision>, Serializable {
 
         HistoryGraph hGraph = (HistoryGraph) other;
 
-        return map.equals(hGraph.map)
-                && orderedRevisions.equals(hGraph.orderedRevisions);
+        return repository.equals(hGraph.repository) 
+        		&& orderedRevisions.equals(hGraph.orderedRevisions);
     }
 
     @Override
     public int hashCode() {
-        return 11 * map.hashCode() + 13 * orderedRevisions.hashCode();
+        return 11 * repository.hashCode() + 13 * orderedRevisions.hashCode();
     }
 
     @Override
     public String toString() {
-        String str = "";
+        String str = repository.toString() + "\n";
         for (Revision revision : orderedRevisions) {
             str += revision.toString() + "\n";
         }
