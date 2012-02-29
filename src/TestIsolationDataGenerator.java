@@ -146,7 +146,12 @@ public class TestIsolationDataGenerator {
         // For each revision between start and end IDs, get the test results,
         // and record them to a serialized file.
         while (true) {
-            revision.getTestResult();
+        	// check out the revision
+        	int exitValue = revision.checkoutRevision();
+        	assert (exitValue == 0);
+        	
+        	// compile and run tests on the revision
+        	revision.compileAndRunAllTests();
 
             String filename = outputDirName + revision.getCommitID()
                     + SERIALIZED_EXTENSION;

@@ -1,17 +1,31 @@
 package common;
 
+import static org.junit.Assert.fail;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import voldemort.VoldemortTestResult;
 
 /**
- * Revision represents a state of a particular revision.
+ * Revision represents a state of a particular commit.
  * 
- * Revision has access to its repository, a commit ID, 
- * a list of its parents and their corresponding diff files.
+ * Revision has access to its repository, commit ID, 
+ * a list of its parents and their corresponding diff files, 
+ * compilable state, and test result.
  * 
- * Revision knows its compilable state and its test result. 
- * These information can be set by other classes.
+ * Revision contains methods to check out itself from the repository, 
+ * compile and run tests. These methods { compile(), 
+ * and compileAndRunAllTests() } modify the state of the revision.
+ * 
+ * Revision also contains methods that compile and run tests 
+ * but do not modify its state. These methods are build(command) 
+ * and run(command).
  */
 public class Revision implements Serializable {
     /**
@@ -86,95 +100,172 @@ public class Revision implements Serializable {
     }
     
     /**
-     * set this revision's compilable flag
+     * @return compilable flag of this revision
      */
-    public void setCompilableFlag(COMPILABLE compilable) {
-    	this.compilable = compilable;
-    }
-    
-    /**
-     * set this revisions's test result
-     */
-    public void setTestResult(/*@Nullable*/TestResult testResult) {
-    	this.testResult = testResult;
-    }
-    
-    /**
-     * combine the given test result into this revision's test result
-     * @requires result != null
-     */
-    public void addTestResult(/*@NonNull*/TestResult result) {
-    	if (this.testResult == null) {
-    		this.testResult = result;
-    	} else {
-    		for (String test : result.getAllTests()) {
-    			this.testResult.addTest(test);
-    		}
-    		for (String failedTest : result.getFailedTests()) {
-    			this.testResult.addFailedTest(failedTest);
-    		}
-    	}
-    }
-    
     public COMPILABLE isCompilable() {
     	return compilable;
     }
     
+    /**
+     * @return test result of this revision
+     */
     public TestResult getTestResult() {
     	return testResult;
     }
 
-    @Override
-    public boolean equals(Object other) {
-        if (other == null || !other.getClass().equals(this.getClass())) {
-            return false;
-        }
-
-        Revision revision = (Revision) other;
-
-        return repository.equals(revision.repository)
-                && commitID.equals(revision.commitID)
-                && parents.equals(revision.parents)
-                && diffFiles.equals(revision.diffFiles)
-                && compilable == revision.compilable
-                && ((testResult == null && revision.testResult == null) || testResult
-                        .equals(revision.testResult));
+    /**
+     * check out this revision from the repository
+     * @return exit value of 'git checkout' process
+     */
+    public int checkoutRevision() {
+    	return repository.checkoutCommit(commitID);
     }
+    
+    /**
+	 * compile this revision
+	 * @modifies this
+	 */
+	public void compile() {
+		if (build(repository.antBuild) && build(repository.antBuildtest)) {
+			compilable = COMPILABLE.YES;
+		} else {
+			compilable = COMPILABLE.NO;
+		}
+	}
 
-    @Override
-    public int hashCode() {
-        int code = 11 * repository.hashCode() + 13 * commitID.hashCode() 
-        		+ 17 * parents.hashCode() + 19 * diffFiles.hashCode() + 23 * compilable.hashCode();
-        if (testResult != null) {
-            code += 29 * testResult.hashCode();
-        }
+	/**
+	 * compile and run all tests on this revision
+	 * @modifies this
+	 */
+	public void compileAndRunAllTests() {
+		testResult = run(repository.antJunit);
+		
+		if (testResult != null) {
+			compilable = COMPILABLE.YES;
+		} else {
+			compilable = COMPILABLE.NO;
+		}
+	}
 
-        return code;
-    }
+	/**
+	 * build this revision using a given command
+	 * @return true if build successful, false if build failed
+	 */
+	public boolean build(String[] command) {
+	    Process process = Util.runProcess(command, repository.getDirectory());
+	
+	    BufferedReader stdOutputReader = new BufferedReader(
+	            new InputStreamReader(process.getInputStream()));
+	
+	    BufferedReader stdErrorReader = new BufferedReader(
+	            new InputStreamReader(process.getErrorStream()));
+	
+	    List<String> outputStreamContent = Util.getStreamContent(stdOutputReader);
+	    List<String> errorStreamContent = Util.getStreamContent(stdErrorReader);
+	    
+	    return buildSuccessful(outputStreamContent, errorStreamContent);
+	}
 
-    @Override
-    public String toString() {
-        String result = "commit : " + commitID + "\n";
-        result += "compilable : ";
-        if (compilable == COMPILABLE.YES) {
-            result += "yes\n";
-            result += testResult.toString();
-        } else if (compilable == COMPILABLE.NO) {
-            result += "no\n";
-        } else {
-            result += "unknown\n";
-        }
-        
-        for (int i = 0; i < parents.size(); i++) {
-        	result += "parent : " + parents.get(i).getCommitID() + "\n";
-        	result += "diff files :\n";
-        	List<DiffFile> files = diffFiles.get(i);
-        	
-        	for (DiffFile file : files) {
-                result += file + "\n";
-            }
-        }
+	/**
+	 * run a given test command on this revision
+	 * @return a TestResult of the test command
+	 */
+	public TestResult run(String[] testCommand) {
+	    Process process = Util.runProcess(testCommand, repository.getDirectory());
+	
+	    BufferedReader stdOutputReader = new BufferedReader(
+	            new InputStreamReader(process.getInputStream()));
+	
+	    BufferedReader stdErrorReader = new BufferedReader(
+	            new InputStreamReader(process.getErrorStream()));
+	
+	    List<String> outputStreamContent = Util.getStreamContent(stdOutputReader);
+	    List<String> errorStreamContent = Util.getStreamContent(stdErrorReader);
+	    
+	    if (buildSuccessful(outputStreamContent, errorStreamContent)) {
+	    	return new VoldemortTestResult(commitID, outputStreamContent, errorStreamContent);
+	    }
+	    
+	    return null;
+	}
 
-        return result;
-    }
+	/**
+	 * Helper method for build(command) and run(command)
+	 * @return true if build successful, false if build failed
+	 */
+	private boolean buildSuccessful(List<String> outputStreamContent, List<String> errorStreamContent) {
+		Pattern buildSuccessfulPattern = Pattern.compile("BUILD SUCCESSFUL");
+	    Pattern buildFailedPattern = Pattern.compile("BUILD FAILED");
+	    
+	    for (String line : outputStreamContent) {
+	        Matcher buildSuccessfulMatcher = buildSuccessfulPattern.matcher(line);
+	        if (buildSuccessfulMatcher.find()) {
+	            return true;
+	        }
+	    }
+	    
+	    for (String line : errorStreamContent) {
+	        Matcher buildFailedMatcher = buildFailedPattern.matcher(line);
+	        if (buildFailedMatcher.find()) {
+	            return false;
+	        }
+	    }
+	
+	    fail("Neither BUILD SUCCESSFUL nor BUILD FAILED found");
+	    return false;
+	}
+
+	@Override
+	public boolean equals(Object other) {
+	    if (other == null || !other.getClass().equals(this.getClass())) {
+	        return false;
+	    }
+	
+	    Revision revision = (Revision) other;
+	
+	    return repository.equals(revision.repository)
+	            && commitID.equals(revision.commitID)
+	            && parents.equals(revision.parents)
+	            && diffFiles.equals(revision.diffFiles)
+	            && compilable == revision.compilable
+	            && ((testResult == null && revision.testResult == null) || testResult
+	                    .equals(revision.testResult));
+	}
+
+	@Override
+	public int hashCode() {
+	    int code = 11 * repository.hashCode() + 13 * commitID.hashCode() 
+	    		+ 17 * parents.hashCode() + 19 * diffFiles.hashCode() + 23 * compilable.hashCode();
+	    if (testResult != null) {
+	        code += 29 * testResult.hashCode();
+	    }
+	
+	    return code;
+	}
+
+	@Override
+	public String toString() {
+	    String result = "commit : " + commitID + "\n";
+	    result += "compilable : ";
+	    if (compilable == COMPILABLE.YES) {
+	        result += "yes\n";
+	        result += testResult.toString();
+	    } else if (compilable == COMPILABLE.NO) {
+	        result += "no\n";
+	    } else {
+	        result += "unknown\n";
+	    }
+	    
+	    for (int i = 0; i < parents.size(); i++) {
+	    	result += "parent : " + parents.get(i).getCommitID() + "\n";
+	    	result += "diff files :\n";
+	    	List<DiffFile> files = diffFiles.get(i);
+	    	
+	    	for (DiffFile file : files) {
+	            result += file + "\n";
+	        }
+	    }
+	
+	    return result;
+	}
 }

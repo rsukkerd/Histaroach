@@ -1,7 +1,5 @@
 package common;
 
-import static org.junit.Assert.fail;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -11,30 +9,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 
-import voldemort.VoldemortTestResult;
-
 import common.DiffFile.DiffType;
-import common.Revision.COMPILABLE;
 
 /**
  * Repository represents a git repository.
  * 
- * Repository has access to the directory associated with it,
- * and the revision that is currently checked out.
+ * Repository has access to the directory associated with it.
  * 
- * Repository contains methods to check out a revision, compile 
- * it and run test(s) on that revision. These methods { compile(), 
- * compileAndRunAllTests(), and compileAndRunTest(test) } modify 
- * the state of the revision.
- * 
- * Repository also contains public methods that compile and run 
- * test(s) on the current revision but do not modify the revision. 
- * These methods are build(command) and run(command).
+ * Repository contains methods to check out a commit into 
+ * the working directory, and to build a graph structure 
+ * representing the revision history of the repository.
  */
 public class Repository implements Serializable {
     /**
@@ -50,13 +37,12 @@ public class Repository implements Serializable {
     public static final String JUNIT_TEST_COMMAND = "junit-test -Dtest.name=";
 
     private final File directory;
-    private final String[] antJunit;
-    private final String[] antBuild;
-    private final String[] antBuildtest;
     
-    private Revision currRevision;
+    protected final String[] antBuild;
+    protected final String[] antBuildtest;
+    protected final String[] antJunit;
 
-    /**
+	/**
      * create a repository instance
      * 
      * @param pathname
@@ -154,12 +140,10 @@ public class Repository implements Serializable {
     }
 
     /**
-     * Helper method for buildHistoryGraph
-	 * Checks out a particular commit from this repository.
-	 * 
+	 * Checks out a given commit from this repository.
 	 * @return exit value of 'git checkout' process
 	 */
-	private int checkoutCommit(String commitID) {
+	public int checkoutCommit(String commitID) {
 	    Process p = Util.runProcess(
 	            new String[] { "git", "checkout", commitID }, directory);
 	    return p.exitValue();
@@ -167,7 +151,6 @@ public class Repository implements Serializable {
 
 	/**
 	 * Helper method for buildHistoryGraph
-	 * 
 	 * @return a list of diff files between childCommit and parentCommit
 	 */
 	private List<DiffFile> getDiffFiles(String childCommitID,
@@ -200,126 +183,6 @@ public class Repository implements Serializable {
 	    }
 	
 	    return diffFiles;
-	}
-
-	/**
-	 * check out the revision from this repository
-	 * @return exit value of the check out process
-	 */
-	public int checkoutRevision(Revision revision) {
-		currRevision = revision;
-		return checkoutCommit(currRevision.getCommitID());
-	}
-
-	/**
-	 * compile the current revision
-	 * @modifies compilable flag of the current revision
-	 */
-	public void compile() {
-		if (build(antBuild) && build(antBuildtest)) {
-			currRevision.setCompilableFlag(COMPILABLE.YES);
-		} else {
-			currRevision.setCompilableFlag(COMPILABLE.NO);
-		}
-	}
-
-	/**
-	 * compile and run all tests on the current revision
-	 * @modifies compilable flag and test result of the current revision
-	 */
-	public void compileAndRunAllTests() {
-		/*@Nullable*/TestResult testResult = run(antJunit);
-		currRevision.setTestResult(testResult);
-		
-		if (testResult != null) {
-			currRevision.setCompilableFlag(COMPILABLE.YES);
-		} else {
-			currRevision.setCompilableFlag(COMPILABLE.NO);
-		}
-	}
-
-	/**
-	 * compile and run a specific test on the current revision
-	 * @modifies test result and compilable flag of the current revision
-	 */
-	public void compildAndRunTest(String testName) {
-		String[] antJunitTest = (JUNIT_TEST_COMMAND + testName).split(" ");
-		TestResult result = run(antJunitTest);
-		
-		if (result != null) {
-			currRevision.addTestResult(result);
-			currRevision.setCompilableFlag(COMPILABLE.YES);
-		} else {
-			currRevision.setCompilableFlag(COMPILABLE.NO);
-		}
-	}
-
-	/**
-	 * build the current revision using a given command
-	 * @return true if build successful, false if build failed
-	 */
-	public boolean build(String[] command) {
-	    Process process = Util.runProcess(command, directory);
-	
-	    BufferedReader stdOutputReader = new BufferedReader(
-	            new InputStreamReader(process.getInputStream()));
-	
-	    BufferedReader stdErrorReader = new BufferedReader(
-	            new InputStreamReader(process.getErrorStream()));
-	
-	    List<String> outputStreamContent = Util.getStreamContent(stdOutputReader);
-	    List<String> errorStreamContent = Util.getStreamContent(stdErrorReader);
-	    
-	    return buildSuccessful(outputStreamContent, errorStreamContent);
-	}
-
-	/**
-	 * run a given test command on the current revision
-	 * @return a TestResult of the test command
-	 */
-	public TestResult run(String[] testCommand) {
-	    Process process = Util.runProcess(testCommand, directory);
-	
-	    BufferedReader stdOutputReader = new BufferedReader(
-	            new InputStreamReader(process.getInputStream()));
-	
-	    BufferedReader stdErrorReader = new BufferedReader(
-	            new InputStreamReader(process.getErrorStream()));
-	
-	    List<String> outputStreamContent = Util.getStreamContent(stdOutputReader);
-	    List<String> errorStreamContent = Util.getStreamContent(stdErrorReader);
-	    
-	    if (buildSuccessful(outputStreamContent, errorStreamContent)) {
-	    	return new VoldemortTestResult(currRevision.getCommitID(), outputStreamContent, errorStreamContent);
-	    }
-	    
-	    return null;
-	}
-
-	/**
-	 * Helper method for build(command) and run(command)
-	 * @return true if build successful, false if build failed
-	 */
-	private boolean buildSuccessful(List<String> outputStreamContent, List<String> errorStreamContent) {
-		Pattern buildSuccessfulPattern = Pattern.compile("BUILD SUCCESSFUL");
-	    Pattern buildFailedPattern = Pattern.compile("BUILD FAILED");
-	    
-	    for (String line : outputStreamContent) {
-	        Matcher buildSuccessfulMatcher = buildSuccessfulPattern.matcher(line);
-	        if (buildSuccessfulMatcher.find()) {
-	            return true;
-	        }
-	    }
-	    
-	    for (String line : errorStreamContent) {
-	        Matcher buildFailedMatcher = buildFailedPattern.matcher(line);
-	        if (buildFailedMatcher.find()) {
-	            return false;
-	        }
-	    }
-	
-	    fail("Neither BUILD SUCCESSFUL nor BUILD FAILED found");
-	    return false;
 	}
 
 	public void copyFile(String filename, File srcDir, File destDir) throws IOException {
