@@ -2,15 +2,12 @@ package common;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.io.FileUtils;
 
 import common.DiffFile.DiffType;
 
@@ -43,12 +40,10 @@ public class Repository implements Serializable {
     protected final String[] antJunit;
 
 	/**
-     * create a repository instance
+     * Create a repository
      * 
-     * @param pathname
-     *            : full path to the repository directory
-     * @param antCommand
-     *            : ant command
+     * @param pathname : full path to the repository directory
+     * @param antCommand : ant command
      */
     public Repository(String pathname, String antCommand) {
         directory = new File(pathname);
@@ -97,6 +92,8 @@ public class Repository implements Serializable {
 
         List<String> lines = Util.getStreamContent(reader);
 
+        // mapping : parent ID -> list of its child revisions
+        // used for referencing child to its parents later
         Map<String, List<Revision>> parentIDToChildRevisions = new HashMap<String, List<Revision>>();
         
         for (String line : lines) {
@@ -121,6 +118,7 @@ public class Repository implements Serializable {
             System.out.println(revision);
         }
         
+        // referencing each child to its parents
         for (Revision revision : hGraph) {
         	String commitID = revision.getCommitID();
         	
@@ -183,16 +181,6 @@ public class Repository implements Serializable {
 	    }
 	
 	    return diffFiles;
-	}
-
-	public void copyFile(String filename, File srcDir, File destDir) throws IOException {
-		File srcFile = new File(srcDir.getAbsolutePath() + File.separatorChar + filename);
-		FileUtils.copyFileToDirectory(srcFile, destDir);
-	}
-
-	public void deleteFile(String filename, File dir) throws IOException {
-		File file = new File(dir.getAbsolutePath() + File.separatorChar + filename);
-		FileUtils.forceDelete(file);
 	}
 
 	@Override

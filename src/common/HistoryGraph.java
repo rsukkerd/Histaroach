@@ -13,6 +13,14 @@ import java.util.Set;
 
 /**
  * HistoryGraph represents a graph structure of a particular repository.
+ * 
+ * HistoryGraph has access to the repository that it represents.
+ * 
+ * HistoryGraph maintain a list of revisions. It has methods to add 
+ * revision and to iterate over its list of revisions.
+ * 
+ * HistoryGraph has a method to get a list of flips that are present 
+ * in its list of revisions.
  */
 public class HistoryGraph implements Iterable<Revision>, Serializable {
     /**
@@ -34,6 +42,10 @@ public class HistoryGraph implements Iterable<Revision>, Serializable {
      */
     public void addRevision(Revision revision) {
         orderedRevisions.add(revision);
+    }
+    
+    public Repository getRepository() {
+    	return repository;
     }
 
     /**
@@ -81,10 +93,10 @@ public class HistoryGraph implements Iterable<Revision>, Serializable {
     }
     
     /**
-     * @return a set of all flips in this historyGraph
+     * @return a list of all flips in this historyGraph
      */
-    public Set<Flip> getAllFlips() {
-        Set<Flip> flips = new HashSet<Flip>();
+    public List<Flip> getAllFlips() {
+        List<Flip> flips = new ArrayList<Flip>();
 
         for (Revision revision : orderedRevisions) {
             TestResult childResult = revision.getTestResult();
@@ -95,9 +107,7 @@ public class HistoryGraph implements Iterable<Revision>, Serializable {
 
             List<Revision> parents = revision.getParents();
 
-            for (Revision parent : parents) {
-            	if (parent == null) { continue; } // when build partial HistoryGraph
-            	
+            for (/*@NonNull*/Revision parent : parents) {            	
                 TestResult parentResult = parent.getTestResult();
                 
                 if (parentResult == null) { continue; }

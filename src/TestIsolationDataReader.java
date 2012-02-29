@@ -1,12 +1,8 @@
-import static org.junit.Assert.assertNotNull;
-
 import java.util.List;
-import java.util.Set;
 
 import common.Flip;
 import common.HistoryGraph;
 import common.Repository;
-import common.Revision;
 import common.Util;
 
 import plume.Option;
@@ -38,8 +34,8 @@ public class TestIsolationDataReader {
     public static final String usage_string = "TestIsolationDataReader [options]";
     
 	/**
-	 * Initial program entrance -- read a serialized HistoryGraph 
-	 * from an input file
+	 * Initial program entrance -- reconstruct a HistoryGraph from 
+	 * serialized revision files from an input directory.
 	 * 
 	 * @param args : command line arguments.
 	 */
@@ -55,20 +51,10 @@ public class TestIsolationDataReader {
         
         Repository repository = new Repository(serializedRevisionsDirName, antCommand);
         HistoryGraph hGraph = Util.reconstructHistoryGraph(repository);
-        // verifyHistoryGraph(hGraph);
         
-        Set<Flip> flips = hGraph.getAllFlips();
+        List<Flip> flips = hGraph.getAllFlips();
         for (Flip flip : flips) {
         	System.out.println(flip);
         }
-	}
-
-	public static void verifyHistoryGraph(HistoryGraph historyGraph) {
-		for (Revision revision : historyGraph) {
-			List<Revision> parents = revision.getParents();
-			for (Revision parent : parents) {
-				assertNotNull("null parent at " + revision.getCommitID(), parent);
-			}
-		}
 	}
 }
