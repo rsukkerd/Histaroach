@@ -3,7 +3,6 @@ package common;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,20 +11,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import common.DiffFile.DiffType;
+import common.Revision.COMPILABLE;
 
 import voldemort.VoldemortTestResult;
 
 /**
- * Repository represents a git repository. Repository has access to the
- * directory associated with it. Repository contains methods to check out a
- * commit into the working directory, and to build a graph structure
- * representing the revision history of the repository.
+ * Repository represents a git repository. Repository has access to the 
+ * directory associated with it. Repository contains methods to check out 
+ * a commit into the working directory, build, run tests, and build a graph 
+ * structure representing the revision history of the repository.
  */
-public class Repository implements Serializable {
-    /**
-     * serial version ID
-     */
-    private static final long serialVersionUID = -2999033773371301088L;
+public class Repository {
 
     public static final String[] LOG_COMMAND = { "git", "log",
             "--pretty=format:%h %p" };
@@ -75,9 +71,8 @@ public class Repository implements Serializable {
     }
 
     /**
-     * Build a HistoryGraph instance containing revisions from startCommit to
-     * the root commit. Initially, each revision in the HistoryGraph has
-     * compilable = UNKNOWN and TestResult = null
+     * Build a history graph containing revisions from startCommit to
+     * the root commit.
      * 
      * @return a history graph of this repository
      */
@@ -125,8 +120,7 @@ public class Repository implements Serializable {
             String commitID = revision.getCommitID();
 
             if (parentIDToChildRevisions.containsKey(commitID)) {
-                List<Revision> childRevisions = parentIDToChildRevisions
-                        .get(commitID);
+                List<Revision> childRevisions = parentIDToChildRevisions.get(commitID);
 
                 for (Revision childRevision : childRevisions) {
                     String childID = childRevision.getCommitID();
@@ -152,12 +146,13 @@ public class Repository implements Serializable {
     }
 
     /**
-     * build this revision using a given command
+     * Build using a given build command
      * 
-     * @return true if build successful, false if build failed
+     * @return YES if build successful, NO if build failed, 
+     * and NO_BUILD_FILE if there is no build file
      */
-    public boolean build(String[] command) {
-        Process process = Util.runProcess(command, getDirectory());
+    public COMPILABLE build(String[] buildCommand) {
+        Process process = Util.runProcess(buildCommand, getDirectory());
 
         BufferedReader stdOutputReader = new BufferedReader(
                 new InputStreamReader(process.getInputStream()));
@@ -173,11 +168,11 @@ public class Repository implements Serializable {
     }
 
     /**
-     * run a given test command on this revision
+     * run a given test command
      * 
-     * @return a TestResult of the test command
+     * @return a pair of compilable flag and test result
      */
-    public TestResult run(String[] testCommand, String commitID) {
+    public Pair<COMPILABLE, TestResult> run(String[] testCommand, String commitID) {
         Process process = Util.runProcess(testCommand, getDirectory());
 
         BufferedReader stdOutputReader = new BufferedReader(
@@ -190,20 +185,24 @@ public class Repository implements Serializable {
                 .getStreamContent(stdOutputReader);
         List<String> errorStreamContent = Util.getStreamContent(stdErrorReader);
 
-        if (buildSuccessful(outputStreamContent, errorStreamContent)) {
-            return new VoldemortTestResult(commitID, outputStreamContent,
-                    errorStreamContent);
+        COMPILABLE compilable = buildSuccessful(outputStreamContent, errorStreamContent);
+        TestResult testResult = null;
+        
+        if (compilable == COMPILABLE.YES) {
+            testResult = new VoldemortTestResult(commitID, outputStreamContent,
+                    errorStreamContent);            
         }
 
-        return null;
+        return new Pair<COMPILABLE, TestResult>(compilable, testResult);
     }
 
     /**
      * Helper method for build(command) and run(command)
      * 
-     * @return true if build successful, false if build failed
+     * @return YES if build successful, NO if build failed, 
+     * and NO_BUILD_FILE if there is no build file
      */
-    private boolean buildSuccessful(List<String> outputStreamContent,
+    private COMPILABLE buildSuccessful(List<String> outputStreamContent,
             List<String> errorStreamContent) {
         Pattern buildSuccessfulPattern = Pattern.compile("BUILD SUCCESSFUL");
         Pattern buildFailedPattern = Pattern.compile("BUILD FAILED");
@@ -212,19 +211,18 @@ public class Repository implements Serializable {
             Matcher buildSuccessfulMatcher = buildSuccessfulPattern
                     .matcher(line);
             if (buildSuccessfulMatcher.find()) {
-                return true;
+                return COMPILABLE.YES;
             }
         }
 
         for (String line : errorStreamContent) {
             Matcher buildFailedMatcher = buildFailedPattern.matcher(line);
             if (buildFailedMatcher.find()) {
-                return false;
+                return COMPILABLE.NO;
             }
         }
 
-        assert false : "Neither BUILD SUCCESSFUL nor BUILD FAILED found";
-        return false;
+        return COMPILABLE.NO_BUILD_FILE;
     }
 
     /**

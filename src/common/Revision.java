@@ -1,17 +1,15 @@
 package common;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Revision represents a state of a particular commit. Revision has access to
- * its repository, commit ID, a list of its parents and their corresponding diff
- * files, compilable state, and test result. Revision contains methods to check
- * out itself from the repository, compile and run tests. These methods {
- * compile(), and compileAndRunAllTests() } modify the state of the revision.
- * Revision also contains methods that compile and run tests but do not modify
- * its state. These methods are build(command) and run(command).
+ * its repository, commit ID, a set of its parents and their corresponding diff
+ * files, compilable state, and test result.
  */
 public class Revision implements Serializable {
     /**
@@ -20,29 +18,27 @@ public class Revision implements Serializable {
     private static final long serialVersionUID = -4044614975764741642L;
 
     public enum COMPILABLE {
-        YES, NO, UNKNOWN
+        YES, NO, UNKNOWN, NO_BUILD_FILE
     }
 
     private final Repository repository;
     private final String commitID;
     /**
-     * index mapping : a parent revision -> a list of files that are different
+     * mapping : parent revision -> a list of files that are different
      * between the parent and this revision
-     **/
-    private final List<Revision> parents;
-    private final List<List<DiffFile>> diffFiles;
+     */
+    private final Map<Revision, List<DiffFile>> parentToDiffFiles;
     private COMPILABLE compilable;
     private/* @Nullable */TestResult testResult;
 
     /**
-     * Create a revision Initially, compilable flag is unknown and test result
-     * is null
+     * Create a revision.
+     * Compilable state and test result are known.
      */
     public Revision(Repository repository, String commitID) {
         this.repository = repository;
         this.commitID = commitID;
-        this.parents = new ArrayList<Revision>();
-        this.diffFiles = new ArrayList<List<DiffFile>>();
+        parentToDiffFiles = new HashMap<Revision, List<DiffFile>>();
         compilable = COMPILABLE.UNKNOWN;
         testResult = null;
 
@@ -72,24 +68,21 @@ public class Revision implements Serializable {
      * add a parent revision and its corresponding diff files
      */
     public void addParent(Revision parent, List<DiffFile> files) {
-        parents.add(parent);
-        diffFiles.add(files);
+        parentToDiffFiles.put(parent, files);
     }
 
     /**
-     * @return list of parents of this revision
+     * @return set of parents of this revision
      */
-    public List<Revision> getParents() {
-        return parents;
+    public Set<Revision> getParents() {
+        return parentToDiffFiles.keySet();
     }
 
     /**
      * @return list of diff files corresponding to the given parent
      */
     public List<DiffFile> getDiffFiles(Revision parent) {
-        int i = parents.indexOf(parent);
-        assert i >= 0;
-        return diffFiles.get(i);
+        return parentToDiffFiles.get(parent);
     }
 
     /**
@@ -107,32 +100,14 @@ public class Revision implements Serializable {
     }
 
     /**
-     * compile this revision
-     * 
-     * @modifies this
-     */
-    // private void compile() {
-    // if (repository.build(repository.antBuild)
-    // && repository.build(repository.antBuildtest)) {
-    // compilable = COMPILABLE.YES;
-    // } else {
-    // compilable = COMPILABLE.NO;
-    // }
-    // }
-
-    /**
      * compile and run all tests on this revision
      * 
      * @modifies this
      */
     private void compileAndRunAllTests() {
-        testResult = repository.run(repository.antJunit, commitID);
-
-        if (testResult != null) {
-            compilable = COMPILABLE.YES;
-        } else {
-            compilable = COMPILABLE.NO;
-        }
+        Pair<COMPILABLE, TestResult> pair = repository.run(repository.antJunit, commitID);
+        compilable = pair.getFirst();
+        testResult = pair.getSecond();
     }
 
     @Override
@@ -145,8 +120,7 @@ public class Revision implements Serializable {
 
         return repository.equals(revision.repository)
                 && commitID.equals(revision.commitID)
-                && parents.equals(revision.parents)
-                && diffFiles.equals(revision.diffFiles)
+                && parentToDiffFiles.equals(revision.parentToDiffFiles)
                 && compilable == revision.compilable
                 && ((testResult == null && revision.testResult == null) || testResult
                         .equals(revision.testResult));
@@ -154,11 +128,10 @@ public class Revision implements Serializable {
 
     @Override
     public int hashCode() {
-        int code = 11 * repository.hashCode() + 13 * commitID.hashCode() + 17
-                * parents.hashCode() + 19 * diffFiles.hashCode() + 23
-                * compilable.hashCode();
+        int code = 11 * repository.hashCode() + 13 * commitID.hashCode() 
+        			+ 17 * parentToDiffFiles.hashCode() + 19 * compilable.hashCode();
         if (testResult != null) {
-            code += 29 * testResult.hashCode();
+            code += 23 * testResult.hashCode();
         }
 
         return code;
@@ -173,18 +146,20 @@ public class Revision implements Serializable {
             result += testResult.toString();
         } else if (compilable == COMPILABLE.NO) {
             result += "no\n";
-        } else {
+        } else if (compilable == COMPILABLE.UNKNOWN) {
             result += "unknown\n";
+        } else {
+            result += "no build file\n";
         }
-
-        for (int i = 0; i < parents.size(); i++) {
-            result += "parent : " + parents.get(i).getCommitID() + "\n";
-            result += "diff files :\n";
-            List<DiffFile> files = diffFiles.get(i);
-
-            for (DiffFile file : files) {
-                result += file + "\n";
-            }
+        
+        for (Revision parent : parentToDiffFiles.keySet()) {
+        	result += "parent : " + parent.getCommitID() + "\n";
+        	result += "diff files :\n";
+        	List<DiffFile> diffFiles = parentToDiffFiles.get(parent);
+        	
+        	for (DiffFile diffFile : diffFiles) {
+        		result += diffFile + "\n";
+        	}
         }
 
         return result;

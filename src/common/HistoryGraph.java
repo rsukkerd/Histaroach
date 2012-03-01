@@ -74,7 +74,7 @@ public class HistoryGraph implements Iterable<Revision>, Serializable {
             Set<Revision> visited) {
         visited.add(revision_B);
 
-        List<Revision> parents = revision_B.getParents();
+        Set<Revision> parents = revision_B.getParents();
         for (Revision parent : parents) {
             if (parent.equals(revision_A)) {
                 return true;
@@ -105,7 +105,7 @@ public class HistoryGraph implements Iterable<Revision>, Serializable {
 
             Set<String> allTests = childResult.getAllTests();
 
-            List<Revision> parents = revision.getParents();
+            Set<Revision> parents = revision.getParents();
 
             for (/*@NonNull*/Revision parent : parents) {            	
                 TestResult parentResult = parent.getTestResult();
@@ -178,7 +178,7 @@ public class HistoryGraph implements Iterable<Revision>, Serializable {
         for (Revision revision : orderedRevisions) {
         	// find all bug that this revision fixed
             List<String> fixedBugs = new ArrayList<String>();
-            List<Revision> parents = revision.getParents();
+            Set<Revision> parents = revision.getParents();
 
             for (Revision parent : parents) {
                 for (String failedTest : parent.getTestResult()

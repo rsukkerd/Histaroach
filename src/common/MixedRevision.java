@@ -22,6 +22,7 @@ public class MixedRevision {
     private final Repository repository;
     private final File repoDir;
     private COMPILABLE compilable;
+    private COMPILABLE testCompilable;
     private TestResult testResult;
 
     /**
@@ -68,6 +69,10 @@ public class MixedRevision {
     public COMPILABLE isCompilable() {
         return compilable;
     }
+    
+    public COMPILABLE isTestCompilable() {
+        return testCompilable;
+    }
 
     public TestResult getTestResult() {
         return testResult;
@@ -79,14 +84,14 @@ public class MixedRevision {
      * @modifies this
      */
     public void compile() {
-        boolean build = repository.build(repository.antBuild);
-        boolean buildtest = repository.build(repository.antBuildtest);
-
-        if (build && buildtest) {
-            compilable = COMPILABLE.YES;
-        } else {
-            compilable = COMPILABLE.NO;
-        }
+        compilable = repository.build(repository.antBuild);
+    }
+    
+    /**
+     * compile test on the mixed revision
+     */
+    public void compileTest() {
+        testCompilable = repository.build(repository.antBuildtest);
     }
 
     /**
@@ -95,14 +100,9 @@ public class MixedRevision {
      * @modifies this
      */
     public void compileAndRunAllTests() {
-        testResult = repository.run(repository.antJunit,
-                baseRevision.getCommitID() + "-mixed");
-
-        if (testResult != null) {
-            compilable = COMPILABLE.YES;
-        } else {
-            compilable = COMPILABLE.NO;
-        }
+        Pair<COMPILABLE, TestResult> pair = repository.run(repository.antJunit, baseRevision.getCommitID());
+        compilable = pair.getFirst();
+        testResult = pair.getSecond();
     }
 
     /**

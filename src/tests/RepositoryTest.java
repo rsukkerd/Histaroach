@@ -2,7 +2,6 @@ package tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -174,7 +173,7 @@ public class RepositoryTest {
 	
 	@Test
 	public void testBuildHistoryGraphOnSampleRepositories() {
-		assertTrue(untarSampleRepositories());
+		assert untarSampleRepositories();
 		
 		for (int i = 0; i < DIRECTORIES.length; i++) {
 			Repository repo = new Repository(DIRECTORIES[i], ANT_COMMAND);
@@ -186,7 +185,7 @@ public class RepositoryTest {
 			assertEquals("result mismatched on " + DIRECTORIES[i], EXPECTED_HGRAPHS[i], actualHGraph);
 		}
 		
-		assertTrue(deleteSampleRepositores());
+		assert deleteSampleRepositores();
 	}
 	
 	@Test
