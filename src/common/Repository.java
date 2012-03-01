@@ -8,16 +8,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import common.DiffFile.DiffType;
 
+import voldemort.VoldemortTestResult;
+
 /**
- * Repository represents a git repository.
- * 
- * Repository has access to the directory associated with it.
- * 
- * Repository contains methods to check out a commit into 
- * the working directory, and to build a graph structure 
+ * Repository represents a git repository. Repository has access to the
+ * directory associated with it. Repository contains methods to check out a
+ * commit into the working directory, and to build a graph structure
  * representing the revision history of the repository.
  */
 public class Repository implements Serializable {
@@ -34,29 +35,31 @@ public class Repository implements Serializable {
     public static final String JUNIT_TEST_COMMAND = "junit-test -Dtest.name=";
 
     private final File directory;
-    
+
     protected final String[] antBuild;
     protected final String[] antBuildtest;
     protected final String[] antJunit;
 
-	/**
+    /**
      * Create a repository
      * 
-     * @param pathname : full path to the repository directory
-     * @param antCommand : ant command
+     * @param pathname
+     *            : full path to the repository directory
+     * @param antCommand
+     *            : ant command
      */
     public Repository(String pathname, String antCommand) {
         directory = new File(pathname);
-        
+
         String[] ant = antCommand.split(" ");
         antJunit = new String[ant.length + 1];
         antBuild = new String[ant.length + 1];
         antBuildtest = new String[ant.length + 1];
 
         for (int i = 0; i < ant.length; i++) {
-        	antJunit[i] = ant[i];
-        	antBuild[i] = ant[i];
-        	antBuildtest[i] = ant[i];
+            antJunit[i] = ant[i];
+            antBuild[i] = ant[i];
+            antBuildtest[i] = ant[i];
         }
 
         antJunit[antJunit.length - 1] = JUNIT_COMMAND;
@@ -72,9 +75,8 @@ public class Repository implements Serializable {
     }
 
     /**
-     * Build a HistoryGraph instance containing revisions from startCommit 
-     * to the root commit.
-     * Initially, each revision in the HistoryGraph has
+     * Build a HistoryGraph instance containing revisions from startCommit to
+     * the root commit. Initially, each revision in the HistoryGraph has
      * compilable = UNKNOWN and TestResult = null
      * 
      * @return a history graph of this repository
@@ -95,7 +97,7 @@ public class Repository implements Serializable {
         // mapping : parent ID -> list of its child revisions
         // used for referencing child to its parents later
         Map<String, List<Revision>> parentIDToChildRevisions = new HashMap<String, List<Revision>>();
-        
+
         for (String line : lines) {
             String[] hashes = line.split(" ");
 
@@ -103,103 +105,182 @@ public class Repository implements Serializable {
 
             Revision revision = new Revision(this, commitID);
             hGraph.addRevision(revision);
-            
+
             for (int i = 1; i < hashes.length; i++) {
-            	if (parentIDToChildRevisions.containsKey(hashes[i])) {
-            		parentIDToChildRevisions.get(hashes[i]).add(revision);
-            	} else {
-            		List<Revision> childRevisions = new ArrayList<Revision>();
-            		childRevisions.add(revision);
-            		parentIDToChildRevisions.put(hashes[i], childRevisions);
-            	}
+                if (parentIDToChildRevisions.containsKey(hashes[i])) {
+                    parentIDToChildRevisions.get(hashes[i]).add(revision);
+                } else {
+                    List<Revision> childRevisions = new ArrayList<Revision>();
+                    childRevisions.add(revision);
+                    parentIDToChildRevisions.put(hashes[i], childRevisions);
+                }
             }
 
             /* print progress to standard output */
             System.out.println(revision);
         }
-        
+
         // referencing each child to its parents
         for (Revision revision : hGraph) {
-        	String commitID = revision.getCommitID();
-        	
-        	if (parentIDToChildRevisions.containsKey(commitID)) {
-        		List<Revision> childRevisions = parentIDToChildRevisions.get(commitID);
-        		
-        		for (Revision childRevision : childRevisions) {
-        			String childID = childRevision.getCommitID();
-        			List<DiffFile> files = getDiffFiles(childID, commitID);
-        			
-        			childRevision.addParent(revision, files);
-        		}
-        	}
+            String commitID = revision.getCommitID();
+
+            if (parentIDToChildRevisions.containsKey(commitID)) {
+                List<Revision> childRevisions = parentIDToChildRevisions
+                        .get(commitID);
+
+                for (Revision childRevision : childRevisions) {
+                    String childID = childRevision.getCommitID();
+                    List<DiffFile> files = getDiffFiles(childID, commitID);
+
+                    childRevision.addParent(revision, files);
+                }
+            }
         }
 
         return hGraph;
     }
 
     /**
-	 * Checks out a given commit from this repository.
-	 * @return exit value of 'git checkout' process
-	 */
-	public int checkoutCommit(String commitID) {
-	    Process p = Util.runProcess(
-	            new String[] { "git", "checkout", commitID }, directory);
-	    return p.exitValue();
-	}
+     * Checks out a given commit from this repository.
+     * 
+     * @return exit value of 'git checkout' process
+     */
+    public int checkoutCommit(String commitID) {
+        Process p = Util.runProcess(
+                new String[] { "git", "checkout", commitID }, directory);
+        return p.exitValue();
+    }
 
-	/**
-	 * Helper method for buildHistoryGraph
-	 * @return a list of diff files between childCommit and parentCommit
-	 */
-	private List<DiffFile> getDiffFiles(String childCommitID,
-	        String parentCommitID) {
-	    List<DiffFile> diffFiles = new ArrayList<DiffFile>();
-	
-	    Process p = Util.runProcess(new String[] { "git", "diff",
-	            "--name-status", childCommitID, parentCommitID }, directory);
-	
-	    BufferedReader reader = new BufferedReader(new InputStreamReader(
-	            p.getInputStream()));
-	
-	    List<String> lines = Util.getStreamContent(reader);
-	
-	    for (String line : lines) {
-	        String[] tokens = line.split("\\s");
-	
-	        DiffType type;
-	        if (tokens[0].equals("A")) {
-	            type = DiffType.ADDED;
-	        } else if (tokens[0].equals("M")) {
-	            type = DiffType.MODIFIED;
-	        } else {
-	            type = DiffType.DELETED;
-	        }
-	
-	        DiffFile diffFile = new DiffFile(type, tokens[1]);
-	
-	        diffFiles.add(diffFile);
-	    }
-	
-	    return diffFiles;
-	}
+    /**
+     * build this revision using a given command
+     * 
+     * @return true if build successful, false if build failed
+     */
+    public boolean build(String[] command) {
+        Process process = Util.runProcess(command, getDirectory());
 
-	@Override
-	public boolean equals(Object other) {
-	    if (other == null || !other.getClass().equals(this.getClass())) {
-	        return false;
-	    }
-	
-	    Repository repository = (Repository) other;
-	    return directory.equals(repository.directory);
-	}
+        BufferedReader stdOutputReader = new BufferedReader(
+                new InputStreamReader(process.getInputStream()));
 
-	@Override
-	public int hashCode() {
-	    return directory.hashCode();
-	}
+        BufferedReader stdErrorReader = new BufferedReader(
+                new InputStreamReader(process.getErrorStream()));
 
-	@Override
-	public String toString() {
-	    return "repository location : " + directory.getAbsolutePath();
-	}
+        List<String> outputStreamContent = Util
+                .getStreamContent(stdOutputReader);
+        List<String> errorStreamContent = Util.getStreamContent(stdErrorReader);
+
+        return buildSuccessful(outputStreamContent, errorStreamContent);
+    }
+
+    /**
+     * run a given test command on this revision
+     * 
+     * @return a TestResult of the test command
+     */
+    public TestResult run(String[] testCommand, String commitID) {
+        Process process = Util.runProcess(testCommand, getDirectory());
+
+        BufferedReader stdOutputReader = new BufferedReader(
+                new InputStreamReader(process.getInputStream()));
+
+        BufferedReader stdErrorReader = new BufferedReader(
+                new InputStreamReader(process.getErrorStream()));
+
+        List<String> outputStreamContent = Util
+                .getStreamContent(stdOutputReader);
+        List<String> errorStreamContent = Util.getStreamContent(stdErrorReader);
+
+        if (buildSuccessful(outputStreamContent, errorStreamContent)) {
+            return new VoldemortTestResult(commitID, outputStreamContent,
+                    errorStreamContent);
+        }
+
+        return null;
+    }
+
+    /**
+     * Helper method for build(command) and run(command)
+     * 
+     * @return true if build successful, false if build failed
+     */
+    private boolean buildSuccessful(List<String> outputStreamContent,
+            List<String> errorStreamContent) {
+        Pattern buildSuccessfulPattern = Pattern.compile("BUILD SUCCESSFUL");
+        Pattern buildFailedPattern = Pattern.compile("BUILD FAILED");
+
+        for (String line : outputStreamContent) {
+            Matcher buildSuccessfulMatcher = buildSuccessfulPattern
+                    .matcher(line);
+            if (buildSuccessfulMatcher.find()) {
+                return true;
+            }
+        }
+
+        for (String line : errorStreamContent) {
+            Matcher buildFailedMatcher = buildFailedPattern.matcher(line);
+            if (buildFailedMatcher.find()) {
+                return false;
+            }
+        }
+
+        assert false : "Neither BUILD SUCCESSFUL nor BUILD FAILED found";
+        return false;
+    }
+
+    /**
+     * Helper method for buildHistoryGraph
+     * 
+     * @return a list of diff files between childCommit and parentCommit
+     */
+    private List<DiffFile> getDiffFiles(String childCommitID,
+            String parentCommitID) {
+        List<DiffFile> diffFiles = new ArrayList<DiffFile>();
+
+        Process p = Util.runProcess(new String[] { "git", "diff",
+                "--name-status", childCommitID, parentCommitID }, directory);
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(
+                p.getInputStream()));
+
+        List<String> lines = Util.getStreamContent(reader);
+
+        for (String line : lines) {
+            String[] tokens = line.split("\\s");
+
+            DiffType type;
+            if (tokens[0].equals("A")) {
+                type = DiffType.ADDED;
+            } else if (tokens[0].equals("M")) {
+                type = DiffType.MODIFIED;
+            } else {
+                type = DiffType.DELETED;
+            }
+
+            DiffFile diffFile = new DiffFile(type, tokens[1]);
+
+            diffFiles.add(diffFile);
+        }
+
+        return diffFiles;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == null || !other.getClass().equals(this.getClass())) {
+            return false;
+        }
+
+        Repository repository = (Repository) other;
+        return directory.equals(repository.directory);
+    }
+
+    @Override
+    public int hashCode() {
+        return directory.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "repository location : " + directory.getAbsolutePath();
+    }
 }

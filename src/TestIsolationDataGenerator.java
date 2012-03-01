@@ -106,7 +106,7 @@ public class TestIsolationDataGenerator {
         HistoryGraph historyGraph = repository.buildHistoryGraph(startHGraphID);
 
         if (startTResultID != null && endTResultID != null) {
-            populateTestResults(historyGraph);
+            exportTestResults(historyGraph);
         }
 
         String fileName = "";
@@ -126,7 +126,7 @@ public class TestIsolationDataGenerator {
      * 
      * @modifies historyGraph
      */
-    public static void populateTestResults(HistoryGraph historyGraph) {
+    public static void exportTestResults(HistoryGraph historyGraph) {
         Iterator<Revision> itr = historyGraph.iterator();
         Revision revision = null;
 
@@ -146,13 +146,6 @@ public class TestIsolationDataGenerator {
         // For each revision between start and end IDs, get the test results,
         // and record them to a serialized file.
         while (true) {
-        	// check out the revision
-        	int exitValue = revision.checkoutRevision();
-        	assert (exitValue == 0);
-        	
-        	// compile and run tests on the revision
-        	revision.compileAndRunAllTests();
-
             String filename = outputDirName + revision.getCommitID()
                     + SERIALIZED_EXTENSION;
             Util.writeToSerializedFile(filename, revision);
