@@ -22,7 +22,8 @@ import voldemort.VoldemortTestResult;
  * Repository represents a git repository. Repository has access to the 
  * directory associated with it. Repository contains methods to check out 
  * a commit into the working directory, build, run tests, and build a graph 
- * structure representing the revision history of the repository.
+ * structure representing the revision history of the repository. 
+ * Repository is immutable.
  */
 public class Repository {
 
@@ -80,63 +81,6 @@ public class Repository {
      * @return a history graph of this repository
      */
     public HistoryGraph buildHistoryGraph(String startCommitID) {
-        HistoryGraph hGraph = new HistoryGraph(this);
-
-        int exitValue = checkoutCommit(startCommitID);
-        assert (exitValue == 0);
-
-        Process logProcess = Util.runProcess(LOG_COMMAND, directory);
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(
-                logProcess.getInputStream()));
-
-        List<String> lines = Util.getStreamContent(reader);
-
-        // mapping : parent ID -> list of its child revisions
-        // used for referencing child to its parents later
-        Map<String, List<Revision>> parentIDToChildRevisions = new HashMap<String, List<Revision>>();
-
-        for (String line : lines) {
-            String[] hashes = line.split(" ");
-
-            String commitID = hashes[0];
-
-            Revision revision = new Revision(this, commitID);
-            hGraph.addRevision(revision);
-
-            for (int i = 1; i < hashes.length; i++) {
-                if (parentIDToChildRevisions.containsKey(hashes[i])) {
-                    parentIDToChildRevisions.get(hashes[i]).add(revision);
-                } else {
-                    List<Revision> childRevisions = new ArrayList<Revision>();
-                    childRevisions.add(revision);
-                    parentIDToChildRevisions.put(hashes[i], childRevisions);
-                }
-            }
-
-            /* print progress to standard output */
-            //System.out.println(revision);
-        }
-
-        // referencing each child to its parents
-        for (Revision revision : hGraph) {
-            String commitID = revision.getCommitID();
-
-            if (parentIDToChildRevisions.containsKey(commitID)) {
-                List<Revision> childRevisions = parentIDToChildRevisions.get(commitID);
-
-                for (Revision childRevision : childRevisions) {
-                    String childID = childRevision.getCommitID();
-                    List<DiffFile> files = getDiffFiles(childID, commitID);
-                    childRevision.addParent(revision, files);
-                }
-            }
-        }
-
-        return hGraph;
-    }
-    
-    public HistoryGraph buildHistoryGraph2(String startCommitID) {
     	HistoryGraph hGraph = new HistoryGraph(this);
     	
     	int exitValue = checkoutCommit(startCommitID);
@@ -149,39 +93,43 @@ public class Repository {
 
         List<String> lines = Util.getStreamContent(reader);
         
-        Map<String, List<String>> parentToChildren = new HashMap<String, List<String>>();
+        // parent id -> a list of its children's ids
+        Map<String, List<String>> parentIDToChildrenIDs = new HashMap<String, List<String>>();
+        // child id -> a list of its parents' ids
         Map<String, List<String>> childToParents = new HashMap<String, List<String>>();
         
+        // special case : the start revision has no children
         if (!lines.isEmpty()) {
         	String line = lines.get(0);
         	String[] hashes = line.split(" ");
         	
         	String topID = hashes[0];
-        	parentToChildren.put(topID, new ArrayList<String>());
+        	parentIDToChildrenIDs.put(topID, new ArrayList<String>());
         }
         
         for (String line : lines) {
         	String[] hashes = line.split(" ");
 
             String childID = hashes[0];
-            List<String> parentsID = new ArrayList<String>();
+            List<String> parentsIDs = new ArrayList<String>();
             
             for (int i = 1; i < hashes.length; i++) {
             	String parentID = hashes[i];
-            	parentsID.add(parentID);
+            	parentsIDs.add(parentID);
             	
-            	if (parentToChildren.containsKey(parentID)) {
-            		parentToChildren.get(parentID).add(childID);
+            	if (parentIDToChildrenIDs.containsKey(parentID)) {
+            		parentIDToChildrenIDs.get(parentID).add(childID);
             	} else {
-            		List<String> childrenID = new ArrayList<String>();
-            		childrenID.add(childID);
-            		parentToChildren.put(parentID, childrenID);
+            		List<String> childrenIDs = new ArrayList<String>();
+            		childrenIDs.add(childID);
+            		parentIDToChildrenIDs.put(parentID, childrenIDs);
             	}
             }
             
-            childToParents.put(childID, parentsID);
+            childToParents.put(childID, parentsIDs);
         }
         
+        // commit id -> number of its parents
         Map<String, Integer> incomingEdgeCounter = new HashMap<String, Integer>();
         
         for (String childID : childToParents.keySet()) {
@@ -198,6 +146,7 @@ public class Repository {
         	}
         }
         
+        // commit id -> its revision object
         Map<String, Revision> revisions = new HashMap<String, Revision>();
         
         while (!noIncomingEdge.isEmpty()) {
@@ -207,8 +156,8 @@ public class Repository {
         	
         	Map<Revision, List<DiffFile>> parentToDiffFiles = new HashMap<Revision, List<DiffFile>>();
         	
-        	List<String> parentsID = childToParents.get(commitID);
-        	for (String parentID : parentsID) {
+        	List<String> parentsIDs = childToParents.get(commitID);
+        	for (String parentID : parentsIDs) {
         		Revision parent = revisions.get(parentID);
         		List<DiffFile> diffFiles = getDiffFiles(commitID, parentID);
         		
@@ -220,9 +169,9 @@ public class Repository {
         	
         	revisions.put(commitID, revision);
         	
-        	List<String> childrenID = parentToChildren.get(commitID);
+        	List<String> childrenIDs = parentIDToChildrenIDs.get(commitID);
         	
-        	for (String childID : childrenID) {
+        	for (String childID : childrenIDs) {
         		int edges = incomingEdgeCounter.get(childID);
         		incomingEdgeCounter.put(childID, edges - 1);
         		

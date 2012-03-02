@@ -1,7 +1,6 @@
 package common;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -9,7 +8,7 @@ import java.util.Set;
 /**
  * Revision represents a state of a particular commit. Revision has access to
  * its repository, commit ID, a set of its parents and their corresponding diff
- * files, compilable state, and test result.
+ * files, compilable state, and test result. Revision is immutable.
  */
 public class Revision implements Serializable {
     /**
@@ -35,21 +34,6 @@ public class Revision implements Serializable {
      * Create a revision.
      * Compilable state and test result are populated in this constructor.
      */
-    public Revision(Repository repository, String commitID) {
-        this.repository = repository;
-        this.commitID = commitID;
-        parentToDiffFiles = new HashMap<Revision, List<DiffFile>>();
-        compilable = COMPILABLE.UNKNOWN;
-        testResult = null;
-
-        // Check out the revision.
-        int exitValue = repository.checkoutCommit(commitID);
-        assert exitValue == 0;
-
-        // Run all the tests on the checked-out revision.
-        compileAndRunAllTests();
-    }
-    
     public Revision(Repository repository, String commitID, Map<Revision, List<DiffFile>> parentToDiffFiles) {
     	this.repository = repository;
     	this.commitID = commitID;
@@ -70,12 +54,13 @@ public class Revision implements Serializable {
      * Create a revision.
      * Compilable state and test result are given.
      */
-    public Revision(Repository repository, String commitID, COMPILABLE compilable, TestResult testResult) {
+    public Revision(Repository repository, String commitID, Map<Revision, List<DiffFile>> parentToDiffFiles, 
+    		COMPILABLE compilable, TestResult testResult) {
     	this.repository = repository;
     	this.commitID = commitID;
     	this.compilable = compilable;
     	this.testResult = testResult;
-    	parentToDiffFiles = new HashMap<Revision, List<DiffFile>>();
+    	this.parentToDiffFiles = parentToDiffFiles;
     }
 
     /**
@@ -90,13 +75,6 @@ public class Revision implements Serializable {
      */
     public String getCommitID() {
         return commitID;
-    }
-
-    /**
-     * add a parent revision and its corresponding diff files
-     */
-    public void addParent(Revision parent, List<DiffFile> files) {
-        parentToDiffFiles.put(parent, files);
     }
 
     /**
