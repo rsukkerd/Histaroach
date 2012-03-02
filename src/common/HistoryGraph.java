@@ -16,8 +16,8 @@ import java.util.Set;
  * 
  * HistoryGraph has access to the repository that it represents.
  * 
- * HistoryGraph maintain a list of revisions. It has methods to add 
- * revision and to iterate over its list of revisions.
+ * HistoryGraph maintain a set of revisions. It has methods to add 
+ * revision and to iterate over its set of revisions.
  * 
  * HistoryGraph has a method to get a list of flips that are present 
  * in its list of revisions.
@@ -29,19 +29,19 @@ public class HistoryGraph implements Iterable<Revision>, Serializable {
     private static final long serialVersionUID = 7286435306324502773L;
 
     /** revisions' order according to 'git log' **/
-    private final List<Revision> orderedRevisions;
+    private final Set<Revision> revisions;
     private final Repository repository;
 
     public HistoryGraph(Repository repository) {
     	this.repository = repository;
-        orderedRevisions = new ArrayList<Revision>();
+        revisions = new HashSet<Revision>();
     }
 
     /**
      * add a revision to this history graph
      */
     public void addRevision(Revision revision) {
-        orderedRevisions.add(revision);
+        revisions.add(revision);
     }
     
     public Repository getRepository() {
@@ -98,7 +98,7 @@ public class HistoryGraph implements Iterable<Revision>, Serializable {
     public List<Flip> getAllFlips() {
         List<Flip> flips = new ArrayList<Flip>();
 
-        for (Revision revision : orderedRevisions) {
+        for (Revision revision : revisions) {
             TestResult childResult = revision.getTestResult();
             
             if (childResult == null) { continue; }
@@ -175,7 +175,7 @@ public class HistoryGraph implements Iterable<Revision>, Serializable {
     public Map<String, List<BugFix>> getAllBugFixes() {
         Map<String, List<BugFix>> res = new HashMap<String, List<BugFix>>();
 
-        for (Revision revision : orderedRevisions) {
+        for (Revision revision : revisions) {
         	// find all bug that this revision fixed
             List<String> fixedBugs = new ArrayList<String>();
             Set<Revision> parents = revision.getParents();
@@ -240,18 +240,18 @@ public class HistoryGraph implements Iterable<Revision>, Serializable {
         HistoryGraph hGraph = (HistoryGraph) other;
 
         return repository.equals(hGraph.repository) 
-        		&& orderedRevisions.equals(hGraph.orderedRevisions);
+        		&& revisions.equals(hGraph.revisions);
     }
 
     @Override
     public int hashCode() {
-        return 11 * repository.hashCode() + 13 * orderedRevisions.hashCode();
+        return 11 * repository.hashCode() + 13 * revisions.hashCode();
     }
 
     @Override
     public String toString() {
         String str = repository.toString() + "\n";
-        for (Revision revision : orderedRevisions) {
+        for (Revision revision : revisions) {
             str += revision.toString() + "\n";
         }
 
@@ -260,6 +260,6 @@ public class HistoryGraph implements Iterable<Revision>, Serializable {
 
     @Override
     public Iterator<Revision> iterator() {
-        return orderedRevisions.iterator();
+        return revisions.iterator();
     }
 }

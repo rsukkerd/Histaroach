@@ -33,7 +33,7 @@ public class Revision implements Serializable {
 
     /**
      * Create a revision.
-     * Compilable state and test result are known.
+     * Compilable state and test result are populated in this constructor.
      */
     public Revision(Repository repository, String commitID) {
         this.repository = repository;
@@ -48,6 +48,34 @@ public class Revision implements Serializable {
 
         // Run all the tests on the checked-out revision.
         compileAndRunAllTests();
+    }
+    
+    public Revision(Repository repository, String commitID, Map<Revision, List<DiffFile>> parentToDiffFiles) {
+    	this.repository = repository;
+    	this.commitID = commitID;
+    	this.parentToDiffFiles = parentToDiffFiles;
+    	
+    	compilable = COMPILABLE.UNKNOWN;
+        testResult = null;
+
+        // Check out the revision.
+        int exitValue = repository.checkoutCommit(commitID);
+        assert exitValue == 0;
+
+        // Run all the tests on the checked-out revision.
+        compileAndRunAllTests();
+    }
+    
+    /**
+     * Create a revision.
+     * Compilable state and test result are given.
+     */
+    public Revision(Repository repository, String commitID, COMPILABLE compilable, TestResult testResult) {
+    	this.repository = repository;
+    	this.commitID = commitID;
+    	this.compilable = compilable;
+    	this.testResult = testResult;
+    	parentToDiffFiles = new HashMap<Revision, List<DiffFile>>();
     }
 
     /**
@@ -79,7 +107,8 @@ public class Revision implements Serializable {
     }
 
     /**
-     * @return list of diff files corresponding to the given parent
+     * @return list of diff files corresponding to the given parent, 
+     * null if parent is not a parent of this revision
      */
     public List<DiffFile> getDiffFiles(Revision parent) {
         return parentToDiffFiles.get(parent);
@@ -122,8 +151,8 @@ public class Revision implements Serializable {
                 && commitID.equals(revision.commitID)
                 && parentToDiffFiles.equals(revision.parentToDiffFiles)
                 && compilable == revision.compilable
-                && ((testResult == null && revision.testResult == null) || testResult
-                        .equals(revision.testResult));
+                && ((testResult == null && revision.testResult == null) 
+                		|| (testResult != null && testResult.equals(revision.testResult)));
     }
 
     @Override
@@ -151,12 +180,12 @@ public class Revision implements Serializable {
         } else {
             result += "no build file\n";
         }
-        
+                
         for (Revision parent : parentToDiffFiles.keySet()) {
         	result += "parent : " + parent.getCommitID() + "\n";
         	result += "diff files :\n";
-        	List<DiffFile> diffFiles = parentToDiffFiles.get(parent);
         	
+        	List<DiffFile> diffFiles = parentToDiffFiles.get(parent);
         	for (DiffFile diffFile : diffFiles) {
         		result += diffFile + "\n";
         	}

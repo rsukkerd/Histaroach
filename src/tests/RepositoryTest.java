@@ -2,6 +2,8 @@ package tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,6 +15,7 @@ import org.junit.Test;
 
 import common.DiffFile;
 import common.DiffFile.DiffType;
+import common.Revision.COMPILABLE;
 import common.HistoryGraph;
 import common.Repository;
 import common.Revision;
@@ -72,26 +75,26 @@ public class RepositoryTest {
 	private static final String COMMIT_6_5 = "e654cdb";
 	
 	/** a revision in a particular hGraph **/
-	private static final Revision REVISION_1_1 = new Revision(REPOSITORY_1, COMMIT_1_1);
+	private static final Revision REVISION_1_1 = new Revision(REPOSITORY_1, COMMIT_1_1, COMPILABLE.NO_BUILD_FILE, null);
 	
-	private static final Revision REVISION_1_2 = new Revision(REPOSITORY_2, COMMIT_1_2);
-	private static final Revision REVISION_2_2 = new Revision(REPOSITORY_2, COMMIT_2_2);
+	private static final Revision REVISION_1_2 = new Revision(REPOSITORY_2, COMMIT_1_2, COMPILABLE.NO_BUILD_FILE, null);
+	private static final Revision REVISION_2_2 = new Revision(REPOSITORY_2, COMMIT_2_2, COMPILABLE.NO_BUILD_FILE, null);
 	static {
 		REVISION_2_2.addParent(REVISION_1_2, DIFF_FILES);
 	}
 	
-	private static final Revision REVISION_1_3 = new Revision(REPOSITORY_3, COMMIT_1_3);
-	private static final Revision REVISION_2_3 = new Revision(REPOSITORY_3, COMMIT_2_3);
-	private static final Revision REVISION_3_3 = new Revision(REPOSITORY_3, COMMIT_3_3);
+	private static final Revision REVISION_1_3 = new Revision(REPOSITORY_3, COMMIT_1_3, COMPILABLE.NO_BUILD_FILE, null);
+	private static final Revision REVISION_2_3 = new Revision(REPOSITORY_3, COMMIT_2_3, COMPILABLE.NO_BUILD_FILE, null);
+	private static final Revision REVISION_3_3 = new Revision(REPOSITORY_3, COMMIT_3_3, COMPILABLE.NO_BUILD_FILE, null);
 	static {
 		REVISION_2_3.addParent(REVISION_1_3, DIFF_FILES);
 		REVISION_3_3.addParent(REVISION_2_3, DIFF_FILES);
 	}
 	
-	private static final Revision REVISION_1_4 = new Revision(REPOSITORY_4, COMMIT_1_4);
-	private static final Revision REVISION_2_4 = new Revision(REPOSITORY_4, COMMIT_2_4);
-	private static final Revision REVISION_3_4 = new Revision(REPOSITORY_4, COMMIT_3_4);
-	private static final Revision REVISION_4_4 = new Revision(REPOSITORY_4, COMMIT_4_4);
+	private static final Revision REVISION_1_4 = new Revision(REPOSITORY_4, COMMIT_1_4, COMPILABLE.NO_BUILD_FILE, null);
+	private static final Revision REVISION_2_4 = new Revision(REPOSITORY_4, COMMIT_2_4, COMPILABLE.NO_BUILD_FILE, null);
+	private static final Revision REVISION_3_4 = new Revision(REPOSITORY_4, COMMIT_3_4, COMPILABLE.NO_BUILD_FILE, null);
+	private static final Revision REVISION_4_4 = new Revision(REPOSITORY_4, COMMIT_4_4, COMPILABLE.NO_BUILD_FILE, null);
 	static {
 		REVISION_2_4.addParent(REVISION_1_4, DIFF_FILES);
 		REVISION_3_4.addParent(REVISION_1_4, DIFF_FILES);
@@ -99,12 +102,12 @@ public class RepositoryTest {
 		REVISION_4_4.addParent(REVISION_2_4, DIFF_FILES);
 	}
 	
-	private static final Revision REVISION_1_5 = new Revision(REPOSITORY_5, COMMIT_1_5);
-	private static final Revision REVISION_2_5 = new Revision(REPOSITORY_5, COMMIT_2_5);
-	private static final Revision REVISION_3_5 = new Revision(REPOSITORY_5, COMMIT_3_5);
-	private static final Revision REVISION_4_5 = new Revision(REPOSITORY_5, COMMIT_4_5);
-	private static final Revision REVISION_5_5 = new Revision(REPOSITORY_5, COMMIT_5_5);
-	private static final Revision REVISION_6_5 = new Revision(REPOSITORY_5, COMMIT_6_5);
+	private static final Revision REVISION_1_5 = new Revision(REPOSITORY_5, COMMIT_1_5, COMPILABLE.NO_BUILD_FILE, null);
+	private static final Revision REVISION_2_5 = new Revision(REPOSITORY_5, COMMIT_2_5, COMPILABLE.NO_BUILD_FILE, null);
+	private static final Revision REVISION_3_5 = new Revision(REPOSITORY_5, COMMIT_3_5, COMPILABLE.NO_BUILD_FILE, null);
+	private static final Revision REVISION_4_5 = new Revision(REPOSITORY_5, COMMIT_4_5, COMPILABLE.NO_BUILD_FILE, null);
+	private static final Revision REVISION_5_5 = new Revision(REPOSITORY_5, COMMIT_5_5, COMPILABLE.NO_BUILD_FILE, null);
+	private static final Revision REVISION_6_5 = new Revision(REPOSITORY_5, COMMIT_6_5, COMPILABLE.NO_BUILD_FILE, null);
 	static {
 		REVISION_2_5.addParent(REVISION_1_5, DIFF_FILES);
 		REVISION_3_5.addParent(REVISION_1_5, DIFF_FILES);
@@ -173,19 +176,24 @@ public class RepositoryTest {
 	
 	@Test
 	public void testBuildHistoryGraphOnSampleRepositories() {
-		assert untarSampleRepositories();
+		assertTrue(untarSampleRepositories());
 		
 		for (int i = 0; i < DIRECTORIES.length; i++) {
 			Repository repo = new Repository(DIRECTORIES[i], ANT_COMMAND);
 	
 			HistoryGraph actualHGraph = null;
-			actualHGraph = repo.buildHistoryGraph(START_COMMIT_IDS[i]);
+			try {
+				actualHGraph = repo.buildHistoryGraph2(START_COMMIT_IDS[i]);
+			} catch (Exception e) {
+				e.printStackTrace();
+				fail("Exception thrown in buildHistoryGraph");
+			}
 			
 			assertNotNull("constructor returns null on " + DIRECTORIES[i], actualHGraph);
 			assertEquals("result mismatched on " + DIRECTORIES[i], EXPECTED_HGRAPHS[i], actualHGraph);
 		}
 		
-		assert deleteSampleRepositores();
+		assertTrue(deleteSampleRepositores());
 	}
 	
 	@Test
