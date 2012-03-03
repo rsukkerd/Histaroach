@@ -75,12 +75,12 @@ public class Repository {
     }
 
     /**
-     * Build a history graph containing revisions from startCommit to
-     * the root commit.
+     * Build a history graph containing revisions from startCommit to 
+     * endCommit.
      * 
      * @return a history graph of this repository
      */
-    public HistoryGraph buildHistoryGraph(String startCommitID) {
+    public HistoryGraph buildHistoryGraph(String startCommitID, String endCommitID) {
     	HistoryGraph hGraph = new HistoryGraph(this);
     	
     	int exitValue = checkoutCommit(startCommitID);
@@ -96,7 +96,7 @@ public class Repository {
         // parent id -> a list of its children's ids
         Map<String, List<String>> parentIDToChildrenIDs = new HashMap<String, List<String>>();
         // child id -> a list of its parents' ids
-        Map<String, List<String>> childToParents = new HashMap<String, List<String>>();
+        Map<String, List<String>> childIDToParentsIDs = new HashMap<String, List<String>>();
         
         // special case : the start revision has no children
         if (!lines.isEmpty()) {
@@ -126,14 +126,25 @@ public class Repository {
             	}
             }
             
-            childToParents.put(childID, parentsIDs);
+            childIDToParentsIDs.put(childID, parentsIDs);
+            
+            if (childID.equals(endCommitID)) {
+            	break;
+            }
         }
         
         // commit id -> number of its parents
         Map<String, Integer> incomingEdgeCounter = new HashMap<String, Integer>();
         
-        for (String childID : childToParents.keySet()) {
-        	int incomingEdges = childToParents.get(childID).size();
+        for (String childID : childIDToParentsIDs.keySet()) {
+        	int incomingEdges = 0;
+        	List<String> parentsIDs = childIDToParentsIDs.get(childID);
+        	for (String parentID : parentsIDs) {
+        		if (childIDToParentsIDs.containsKey(parentID)) {
+        			incomingEdges++;
+        		}
+        	}
+        	
         	incomingEdgeCounter.put(childID, incomingEdges);
         }
         
@@ -156,9 +167,17 @@ public class Repository {
         	
         	Map<Revision, List<DiffFile>> parentToDiffFiles = new HashMap<Revision, List<DiffFile>>();
         	
-        	List<String> parentsIDs = childToParents.get(commitID);
+        	List<String> parentsIDs = childIDToParentsIDs.get(commitID);
         	for (String parentID : parentsIDs) {
-        		Revision parent = revisions.get(parentID);
+        		Revision parent;
+        		if (revisions.containsKey(parentID)) {
+        			parent = revisions.get(parentID);
+        		} else {
+        			// dummy revision of parent
+        			parent = new Revision(this, parentID, new HashMap<Revision, List<DiffFile>>(), 
+        					COMPILABLE.UNKNOWN, null);
+        		}
+        		
         		List<DiffFile> diffFiles = getDiffFiles(commitID, parentID);
         		
         		parentToDiffFiles.put(parent, diffFiles);

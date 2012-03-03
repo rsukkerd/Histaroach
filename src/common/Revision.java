@@ -41,13 +41,8 @@ public class Revision implements Serializable {
     	
     	compilable = COMPILABLE.UNKNOWN;
         testResult = null;
-
-        // Check out the revision.
-        int exitValue = repository.checkoutCommit(commitID);
-        assert exitValue == 0;
-
-        // Run all the tests on the checked-out revision.
-        compileAndRunAllTests();
+        
+        populateTestResult();
     }
     
     /**
@@ -107,11 +102,14 @@ public class Revision implements Serializable {
     }
 
     /**
-     * compile and run all tests on this revision
+     * check out this revision, compile and run all tests
      * 
      * @modifies this
      */
-    private void compileAndRunAllTests() {
+    private void populateTestResult() {
+    	int exitValue = repository.checkoutCommit(commitID);
+        assert exitValue == 0;
+        
         Pair<COMPILABLE, TestResult> pair = repository.run(repository.antJunit, commitID);
         compilable = pair.getFirst();
         testResult = pair.getSecond();

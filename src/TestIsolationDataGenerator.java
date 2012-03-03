@@ -1,5 +1,5 @@
+import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
 
 import common.HistoryGraph;
 import common.Repository;
@@ -41,23 +41,17 @@ public class TestIsolationDataGenerator {
      * The commit ID from which to begin the HistoryGraph analysis.
      */
     @Option(
-            value = "-S Starting commit ID for HistoryGraph analysis (Required)",
-            aliases = { "-startHGraphID" })
-    public static String startHGraphID = null;
-
+            value = "-s Starting commit ID for HistoryGraph analysis (Required)",
+            aliases = { "-startCommitID" })
+    public static String startCommitID = null;
+    
     /**
-     * The commit ID from which to begin the TestResult analysis.
+     * The commit ID where the HistoryGraph analysis should terminate.
      */
-    @Option(value = "-s Starting commit ID for TestResult analysis (Optional)",
-            aliases = { "-startTResultID" })
-    public static String startTResultID = null;
-
-    /**
-     * The commit ID where the TestResult analysis should terminate.
-     */
-    @Option(value = "-e Ending commit ID for TestResult analysis (Optional)",
-            aliases = { "-endTResultID" })
-    public static String endTResultID = null;
+    @Option(
+            value = "-e Ending commit ID for HistoryGraph analysis (Required)",
+            aliases = { "-endCommitID" })
+    public static String endCommitID = null;
 
     /**
      * Full path to the repository directory.
@@ -96,23 +90,18 @@ public class TestIsolationDataGenerator {
             return;
         }
 
-        if (startHGraphID == null || repositoryDirName == null
-                || outputDirName == null) {
+        if (startCommitID == null || endCommitID == null || repositoryDirName == null 
+        		|| outputDirName == null) {
             plumeOptions.print_usage();
             return;
         }
 
         Repository repository = new Repository(repositoryDirName, antCommand);
-        HistoryGraph historyGraph = repository.buildHistoryGraph(startHGraphID);
+        HistoryGraph historyGraph = repository.buildHistoryGraph(startCommitID, endCommitID);
+        
+        exportTestResults(historyGraph);
 
-        if (startTResultID != null && endTResultID != null) {
-            exportTestResults(historyGraph);
-        }
-
-        String fileName = "";
-        if (startTResultID != null && endTResultID != null) {
-            fileName = "_" + startTResultID + "_" + endTResultID;
-        }
+        String fileName = "_" + startCommitID + "_" + endCommitID;
 
         Util.writeToSerializedFile(outputDirName + FILE_PREFIX + fileName
                 + SERIALIZED_EXTENSION, historyGraph);
@@ -121,43 +110,12 @@ public class TestIsolationDataGenerator {
     }
 
     /**
-     * Construct a TestResult instance for each revision in a specified range in
-     * historyGraph.
-     * 
-     * @modifies historyGraph
+     * write each revision in the historyGraph to a serialized file
      */
     public static void exportTestResults(HistoryGraph historyGraph) {
-        Iterator<Revision> itr = historyGraph.iterator();
-        Revision revision = null;
-
-        // Search for start revision.
-        while (itr.hasNext()) {
-            revision = itr.next();
-            if (revision.getCommitID().equals(startTResultID)) {
-                break;
-            }
-        }
-
-        // We could not find the start revision.
-        if (revision == null || !revision.getCommitID().equals(startTResultID)) {
-            return;
-        }
-
-        // For each revision between start and end IDs, get the test results,
-        // and record them to a serialized file.
-        while (true) {
-            String filename = outputDirName + revision.getCommitID()
-                    + SERIALIZED_EXTENSION;
-            Util.writeToSerializedFile(filename, revision);
-
-            if (revision.getCommitID().equals(endTResultID)) {
-                return;
-            }
-
-            if (!itr.hasNext()) {
-                break;
-            }
-            revision = itr.next();
-        }
+    	for (Revision revision : historyGraph) {
+    		String filename = outputDirName + File.separatorChar + revision.getCommitID() + SERIALIZED_EXTENSION;
+    		Util.writeToSerializedFile(filename, revision);
+    	}
     }
 }
