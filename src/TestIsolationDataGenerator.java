@@ -61,7 +61,8 @@ public class TestIsolationDataGenerator {
     public static String repositoryDirName = null;
 
     /**
-     * Full path to the output directory.
+     * Full path to the output directory. 
+     * Must NOT contain '/' at the end of the path.
      */
     @Option(value = "-o Full path to the output directory (Required)",
             aliases = { "-outputDir" })
@@ -103,9 +104,9 @@ public class TestIsolationDataGenerator {
 
         String fileName = "_" + startCommitID + "_" + endCommitID;
 
-        Util.writeToSerializedFile(outputDirName + FILE_PREFIX + fileName
+        Util.writeToSerializedFile(outputDirName + File.separatorChar + FILE_PREFIX + fileName
                 + SERIALIZED_EXTENSION, historyGraph);
-        Util.writeToHumanReadableFile(outputDirName + FILE_PREFIX + fileName
+        Util.writeToHumanReadableFile(outputDirName + File.separatorChar + FILE_PREFIX + fileName
                 + HUMAN_READ_EXTENSION, historyGraph);
     }
 

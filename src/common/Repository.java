@@ -221,7 +221,7 @@ public class Repository {
      * and NO_BUILD_FILE if there is no build file
      */
     public COMPILABLE build(String[] buildCommand) {
-        Process process = Util.runProcess(buildCommand, getDirectory());
+        Process process = Util.runProcess(buildCommand, directory);
 
         BufferedReader stdOutputReader = new BufferedReader(
                 new InputStreamReader(process.getInputStream()));
@@ -242,7 +242,7 @@ public class Repository {
      * @return a pair of compilable flag and test result
      */
     public Pair<COMPILABLE, TestResult> run(String[] testCommand, String commitID) {
-        Process process = Util.runProcess(testCommand, getDirectory());
+        Process process = Util.runProcess(testCommand, directory);
 
         BufferedReader stdOutputReader = new BufferedReader(
                 new InputStreamReader(process.getInputStream()));
