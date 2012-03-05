@@ -1,0 +1,10 @@
+package tests;
+
+
+public class MainTest {
+	
+	@Test
+	public void testNothing() {
+		// Test nothing
+	}
+}
