@@ -24,16 +24,19 @@ import common.HistoryGraph;
 import common.Repository;
 import common.Revision;
 import common.Revision.COMPILABLE;
+import common.TestResult;
 import common.Util;
 
-public class RepositoryTests {
+public class RepositoryTest {
 	public static final String ANT_COMMAND = "ant";
 
-	private static final String TAR_FILE = "test/sample_repositories.tar";
-	private static final String DEST_DIR = "test";
 	private static final String SAMPLE_REPOSITORIES = "test/sample_repositories";
+	private static final String SAMPLE_REPOSITORIES_TAR_FILE = "test/sample_repositories.tar";
+	private static final String PROJ = "test/proj";
+	private static final String PROJ_TAR_FILE = "test/proj.tar";
+	private static final String DEST_DIR = "test";
 	
-    private static final String[] DIRECTORIES = {"test/sample_repositories/repo1", 
+	private static final String[] DIRECTORIES = {"test/sample_repositories/repo1", 
     											"test/sample_repositories/repo2",
     											"test/sample_repositories/repo3",
     											"test/sample_repositories/repo4",
@@ -348,7 +351,7 @@ public class RepositoryTests {
 	
 	@Test
 	public void testBuildFullHistoryGraph() {
-		assertTrue(untarSampleRepositories());
+		assertTrue(untar(SAMPLE_REPOSITORIES_TAR_FILE));
 		
 		for (int i = 0; i < DIRECTORIES.length; i++) {
 			Repository repo = new Repository(DIRECTORIES[i], ANT_COMMAND);
@@ -365,12 +368,12 @@ public class RepositoryTests {
 			assertEquals("result mismatched on " + DIRECTORIES[i], EXPECTED_HGRAPHS[i], actualHGraph);
 		}
 		
-		assertTrue(deleteSampleRepositores());
+		assertTrue(deleteDirectory(SAMPLE_REPOSITORIES));
 	}
 	
 	@Test
 	public void testBuildPartialHistoryGraph() {
-		assertTrue(untarSampleRepositories());
+		assertTrue(untar(SAMPLE_REPOSITORIES_TAR_FILE));
 		
 		for (int i = 2; i < DIRECTORIES.length; i++) {
 			Repository repo = new Repository(DIRECTORIES[i], ANT_COMMAND);
@@ -387,12 +390,110 @@ public class RepositoryTests {
 			assertEquals("result mismatched on " + DIRECTORIES[i], EXPECTED_HGRAPHS_PARTIAL[i], actualHGraph);
 		}
 		
-		assertTrue(deleteSampleRepositores());
+		assertTrue(deleteDirectory(SAMPLE_REPOSITORIES));
+	}
+	
+	/** in proj **/
+	private static final Repository REPOSITORY_PROJ = new Repository(PROJ, ANT_COMMAND);
+	
+	private static final String COMMIT_1 = "3c9428d";
+	private static final String COMMIT_2 = "6f43f00";
+	private static final String COMMIT_3 = "265b7eb";
+	private static final String COMMIT_4 = "5bf3cd0";
+	
+	private static final DiffFile DIFF_FILE_BUILD = new DiffFile(DiffType.ADDED, "build.xml");
+	private static final DiffFile DIFF_FILE_MAIN = new DiffFile(DiffType.MODIFIED, "src/proj/Main.java");
+	private static final DiffFile DIFF_FILE_TEST = new DiffFile(DiffType.MODIFIED, "src/proj/tests/Main2Test.java");
+	
+	private static final List<DiffFile> DIFF_FILES_2 = new ArrayList<DiffFile>();
+	static {
+		DIFF_FILES_2.add(DIFF_FILE_BUILD);
+		DIFF_FILES_2.add(DIFF_FILE_MAIN);
+	}
+	private static final List<DiffFile> DIFF_FILES_3 = new ArrayList<DiffFile>();
+	static {
+		DIFF_FILES_3.add(DIFF_FILE_MAIN);
+	}
+	private static final List<DiffFile> DIFF_FILES_4 = new ArrayList<DiffFile>();
+	static {
+		DIFF_FILES_4.add(DIFF_FILE_TEST);
+	}
+	
+	private static final Set<String> ALL_TESTS = new HashSet<String>();
+	static {
+		ALL_TESTS.add("proj.tests.Main1Test");
+		ALL_TESTS.add("proj.tests.Main2Test");
+		ALL_TESTS.add("proj.tests.Main3Test");
+	}
+	
+	private static final Set<String> FAILED_TESTS_3 = new HashSet<String>();
+	static {
+		FAILED_TESTS_3.add("proj.tests.Main3Test");
+	}
+	
+	private static final Set<String> FAILED_TESTS_4 = new HashSet<String>();
+	static {
+		FAILED_TESTS_4.add("proj.tests.Main2Test");
+		FAILED_TESTS_4.add("proj.tests.Main3Test");
+	}
+	
+	private static final TestResult TEST_RESULT_3 = new TestResult(COMMIT_3, ALL_TESTS, FAILED_TESTS_3);
+	private static final TestResult TEST_RESULT_4 = new TestResult(COMMIT_4, ALL_TESTS, FAILED_TESTS_4);
+	
+	/** revision 1 in proj **/
+	private static final Map<Revision, List<DiffFile>> PARENT_DIFF_FILES_1 = new HashMap<Revision, List<DiffFile>>();
+	private static final Revision REVISION_1 = new Revision(REPOSITORY_PROJ, COMMIT_1, PARENT_DIFF_FILES_1, 
+			COMPILABLE.NO_BUILD_FILE, null);
+	
+	/** revision 2 in proj **/
+	private static final Map<Revision, List<DiffFile>> PARENT_DIFF_FILES_2 = new HashMap<Revision, List<DiffFile>>();
+	static {
+		PARENT_DIFF_FILES_2.put(REVISION_1, DIFF_FILES_2);
+	}
+	private static final Revision REVISION_2 = new Revision(REPOSITORY_PROJ, COMMIT_2, PARENT_DIFF_FILES_2, 
+			COMPILABLE.NO, null);
+	
+	/** revision 3 in proj **/
+	private static final Map<Revision, List<DiffFile>> PARENT_DIFF_FILES_3 = new HashMap<Revision, List<DiffFile>>();
+	static {
+		PARENT_DIFF_FILES_3.put(REVISION_2, DIFF_FILES_3);
+	}
+	private static final Revision REVISION_3 = new Revision(REPOSITORY_PROJ, COMMIT_3, PARENT_DIFF_FILES_3, 
+			COMPILABLE.YES, TEST_RESULT_3);
+	
+	/** revision 4 in proj **/
+	private static final Map<Revision, List<DiffFile>> PARENT_DIFF_FILES_4 = new HashMap<Revision, List<DiffFile>>();
+	static {
+		PARENT_DIFF_FILES_4.put(REVISION_3, DIFF_FILES_4);
+	}
+	private static final Revision REVISION_4 = new Revision(REPOSITORY_PROJ, COMMIT_4, PARENT_DIFF_FILES_4, 
+			COMPILABLE.YES, TEST_RESULT_4);
+	
+	/** hGraph of proj **/
+	private static final HistoryGraph EXPECTED_HGRAPH_PROJ = new HistoryGraph(REPOSITORY_PROJ);
+	static {
+		EXPECTED_HGRAPH_PROJ.addRevision(REVISION_1);
+		EXPECTED_HGRAPH_PROJ.addRevision(REVISION_2);
+		EXPECTED_HGRAPH_PROJ.addRevision(REVISION_3);
+		EXPECTED_HGRAPH_PROJ.addRevision(REVISION_4);
 	}
 	
 	@Test
 	public void testRun() {
-		// TODO
+		assertTrue(untar(PROJ_TAR_FILE));
+		
+		HistoryGraph actualHGraph = null;
+		try {
+			actualHGraph = REPOSITORY_PROJ.buildHistoryGraph(COMMIT_4, COMMIT_1);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("Exception thrown in buildHistoryGraph");
+		}
+		
+		assertNotNull("constructor returns null on " + PROJ, actualHGraph);
+		assertEquals("result mismatched on " + PROJ, EXPECTED_HGRAPH_PROJ, actualHGraph);
+		
+		assertTrue(deleteDirectory(PROJ));
 	}
 	
 	private static void buildHistoryGraph(HistoryGraph hGraph, Set<Revision> revisions) {
@@ -401,9 +502,9 @@ public class RepositoryTests {
 		}
 	}
 
-	private static boolean untarSampleRepositories() {
+	private static boolean untar(String tarFile) {
 		try {
-			Util.untar(TAR_FILE, DEST_DIR);
+			Util.untar(tarFile, DEST_DIR);
 			return true;
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -414,8 +515,8 @@ public class RepositoryTests {
 		return false;
 	}
 	
-	private static boolean deleteSampleRepositores() {
-		File target = new File(SAMPLE_REPOSITORIES);
+	private static boolean deleteDirectory(String dir) {
+		File target = new File(dir);
 		try {
 			FileUtils.deleteDirectory(target);
 			return true;

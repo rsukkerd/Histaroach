@@ -3,6 +3,7 @@ package common;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,9 +26,14 @@ import voldemort.VoldemortTestResult;
  * structure representing the revision history of the repository. 
  * Repository is immutable.
  */
-public class Repository {
+public class Repository implements Serializable {
 
-    public static final String[] LOG_COMMAND = { "git", "log",
+    /**
+	 * serial version ID
+	 */
+	private static final long serialVersionUID = -3260488434936650283L;
+	
+	public static final String[] LOG_COMMAND = { "git", "log",
             "--pretty=format:%h %p" };
     public static final String BUILD_COMMAND = "build";
     public static final String BUILDTEST_COMMAND = "buildtest";
@@ -304,7 +310,7 @@ public class Repository {
         List<DiffFile> diffFiles = new ArrayList<DiffFile>();
 
         Process p = Util.runProcess(new String[] { "git", "diff",
-                "--name-status", childCommitID, parentCommitID }, directory);
+                "--name-status", parentCommitID, childCommitID }, directory);
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(
                 p.getInputStream()));
