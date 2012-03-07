@@ -122,13 +122,15 @@ public class Revision implements Serializable {
         }
 
         Revision revision = (Revision) other;
-
-        return repository.equals(revision.repository)
-                && commitID.equals(revision.commitID)
-                && parentToDiffFiles.equals(revision.parentToDiffFiles)
-                && compilable == revision.compilable
-                && ((testResult == null && revision.testResult == null) 
-                		|| (testResult != null && testResult.equals(revision.testResult)));
+        
+        boolean boolRepo = repository.equals(revision.repository);
+        boolean boolCommitID = commitID.equals(revision.commitID);
+        boolean boolParentToDiffFiles = parentToDiffFiles.equals(revision.parentToDiffFiles);
+        boolean boolCompilable = compilable == revision.compilable;
+        boolean boolTestResult = (testResult == null && revision.testResult == null) 
+        						|| (testResult != null && testResult.equals(revision.testResult));
+        
+        return boolRepo && boolCommitID && boolParentToDiffFiles && boolCompilable && boolTestResult;
     }
 
     @Override
@@ -158,7 +160,7 @@ public class Revision implements Serializable {
         }
                 
         for (Revision parent : parentToDiffFiles.keySet()) {
-        	result += "parent : " + parent.getCommitID() + "\n";
+        	result += "parent : " + parent.commitID + "\n";
         	result += "diff files :\n";
         	
         	List<DiffFile> diffFiles = parentToDiffFiles.get(parent);

@@ -1,6 +1,7 @@
 package voldemort;
 
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,10 +15,10 @@ public class VoldemortTestResult extends TestResult {
 	private static final long serialVersionUID = 5271469198946606556L;
 
 	/**
-     * parse junit test results from a cached content of 
-     * standard output and standard error streams
+     * Create a VoldemortTestResult instance. 
      * 
-     * @return TestResult instance of a given commit
+     * Parse junit test results from a cached content of 
+     * standard output and error stream.
      */
     public VoldemortTestResult(String commitID, List<String> outputStreamContent, List<String> errorStreamContent) {
         super(commitID);
@@ -38,5 +39,14 @@ public class VoldemortTestResult extends TestResult {
                 this.addFailedTest(failedTestMatcher.group(1));
             }
     	}
+    }
+    
+    /**
+     * Create a VoldemortTestResult instance. 
+     * 
+     * Use junit test results from given sets of all tests and failed tests.
+     */
+    public VoldemortTestResult(String commitID, Set<String> allTests, Set<String> failedTests) {
+    	super(commitID, allTests, failedTests);
     }
 }

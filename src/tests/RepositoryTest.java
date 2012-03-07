@@ -18,6 +18,8 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
+import voldemort.VoldemortTestResult;
+
 import common.DiffFile;
 import common.DiffFile.DiffType;
 import common.HistoryGraph;
@@ -32,8 +34,8 @@ public class RepositoryTest {
 
 	private static final String SAMPLE_REPOSITORIES = "test/sample_repositories";
 	private static final String SAMPLE_REPOSITORIES_TAR_FILE = "test/sample_repositories.tar";
-	private static final String PROJ = "test/proj";
-	private static final String PROJ_TAR_FILE = "test/proj.tar";
+	private static final String PROJ = "test/project";
+	private static final String PROJ_TAR_FILE = "test/project.tar";
 	private static final String DEST_DIR = "test";
 	
 	private static final String[] DIRECTORIES = {"test/sample_repositories/repo1", 
@@ -396,10 +398,10 @@ public class RepositoryTest {
 	/** in proj **/
 	private static final Repository REPOSITORY_PROJ = new Repository(PROJ, ANT_COMMAND);
 	
-	private static final String COMMIT_1 = "3c9428d";
-	private static final String COMMIT_2 = "6f43f00";
-	private static final String COMMIT_3 = "265b7eb";
-	private static final String COMMIT_4 = "5bf3cd0";
+	private static final String COMMIT_1 = "8a75644";
+	private static final String COMMIT_2 = "57451b4";
+	private static final String COMMIT_3 = "5ee21b8";
+	private static final String COMMIT_4 = "bbd79d7";
 	
 	private static final DiffFile DIFF_FILE_BUILD = new DiffFile(DiffType.ADDED, "build.xml");
 	private static final DiffFile DIFF_FILE_MAIN = new DiffFile(DiffType.MODIFIED, "src/proj/Main.java");
@@ -437,8 +439,8 @@ public class RepositoryTest {
 		FAILED_TESTS_4.add("proj.tests.Main3Test");
 	}
 	
-	private static final TestResult TEST_RESULT_3 = new TestResult(COMMIT_3, ALL_TESTS, FAILED_TESTS_3);
-	private static final TestResult TEST_RESULT_4 = new TestResult(COMMIT_4, ALL_TESTS, FAILED_TESTS_4);
+	private static final TestResult TEST_RESULT_3 = new VoldemortTestResult(COMMIT_3, ALL_TESTS, FAILED_TESTS_3);
+	private static final TestResult TEST_RESULT_4 = new VoldemortTestResult(COMMIT_4, ALL_TESTS, FAILED_TESTS_4);
 	
 	/** revision 1 in proj **/
 	private static final Map<Revision, List<DiffFile>> PARENT_DIFF_FILES_1 = new HashMap<Revision, List<DiffFile>>();
@@ -476,6 +478,14 @@ public class RepositoryTest {
 		EXPECTED_HGRAPH_PROJ.addRevision(REVISION_2);
 		EXPECTED_HGRAPH_PROJ.addRevision(REVISION_3);
 		EXPECTED_HGRAPH_PROJ.addRevision(REVISION_4);
+	}
+	
+	private static final Set<Revision> PROJ_REVISIONS = new HashSet<Revision>();
+	static {
+		PROJ_REVISIONS.add(REVISION_1);
+		PROJ_REVISIONS.add(REVISION_2);
+		PROJ_REVISIONS.add(REVISION_3);
+		PROJ_REVISIONS.add(REVISION_4);
 	}
 	
 	@Test
