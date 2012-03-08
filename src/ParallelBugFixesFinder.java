@@ -8,10 +8,13 @@ import plume.Option;
 import plume.OptionGroup;
 import plume.Options;
 
+import voldemort.VoldemortTestParsingStrategy;
+
 import common.BugFix;
 import common.HistoryGraph;
 import common.ParallelBugFixes;
 import common.Repository;
+import common.TestParsingStrategy;
 
 public class ParallelBugFixesFinder {
     /**
@@ -57,6 +60,13 @@ public class ParallelBugFixesFinder {
     @Option(value = "-r Full path to the repository directory.",
             aliases = { "-repodir" })
     public static String repositoryDirName = null;
+    
+    /**
+     * Project name
+     */
+    @Option(value = "-p Project name (Required)",
+    		aliases = { "-projectName" })
+    public static String projectName = null;
 
     /** One line synopsis of usage */
     public static final String usage_string = "ParallelBugFixesFinder [options]";
@@ -71,6 +81,12 @@ public class ParallelBugFixesFinder {
             return;
         }
 
+        if (startCommitID == null || endCommitID == null || repositoryDirName == null 
+        		|| projectName == null) {
+            plumeOptions.print_usage();
+            return;
+        }
+        
         Set<ParallelBugFixes> allParallelBugFixes = findAllParallelBugFixes();
     }
     
@@ -79,9 +95,16 @@ public class ParallelBugFixesFinder {
      * @throws IOException
      */
     public static Set<ParallelBugFixes> findAllParallelBugFixes() throws IOException {
+    	TestParsingStrategy strategy = null;
+        if (projectName.equals(TestIsolationDataGenerator.VOLDEMORT_PROJECT_NAME)) {
+        	strategy = new VoldemortTestParsingStrategy();
+        }
+        
+        assert strategy != null;
+        
     	Set<ParallelBugFixes> allParallelFixing = new HashSet<ParallelBugFixes>();
         
-        Repository repository = new Repository(repositoryDirName, antCommand);
+        Repository repository = new Repository(repositoryDirName, antCommand, strategy);
         HistoryGraph historyGraph = repository.buildHistoryGraph(startCommitID, endCommitID);
         Map<String, List<BugFix>> allBugFixes = historyGraph.getAllBugFixes();
         

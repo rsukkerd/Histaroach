@@ -1,13 +1,13 @@
 package common;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
  * TestResult represents junit test results of a particular revision.
  * TestResult has a commit id and contains 2 sets of tests: 
- * a set of all tests and a set of failed tests.
+ * a set of all tests and a set of failed tests. 
+ * TestResult is immutable.
  */
 public class TestResult implements Serializable {
 	/**
@@ -20,16 +20,7 @@ public class TestResult implements Serializable {
     private /*@Non-Null*/ Set<String> failedTests;
 
     /**
-     * create an empty TestResult
-     * @param commitID
-     */
-    public TestResult(String commitID) {
-    	this.commitID = commitID;
-        allTests = new HashSet<String>();
-        failedTests = new HashSet<String>();
-    }
-
-    /**
+     * Create a TestResult instance
      * precondition : allTests and failedTests are Non-Null
      */
     public TestResult(String commitID, /*@Non-Null*/ Set<String> allTests, /*@Non-Null*/ Set<String> failedTests) {
@@ -45,20 +36,6 @@ public class TestResult implements Serializable {
         return commitID;
     }
     
-    /**
-     * add a test
-     */
-    public void addTest(String test) {
-    	allTests.add(test);
-	}
-
-    /**
-     * add a failed test
-     */
-	public void addFailedTest(String failedTest) {
-		failedTests.add(failedTest);
-    }
-
     /**
      * @return a set of all tests
      */

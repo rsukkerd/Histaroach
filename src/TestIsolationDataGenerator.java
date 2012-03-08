@@ -4,11 +4,14 @@ import java.io.IOException;
 import common.HistoryGraph;
 import common.Repository;
 import common.Revision;
+import common.TestParsingStrategy;
 import common.Util;
 
 import plume.Option;
 import plume.OptionGroup;
 import plume.Options;
+
+import voldemort.VoldemortTestParsingStrategy;
 
 /**
  * TestIsolationDataGenerator builds a HistoryGraph from voldemort repository
@@ -23,7 +26,9 @@ public class TestIsolationDataGenerator {
 
     // Extension of human-readable files.
     public static final String HUMAN_READ_EXTENSION = ".log";
-
+    
+    public static final String VOLDEMORT_PROJECT_NAME = "voldemort";
+    
     /**
      * Print the short usage message.
      */
@@ -40,16 +45,14 @@ public class TestIsolationDataGenerator {
     /**
      * The commit ID from which to begin the HistoryGraph analysis.
      */
-    @Option(
-            value = "-s Starting commit ID for HistoryGraph analysis (Required)",
+    @Option(value = "-s Starting commit ID for HistoryGraph analysis (Required)",
             aliases = { "-startCommitID" })
     public static String startCommitID = null;
     
     /**
      * The commit ID where the HistoryGraph analysis should terminate.
      */
-    @Option(
-            value = "-e Ending commit ID for HistoryGraph analysis (Required)",
+    @Option(value = "-e Ending commit ID for HistoryGraph analysis (Required)",
             aliases = { "-endCommitID" })
     public static String endCommitID = null;
 
@@ -67,6 +70,13 @@ public class TestIsolationDataGenerator {
     @Option(value = "-o Full path to the output directory (Required)",
             aliases = { "-outputDir" })
     public static String outputDirName = null;
+    
+    /**
+     * Project name
+     */
+    @Option(value = "-p Project name (Required)",
+    		aliases = { "-projectName" })
+    public static String projectName = null;
 
     /** One line synopsis of usage */
     public static final String usage_string = "TestIsolationDataGenerator [options]";
@@ -92,12 +102,19 @@ public class TestIsolationDataGenerator {
         }
 
         if (startCommitID == null || endCommitID == null || repositoryDirName == null 
-        		|| outputDirName == null) {
+        		|| outputDirName == null || projectName == null) {
             plumeOptions.print_usage();
             return;
         }
+        
+        TestParsingStrategy strategy = null;
+        if (projectName.equals(VOLDEMORT_PROJECT_NAME)) {
+        	strategy = new VoldemortTestParsingStrategy();
+        }
+        
+        assert strategy != null;
 
-        Repository repository = new Repository(repositoryDirName, antCommand);
+        Repository repository = new Repository(repositoryDirName, antCommand, strategy);
         HistoryGraph historyGraph = repository.buildHistoryGraph(startCommitID, endCommitID);
         
         exportTestResults(historyGraph);

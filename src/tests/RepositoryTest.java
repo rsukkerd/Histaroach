@@ -18,13 +18,14 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
-import voldemort.VoldemortTestResult;
+import voldemort.VoldemortTestParsingStrategy;
 
 import common.DiffFile;
 import common.DiffFile.DiffType;
 import common.HistoryGraph;
 import common.Repository;
 import common.Revision;
+import common.TestParsingStrategy;
 import common.Revision.COMPILABLE;
 import common.TestResult;
 import common.Util;
@@ -43,12 +44,14 @@ public class RepositoryTest {
     											"test/sample_repositories/repo3",
     											"test/sample_repositories/repo4",
     											"test/sample_repositories/repo5"};
-        
-    private static final Repository REPOSITORY_1 = new Repository(DIRECTORIES[0], ANT_COMMAND);
-    private static final Repository REPOSITORY_2 = new Repository(DIRECTORIES[1], ANT_COMMAND);
-    private static final Repository REPOSITORY_3 = new Repository(DIRECTORIES[2], ANT_COMMAND);
-    private static final Repository REPOSITORY_4 = new Repository(DIRECTORIES[3], ANT_COMMAND);
-    private static final Repository REPOSITORY_5 = new Repository(DIRECTORIES[4], ANT_COMMAND);
+    
+	private static final TestParsingStrategy STRATEGY = new VoldemortTestParsingStrategy();
+	
+    private static final Repository REPOSITORY_1 = new Repository(DIRECTORIES[0], ANT_COMMAND, STRATEGY);
+    private static final Repository REPOSITORY_2 = new Repository(DIRECTORIES[1], ANT_COMMAND, STRATEGY);
+    private static final Repository REPOSITORY_3 = new Repository(DIRECTORIES[2], ANT_COMMAND, STRATEGY);
+    private static final Repository REPOSITORY_4 = new Repository(DIRECTORIES[3], ANT_COMMAND, STRATEGY);
+    private static final Repository REPOSITORY_5 = new Repository(DIRECTORIES[4], ANT_COMMAND, STRATEGY);
     
 	private static final List<DiffFile> DIFF_FILES = new ArrayList<DiffFile>();
 	static {
@@ -356,7 +359,7 @@ public class RepositoryTest {
 		assertTrue(untar(SAMPLE_REPOSITORIES_TAR_FILE));
 		
 		for (int i = 0; i < DIRECTORIES.length; i++) {
-			Repository repo = new Repository(DIRECTORIES[i], ANT_COMMAND);
+			Repository repo = new Repository(DIRECTORIES[i], ANT_COMMAND, STRATEGY);
 	
 			HistoryGraph actualHGraph = null;
 			try {
@@ -378,7 +381,7 @@ public class RepositoryTest {
 		assertTrue(untar(SAMPLE_REPOSITORIES_TAR_FILE));
 		
 		for (int i = 2; i < DIRECTORIES.length; i++) {
-			Repository repo = new Repository(DIRECTORIES[i], ANT_COMMAND);
+			Repository repo = new Repository(DIRECTORIES[i], ANT_COMMAND, STRATEGY);
 	
 			HistoryGraph actualHGraph = null;
 			try {
@@ -396,7 +399,7 @@ public class RepositoryTest {
 	}
 	
 	/** in proj **/
-	private static final Repository REPOSITORY_PROJ = new Repository(PROJ, ANT_COMMAND);
+	private static final Repository REPOSITORY_PROJ = new Repository(PROJ, ANT_COMMAND, STRATEGY);
 	
 	private static final String COMMIT_1 = "8a75644";
 	private static final String COMMIT_2 = "57451b4";
@@ -439,8 +442,8 @@ public class RepositoryTest {
 		FAILED_TESTS_4.add("proj.tests.Main3Test");
 	}
 	
-	private static final TestResult TEST_RESULT_3 = new VoldemortTestResult(COMMIT_3, ALL_TESTS, FAILED_TESTS_3);
-	private static final TestResult TEST_RESULT_4 = new VoldemortTestResult(COMMIT_4, ALL_TESTS, FAILED_TESTS_4);
+	private static final TestResult TEST_RESULT_3 = new TestResult(COMMIT_3, ALL_TESTS, FAILED_TESTS_3);
+	private static final TestResult TEST_RESULT_4 = new TestResult(COMMIT_4, ALL_TESTS, FAILED_TESTS_4);
 	
 	/** revision 1 in proj **/
 	private static final Map<Revision, List<DiffFile>> PARENT_DIFF_FILES_1 = new HashMap<Revision, List<DiffFile>>();

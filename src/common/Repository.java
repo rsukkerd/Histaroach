@@ -17,8 +17,6 @@ import java.util.regex.Pattern;
 import common.DiffFile.DiffType;
 import common.Revision.COMPILABLE;
 
-import voldemort.VoldemortTestResult;
-
 /**
  * Repository represents a git repository. Repository has access to the 
  * directory associated with it. Repository contains methods to check out 
@@ -41,6 +39,7 @@ public class Repository implements Serializable {
     public static final String JUNIT_TEST_COMMAND = "junit-test -Dtest.name=";
 
     private final File directory;
+    private final TestParsingStrategy strategy;
 
     protected final String[] antBuild;
     protected final String[] antBuildtest;
@@ -54,8 +53,9 @@ public class Repository implements Serializable {
      * @param antCommand
      *            : ant command
      */
-    public Repository(String pathname, String antCommand) {
+    public Repository(String pathname, String antCommand, TestParsingStrategy strategy) {
         directory = new File(pathname);
+        this.strategy = strategy;
 
         String[] ant = antCommand.split(" ");
         antJunit = new String[ant.length + 1];
@@ -192,6 +192,9 @@ public class Repository implements Serializable {
         	Revision revision = new Revision(this, commitID, parentToDiffFiles);
         	hGraph.addRevision(revision);
         	
+        	/* print progress to standard out */
+        	System.out.println(revision);
+        	
         	revisions.put(commitID, revision);
         	
         	List<String> childrenIDs = parentIDToChildrenIDs.get(commitID);
@@ -256,16 +259,14 @@ public class Repository implements Serializable {
         BufferedReader stdErrorReader = new BufferedReader(
                 new InputStreamReader(process.getErrorStream()));
 
-        List<String> outputStreamContent = Util
-                .getStreamContent(stdOutputReader);
+        List<String> outputStreamContent = Util.getStreamContent(stdOutputReader);
         List<String> errorStreamContent = Util.getStreamContent(stdErrorReader);
 
         COMPILABLE compilable = buildSuccessful(outputStreamContent, errorStreamContent);
         TestResult testResult = null;
         
         if (compilable == COMPILABLE.YES) {
-            testResult = new VoldemortTestResult(commitID, outputStreamContent,
-                    errorStreamContent);            
+            testResult = strategy.getTestResult(commitID, outputStreamContent, errorStreamContent);
         }
 
         return new Pair<COMPILABLE, TestResult>(compilable, testResult);

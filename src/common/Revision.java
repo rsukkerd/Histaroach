@@ -8,7 +8,8 @@ import java.util.Set;
 /**
  * Revision represents a state of a particular commit. Revision has access to
  * its repository, commit ID, a set of its parents and their corresponding diff
- * files, compilable state, and test result. Revision is immutable.
+ * files, compilable state, and test result. 
+ * Revision is immutable.
  */
 public class Revision implements Serializable {
     /**

@@ -1,7 +1,14 @@
 package common;
 
-public class Pair<T, S> {
-    private final T first;
+import java.io.Serializable;
+
+public class Pair<T, S> implements Serializable {
+    /**
+	 * serial version id
+	 */
+	private static final long serialVersionUID = -3696904408956964528L;
+	
+	private final T first;
     private final S second;
     
     public Pair(T first, S second) {
