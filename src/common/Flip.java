@@ -4,9 +4,11 @@ import java.util.List;
 
 /**
  * Flip represents a pair of child-parent revisions that contain 
- * some tests which one revision passes and the other revision fails.
+ * some tests which one revision passes and the other revision fails. 
+ * Flip class implements Comparable interface: a flip that has fewer 
+ * diff files is less a flip that has more diff files.
  */
-public class Flip {
+public class Flip implements Comparable<Flip> {
 	public enum FlipType {
 		TO_PASS,
 		TO_FAIL
@@ -14,6 +16,7 @@ public class Flip {
 
 	private final Revision child;
 	private final Revision parent;
+	private final List<DiffFile> diffFiles;
 	// list of tests that flip from fail to pass
 	private final List<String> toPassTests;
 	// list of tests that flip from pass to fail
@@ -23,6 +26,7 @@ public class Flip {
 			List<String> toFailTests) {
 		this.child = child;
 		this.parent = parent;
+		diffFiles = child.getDiffFiles(parent);
 		this.toPassTests = toPassTests;
 		this.toFailTests = toFailTests;
 	}
@@ -36,7 +40,7 @@ public class Flip {
 	}
 
 	public List<DiffFile> getDiffFiles() {
-		return child.getDiffFiles(parent);
+		return diffFiles;
 	}
 	
 	public List<String> getToPassTests() {
@@ -81,5 +85,10 @@ public class Flip {
 		}
 		
 		return str;
+	}
+
+	@Override
+	public int compareTo(Flip other) {
+		return diffFiles.size() - other.diffFiles.size();
 	}
 }
