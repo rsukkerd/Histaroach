@@ -27,6 +27,7 @@ public class Util {
         ProcessBuilder pBuilder = new ProcessBuilder(commands);
         pBuilder.directory(processDir);
         Process p = null;
+        
         try {
             p = pBuilder.start();
 
@@ -35,11 +36,13 @@ public class Util {
                 p.waitFor();
             } catch (InterruptedException e) {
                 e.printStackTrace();
+                System.exit(1);
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
         }
+        
         return p;
     }
     

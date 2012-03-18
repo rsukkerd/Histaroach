@@ -10,23 +10,27 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 
+import voldemort.VoldemortTestParsingStrategy;
+
 import common.DiffFile.DiffType;
 import common.Revision.COMPILABLE;
 
 /**
  * MixedRevision represents a hypothetical revision. MixedRevision maintains 
- * a base revision, this revision is not to be modified. MixedRevision has 
- * methods to mix in a file from other revision to the base revision, 
- * mix out a file, compile and run tests on it. These methods determine the 
- * compilability and test result of this MixedRevision.
+ * a base revision. MixedRevision has methods to revert a subset of files in 
+ * the base revision to their former states in other revision, compile and 
+ * run tests on the partially reverted base revision. These methods determine 
+ * the compilability and test result of this MixedRevision.
  */
-public class MixedRevision {
-    private static final File BASE_TMP_DIR = new File("tmpBase");
-    private static final File OTHER_TMP_DIR = new File("tmpOther");
+public class MixedRevision {    
+    private static final String ANT_COMMAND = "ant";
+    private static final TestParsingStrategy STRATEGY = new VoldemortTestParsingStrategy();
 
     private final Revision baseRevision;
     private final Repository repository;
+    private final Repository clonedRepository;
     private final File repoDir;
+    private final File clonedRepoDir;
     
     private COMPILABLE compilable;
     private TestResult testResult;
@@ -35,13 +39,14 @@ public class MixedRevision {
 
     /**
      * Create a MixedRevision
-     * 
-     * @param baseRevision
      */
-    public MixedRevision(Revision baseRevision) {
+    public MixedRevision(Revision baseRevision, String clonedRepoPath) {
         this.baseRevision = baseRevision;
         repository = baseRevision.getRepository();
         repoDir = repository.getDirectory();
+        
+        clonedRepository = new Repository(clonedRepoPath, ANT_COMMAND, STRATEGY);
+        clonedRepoDir = clonedRepository.getDirectory();
         
         compilable = COMPILABLE.UNKNOWN;
         testResult = null;
@@ -49,62 +54,41 @@ public class MixedRevision {
         mixedOutFiles = new ArrayList<DiffFile>();
         
         int exitValue = repository.checkoutCommit(baseRevision.getCommitID());
-        assert (exitValue == 0);
+        assert exitValue == 0;
     }
-
+    
     /**
-     * Mix in a file from other revision into the base revision. 
+     * Revert files in the base revision to their former states 
+     * in other revision
      * 
-     * @requires diffFile.type == MODIFIED or DELETED
-     * @modifies this, file system
+     * @modifies this, files in the base revision.
      * @throws IOException
      */
-    public void mixIn(DiffFile diffFile, Revision otherRevision)
-            throws IOException {
-    	String filename = diffFile.getFileName();
+    public void revertFiles(List<DiffFile> diffFiles, Revision otherRevision) throws IOException {
+    	int exitValue = clonedRepository.checkoutCommit(otherRevision.getCommitID());
+    	assert exitValue == 0;
     	
-        int exitValue = repository.checkoutCommit(otherRevision.getCommitID());
-        assert (exitValue == 0);
-
-        copyFile(filename, repoDir, OTHER_TMP_DIR);
-
-        exitValue = repository.checkoutCommit(baseRevision.getCommitID());
-        assert (exitValue == 0);
-
-        if (diffFile.getDiffType() == DiffType.MODIFIED) {
-        	// store original file in base temp directory
-        	copyFile(filename, repoDir, BASE_TMP_DIR);
-        }
-        
-        copyFile(filename, OTHER_TMP_DIR, repoDir);
-        deleteFile(filename, OTHER_TMP_DIR);
-        
-        mixedInFiles.put(diffFile, otherRevision);
+    	for (DiffFile diffFile : diffFiles) {
+    		String filename = diffFile.getFileName();
+    		DiffType type = diffFile.getDiffType();
+    		
+    		if (type == DiffType.MODIFIED || type == DiffType.DELETED) {
+    			copyFile(filename, clonedRepoDir, repoDir);
+    			mixedInFiles.put(diffFile, otherRevision);
+    		} else {
+    			deleteFile(filename, repoDir);
+    			mixedOutFiles.add(diffFile);
+    		}
+    	}
     }
-    
+
     /**
-     * Mix out a file from the base revision
+     * Export this MixedRevision
      * 
-     * @requires diffFile.type == ADDED
-     * @modifies this, file system
-     * @throws IOException 
-     */
-    public void mixOut(DiffFile diffFile) throws IOException {
-    	String filename = diffFile.getFileName();
-    	
-    	// store original file in base temp directory
-    	copyFile(filename, repoDir, BASE_TMP_DIR);
-    	
-    	deleteFile(filename, repoDir);
-    	
-    	mixedOutFiles.add(diffFile);
-    }
-    
-    /**
      * @return a deep copy of the current state of this MixedRevision
      */
     public MixedRevision export() {
-    	MixedRevision copy = new MixedRevision(baseRevision);
+    	MixedRevision copy = new MixedRevision(baseRevision, clonedRepoDir.getPath());
     	copy.compilable = compilable;
     	if (testResult == null) {
     		copy.testResult = null;
@@ -127,7 +111,7 @@ public class MixedRevision {
     }
     
     /**
-     * restore a file in the base revision to its original state
+     * Restore a file in the base revision to its original state
      * 
      * @modifies this, file system
      * @throws IOException
@@ -137,9 +121,10 @@ public class MixedRevision {
     	DiffType type = diffFile.getDiffType();
     	
     	if (type == DiffType.MODIFIED || type == DiffType.ADDED) {
-    		// restore original file from base temp directory
-    		copyFile(filename, BASE_TMP_DIR, repoDir);
-    		deleteFile(filename, BASE_TMP_DIR);
+    		Process restoreProcess = Util.runProcess(
+    				new String[] { "git", "checkout", filename }, repoDir);
+    		int exitValue = restoreProcess.exitValue();
+    		assert exitValue == 0;
     	} else {
     		deleteFile(filename, repoDir);
     	}
@@ -152,17 +137,23 @@ public class MixedRevision {
     }
     
     /**
-     * restore all files in the base revision to their original states
+     * Restore all files in the base revision to their original states
      * 
      * @modifies this, file system
      * @throws IOException
      */
-    public void restoreBaseRevsision() throws IOException {
+    public void restoreBaseRevision() throws IOException {
+    	List<DiffFile> mixedFiles = new ArrayList<DiffFile>();
+    	
     	for (DiffFile diffFile : mixedInFiles.keySet()) {
-    		restoreBaseRevision(diffFile);
+    		mixedFiles.add(diffFile);
     	}
     	
     	for (DiffFile diffFile : mixedOutFiles) {
+    		mixedFiles.add(diffFile);
+    	}
+    	
+    	for (DiffFile diffFile : mixedFiles) {
     		restoreBaseRevision(diffFile);
     	}
     }
@@ -182,21 +173,25 @@ public class MixedRevision {
     }
     
     /**
-     * @return all mixed in files and their corresponding revisions
+     * Get all new files in this MixedRevision
+     * 
+     * @return all new files and their corresponding source revisions
      */
-    public Map<DiffFile, Revision> getMixedInFiles() {
+    public Map<DiffFile, Revision> getNewFiles() {
     	return mixedInFiles;
     }
     
     /**
-     * @return all mixed out files
+     * Get all files that are removed from this MixedRevision
+     * 
+     * @return all removed files
      */
-    public List<DiffFile> getMixedOutFiles() {
+    public List<DiffFile> getRemovedFiles() {
     	return mixedOutFiles;
     }
 
     /**
-     * compile the mixed revision
+     * Compile this MixedRevision
      * 
      * @modifies this
      */
@@ -218,7 +213,7 @@ public class MixedRevision {
     }
 
     /**
-     * compile and run all tests on the mixed revision
+     * Compile and run all tests on this MixedRevision
      * 
      * @modifies this
      */
@@ -229,25 +224,28 @@ public class MixedRevision {
     }
 
     /**
-     * copy a file from source directory to destination directory
+     * Copy a file from source directory to destination directory 
      * 
      * @modifies file system
+     * @throws IOException
      */
-    public void copyFile(String filename, File srcDir, File destDir)
-            throws IOException {
-        File srcFile = new File(srcDir.getAbsolutePath() + File.separatorChar
+    public void copyFile(String filename, File srcDir, File destDir) throws IOException {
+        File srcFile = new File(srcDir.getAbsolutePath() + File.separatorChar 
                 + filename);
-        FileUtils.copyFileToDirectory(srcFile, destDir);
+        File destFile = new File(destDir.getAbsolutePath() + File.separatorChar 
+        		+ filename);
+        FileUtils.copyFile(srcFile, destFile);
     }
 
     /**
-     * delete a file from directory
+     * Delete a file from directory
      * 
      * @modifies file system
+     * @throws IOException 
      */
     public void deleteFile(String filename, File dir) throws IOException {
         File file = new File(dir.getAbsolutePath() + File.separatorChar
                 + filename);
-        FileUtils.forceDelete(file);
+		FileUtils.forceDelete(file);
     }
 }
