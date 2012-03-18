@@ -19,7 +19,7 @@ import voldemort.VoldemortTestParsingStrategy;
  */
 public class TestIsolationDataGenerator {
     // Prefix of files to which HistoryGraph instances are written.
-    public static final String FILE_PREFIX = "historyGraph";
+    public static final String HGRAPH_FILE_PREFIX = "historyGraph";
 
     // Extension of serialized files.
     public static final String SERIALIZED_EXTENSION = ".ser";
@@ -120,10 +120,8 @@ public class TestIsolationDataGenerator {
         exportTestResults(historyGraph);
 
         String fileName = "_" + startCommitID + "_" + endCommitID;
-
-        Util.writeToSerializedFile(outputDirName + File.separatorChar + FILE_PREFIX + fileName
-                + SERIALIZED_EXTENSION, historyGraph);
-        Util.writeToHumanReadableFile(outputDirName + File.separatorChar + FILE_PREFIX + fileName
+        
+        Util.writeToHumanReadableFile(outputDirName + File.separatorChar + HGRAPH_FILE_PREFIX + fileName
                 + HUMAN_READ_EXTENSION, historyGraph);
     }
 

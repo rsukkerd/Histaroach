@@ -1,6 +1,5 @@
 package common;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,15 +18,11 @@ import java.util.Set;
  * HistoryGraph maintain a set of revisions. It has methods to add 
  * revision and to iterate over its set of revisions.
  * 
- * HistoryGraph has a method to get a list of flips that are present 
+ * HistoryGraph has a method to get a set of flips that are present 
  * in its list of revisions.
  */
-public class HistoryGraph implements Iterable<Revision>, Serializable {
-    /**
-     * serial version ID
-     */
-    private static final long serialVersionUID = 7286435306324502773L;
-
+public class HistoryGraph implements Iterable<Revision> {
+	
     /** revisions' order according to 'git log' **/
     private final Set<Revision> revisions;
     private final Repository repository;
@@ -38,7 +33,7 @@ public class HistoryGraph implements Iterable<Revision>, Serializable {
     }
 
     /**
-     * add a revision to this history graph
+     * Add a revision to this HistoryGraph
      */
     public void addRevision(Revision revision) {
         revisions.add(revision);
@@ -49,8 +44,8 @@ public class HistoryGraph implements Iterable<Revision>, Serializable {
     }
 
     /**
-     * @return true iff revision_A and revision_B are parallel in this history
-     *         graph
+     * @return true if and only if revision_A and revision_B 
+     * are parallel in this HistoryGraph
      */
     public boolean parallel(Revision revision_A, Revision revision_B) {
         return !revision_A.equals(revision_B)
@@ -59,7 +54,7 @@ public class HistoryGraph implements Iterable<Revision>, Serializable {
     }
 
     /**
-     * @return true iff revision_A is an ancestor of revision_B
+     * @return true if and only if revision_A is an ancestor of revision_B
      */
     public boolean isAncestorOf(Revision revision_A, Revision revision_B) {
         return isAncestorOf(revision_A, revision_B, new HashSet<Revision>());
@@ -68,7 +63,7 @@ public class HistoryGraph implements Iterable<Revision>, Serializable {
     /**
      * Helper method
      * 
-     * @return true iff revision_A is an ancestor of revision_B
+     * @return true if and only if revision_A is an ancestor of revision_B
      */
     private boolean isAncestorOf(Revision revision_A, Revision revision_B,
             Set<Revision> visited) {
@@ -93,10 +88,10 @@ public class HistoryGraph implements Iterable<Revision>, Serializable {
     }
     
     /**
-     * @return a list of all flips in this historyGraph
+     * @return a set of all flips in this HistoryGraph
      */
-    public List<Flip> getAllFlips() {
-        List<Flip> flips = new ArrayList<Flip>();
+    public Set<Flip> getAllFlips() {
+        Set<Flip> flips = new HashSet<Flip>();
 
         for (Revision revision : revisions) {
             TestResult childResult = revision.getTestResult();
@@ -112,18 +107,18 @@ public class HistoryGraph implements Iterable<Revision>, Serializable {
                 
                 if (parentResult == null) { continue; }
                 
-                List<String> toPassTests = null;
-                List<String> toFailTests = null;
+                Set<String> toPassTests = null;
+                Set<String> toFailTests = null;
 
                 for (String test : allTests) {
                     if (childResult.pass(test) && parentResult.fail(test)) {
                         if (toPassTests == null) {
-                        	toPassTests = new ArrayList<String>();
+                        	toPassTests = new HashSet<String>();
                         }
                         toPassTests.add(test);
                     } else if (childResult.fail(test) && parentResult.pass(test)) {
                         if (toFailTests == null) {
-                        	toFailTests = new ArrayList<String>();
+                        	toFailTests = new HashSet<String>();
                         }
                         toFailTests.add(test);
                     }
@@ -131,9 +126,9 @@ public class HistoryGraph implements Iterable<Revision>, Serializable {
 
                 if (toPassTests != null || toFailTests != null) {
                 	if (toPassTests == null) {
-                		toPassTests = new ArrayList<String>();
+                		toPassTests = new HashSet<String>();
                 	} else if (toFailTests == null) {
-                		toFailTests = new ArrayList<String>();
+                		toFailTests = new HashSet<String>();
                 	}
                 	
 	                Flip flip = new Flip(revision, parent, toPassTests, toFailTests);

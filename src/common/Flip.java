@@ -1,6 +1,7 @@
 package common;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Flip represents a pair of child-parent revisions that contain 
@@ -17,13 +18,13 @@ public class Flip implements Comparable<Flip> {
 	private final Revision child;
 	private final Revision parent;
 	private final List<DiffFile> diffFiles;
-	// list of tests that flip from fail to pass
-	private final List<String> toPassTests;
-	// list of tests that flip from pass to fail
-	private final List<String> toFailTests;
+	// set of tests that flip from fail to pass
+	private final Set<String> toPassTests;
+	// set of tests that flip from pass to fail
+	private final Set<String> toFailTests;
 
-	public Flip(Revision child, Revision parent, List<String> toPassTests,
-			List<String> toFailTests) {
+	public Flip(Revision child, Revision parent, Set<String> toPassTests,
+			Set<String> toFailTests) {
 		this.child = child;
 		this.parent = parent;
 		diffFiles = child.getDiffFiles(parent);
@@ -43,11 +44,11 @@ public class Flip implements Comparable<Flip> {
 		return diffFiles;
 	}
 	
-	public List<String> getToPassTests() {
+	public Set<String> getToPassTests() {
 		return toPassTests;
 	}
 	
-	public List<String> getToFailTests() {
+	public Set<String> getToFailTests() {
 		return toFailTests;
 	}
 
@@ -74,14 +75,18 @@ public class Flip implements Comparable<Flip> {
 		String str = "child commit: " + child.getCommitID() + "\n"
 				+ "parent commit: " + parent.getCommitID() + "\n";
 		
-		str += "TO PASS:\n";
-		for (String test : toPassTests) {
-			str += test + "\n";
+		if (!toPassTests.isEmpty()) {
+			str += "TO PASS:\n";
+			for (String test : toPassTests) {
+				str += test + "\n";
+			}
 		}
 		
-		str += "TO FAIL:\n";
-		for (String test : toFailTests) {
-			str += test + "\n";
+		if (!toFailTests.isEmpty()) {
+			str += "TO FAIL:\n";
+			for (String test : toFailTests) {
+				str += test + "\n";
+			}
 		}
 		
 		return str;

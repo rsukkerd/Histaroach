@@ -1,16 +1,15 @@
-import java.util.List;
+import java.util.Set;
+
+import plume.Option;
+import plume.OptionGroup;
+import plume.Options;
+import voldemort.VoldemortTestParsingStrategy;
 
 import common.Flip;
 import common.HistoryGraph;
 import common.Repository;
 import common.TestParsingStrategy;
 import common.Util;
-
-import plume.Option;
-import plume.OptionGroup;
-import plume.Options;
-
-import voldemort.VoldemortTestParsingStrategy;
 
 public class TestIsolationDataReader {
 
@@ -74,7 +73,7 @@ public class TestIsolationDataReader {
         Repository repository = new Repository(serializedRevisionsDirName, antCommand, strategy);
         HistoryGraph hGraph = Util.reconstructHistoryGraph(repository);
         
-        List<Flip> flips = hGraph.getAllFlips();
+        Set<Flip> flips = hGraph.getAllFlips();
         for (Flip flip : flips) {
         	System.out.println(flip);
         }
