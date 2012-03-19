@@ -1,12 +1,12 @@
-import java.util.Set;
+import java.io.IOException;
 
 import plume.Option;
 import plume.OptionGroup;
 import plume.Options;
 import voldemort.VoldemortTestParsingStrategy;
 
-import common.Flip;
 import common.HistoryGraph;
+import common.MixingTool;
 import common.Repository;
 import common.TestParsingStrategy;
 import common.Util;
@@ -17,19 +17,29 @@ public class TestIsolationDataReader {
      * Print the short usage message.
      */
     @OptionGroup("General Options")
-    @Option(value = "-h Print short usage message", aliases = { "-help" })
+    @Option(value = "-h Print short usage message", 
+    		aliases = { "-help" })
     public static boolean showHelp = false;
 
     /**
      * Full path to the directory containing serialized revision files.
      */
-    @Option(value = "-z Directory containing serialized revision files (Required)", aliases = { "-serializedRevisionsDir" })
+    @Option(value = "-z Directory containing serialized revision files (Required)", 
+    		aliases = { "-serializedRevisionsDir" })
     public static String serializedRevisionsDirName = null;
+    
+    /**
+     * Full path to the cloned repository directory.
+     */
+    @Option(value = "-c Full path to the cloned repository directory (Required)",
+            aliases = { "-clonedRepoDir" })
+    public static String clonedRepoDirName = null;
     
     /**
      * The ant command used for running ant. By default this is just 'ant'.
      */
-    @Option(value = "-a ant command (Optional)", aliases = { "-antCommand" })
+    @Option(value = "-a ant command (Optional)", 
+    		aliases = { "-antCommand" })
     public static String antCommand = "ant";
     
     /**
@@ -47,8 +57,9 @@ public class TestIsolationDataReader {
 	 * serialized revision files from an input directory.
 	 * 
 	 * @param args : command line arguments.
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		Options plumeOptions = new Options(TestIsolationDataReader.usage_string, TestIsolationDataReader.class);
         plumeOptions.parse_or_usage(args);
 
@@ -58,7 +69,8 @@ public class TestIsolationDataReader {
             return;
         }
         
-        if (serializedRevisionsDirName == null || projectName == null) {
+        if (serializedRevisionsDirName == null || projectName == null 
+        		|| clonedRepoDirName == null) {
         	plumeOptions.print_usage();
         	return;
         }
@@ -71,11 +83,9 @@ public class TestIsolationDataReader {
         assert strategy != null;
         
         Repository repository = new Repository(serializedRevisionsDirName, antCommand, strategy);
-        HistoryGraph hGraph = Util.reconstructHistoryGraph(repository);
+        HistoryGraph historyGraph = Util.reconstructHistoryGraph(repository);
         
-        Set<Flip> flips = hGraph.getAllFlips();
-        for (Flip flip : flips) {
-        	System.out.println(flip);
-        }
+        MixingTool mixing = new MixingTool(historyGraph, clonedRepoDirName);
+        mixing.run();
 	}
 }

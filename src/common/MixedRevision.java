@@ -157,6 +157,13 @@ public class MixedRevision {
     		restoreBaseRevision(diffFile);
     	}
     }
+    
+    /**
+     * @return base revision of this MixedRevision
+     */
+    public Revision getBaseRevision() {
+    	return baseRevision;
+    }
 
     /**
      * @return compilability of the current state of this MixedRevision
@@ -247,5 +254,65 @@ public class MixedRevision {
         File file = new File(dir.getAbsolutePath() + File.separatorChar
                 + filename);
 		FileUtils.forceDelete(file);
+    }
+    
+    @Override
+	public boolean equals(Object other) {
+		if (other == null || !other.getClass().equals(this.getClass())) {
+			return false;
+		}
+
+		MixedRevision mr = (MixedRevision) other;
+
+		return baseRevision.equals(mr.baseRevision) && compilable == mr.compilable 
+				&& ((testResult == null && mr.testResult == null) || 
+						(testResult != null && testResult.equals(mr.testResult)))
+				&& mixedInFiles.equals(mr.mixedInFiles) && mixedOutFiles.equals(mr.mixedOutFiles);
+	}
+
+	@Override
+	public int hashCode() {
+		int hashCode = 11 * baseRevision.hashCode() + 13 * compilable.hashCode() 
+						+ 17 * mixedInFiles.hashCode() + 19 * mixedOutFiles.hashCode();
+		if (testResult != null) {
+			hashCode += 23 * testResult.hashCode();
+		}
+		
+		return hashCode;
+	}
+	
+	@Override
+    public String toString() {
+        String str = "base : " + baseRevision.getCommitID() + "\n";
+        str += "compilable : ";
+        
+        if (compilable == COMPILABLE.YES) {
+            str += "yes\n";
+            str += testResult.toString();
+        } else if (compilable == COMPILABLE.NO) {
+            str += "no\n";
+        } else if (compilable == COMPILABLE.UNKNOWN) {
+            str += "unknown\n";
+        } else {
+            str += "no build file\n";
+        }
+        
+        if (!mixedInFiles.isEmpty()) {
+        	str += "new files :\n";
+        	for (DiffFile diffFile : mixedInFiles.keySet()) {
+        		str += diffFile.toString() + " | ";
+        		Revision srcRev = mixedInFiles.get(diffFile);
+        		str += srcRev.getCommitID() + "\n";
+        	}
+        }
+        
+        if (!mixedOutFiles.isEmpty()) {
+        	str += "removed files :\n";
+        	for (DiffFile diffFile : mixedOutFiles) {
+        		str += diffFile.toString() + "\n";
+        	}
+        }
+
+        return str;
     }
 }
