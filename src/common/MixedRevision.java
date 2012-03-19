@@ -40,9 +40,10 @@ public class MixedRevision {
     /**
      * Create a MixedRevision
      */
-    public MixedRevision(Revision baseRevision, String clonedRepoPath) {
+    public MixedRevision(Revision baseRevision, String repoPath, String clonedRepoPath) {
         this.baseRevision = baseRevision;
-        repository = baseRevision.getRepository();
+        
+        repository = new Repository(repoPath, ANT_COMMAND, STRATEGY);        
         repoDir = repository.getDirectory();
         
         clonedRepository = new Repository(clonedRepoPath, ANT_COMMAND, STRATEGY);
@@ -88,7 +89,7 @@ public class MixedRevision {
      * @return a deep copy of the current state of this MixedRevision
      */
     public MixedRevision export() {
-    	MixedRevision copy = new MixedRevision(baseRevision, clonedRepoDir.getPath());
+    	MixedRevision copy = new MixedRevision(baseRevision, repoDir.getPath(), clonedRepoDir.getPath());
     	copy.compilable = compilable;
     	if (testResult == null) {
     		copy.testResult = null;

@@ -91,7 +91,7 @@ public class MixedRevisionTest {
 		assertTrue(untar(TAR_FILE));
 		assertTrue(untar(TAR_FILE_CLONE));
 		
-		MixedRevision mr = new MixedRevision(REVISION_2, PATHNAME_CLONE);
+		MixedRevision mr = new MixedRevision(REVISION_2, PATHNAME, PATHNAME_CLONE);
 		
 		try {
 			mr.revertFiles(DIFF_FILES, REVISION_1);
@@ -236,7 +236,7 @@ public class MixedRevisionTest {
 		assertTrue(untar(PRJ_TAR_FILE));
 		assertTrue(untar(PRJ_TAR_FILE_CLONE));
 		
-		MixedRevision mr = new MixedRevision(PRJ_REVISION_2, PRJ_PATHNAME_CLONE);
+		MixedRevision mr = new MixedRevision(PRJ_REVISION_2, PRJ_PATHNAME, PRJ_PATHNAME_CLONE);
 		
 		try {
 			mr.revertFiles(combination, PRJ_REVISION_1);

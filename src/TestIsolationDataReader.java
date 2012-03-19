@@ -29,6 +29,13 @@ public class TestIsolationDataReader {
     public static String serializedRevisionsDirName = null;
     
     /**
+     * Full path to the repository directory.
+     */
+    @Option(value = "-r Full path to the repository directory (Required)",
+            aliases = { "-repoDir" })
+    public static String repoDirName = null;
+    
+    /**
      * Full path to the cloned repository directory.
      */
     @Option(value = "-c Full path to the cloned repository directory (Required)",
@@ -70,7 +77,7 @@ public class TestIsolationDataReader {
         }
         
         if (serializedRevisionsDirName == null || projectName == null 
-        		|| clonedRepoDirName == null) {
+        		|| repoDirName == null || clonedRepoDirName == null) {
         	plumeOptions.print_usage();
         	return;
         }
@@ -85,7 +92,7 @@ public class TestIsolationDataReader {
         Repository repository = new Repository(serializedRevisionsDirName, antCommand, strategy);
         HistoryGraph historyGraph = Util.reconstructHistoryGraph(repository);
         
-        MixingTool mixing = new MixingTool(historyGraph, clonedRepoDirName);
+        MixingTool mixing = new MixingTool(historyGraph, repoDirName, clonedRepoDirName);
         mixing.run();
 	}
 }

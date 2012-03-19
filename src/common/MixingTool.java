@@ -10,10 +10,12 @@ import java.util.Set;
 import common.Revision.COMPILABLE;
 
 public class MixingTool {
+	
+	private final String repoPath;
 	private final String clonedRepoPath;
 	private final List<Flip> sortedToFailFlips;
 
-	public MixingTool(HistoryGraph historyGraph, String clonedRepoPath) {
+	public MixingTool(HistoryGraph historyGraph, String repoPath, String clonedRepoPath) {
 		Set<Flip> flips = historyGraph.getAllFlips();
 		sortedToFailFlips = new ArrayList<Flip>();
 		
@@ -24,6 +26,8 @@ public class MixingTool {
 		}
 		
 		Collections.sort(sortedToFailFlips);
+		
+		this.repoPath = repoPath;
 		this.clonedRepoPath = clonedRepoPath;			
 	}
 	
@@ -49,7 +53,7 @@ public class MixingTool {
 		Revision parent = flip.getParentRevision();
 		List<DiffFile> diffFiles = flip.getDiffFiles();
 		
-		MixedRevision mixedRevision = new MixedRevision(child, clonedRepoPath);
+		MixedRevision mixedRevision = new MixedRevision(child, repoPath, clonedRepoPath);
 		
 		for (int r = 1; r < diffFiles.size(); r++) {
 			CombinationGenerator generator = new CombinationGenerator(diffFiles.size(), r);
