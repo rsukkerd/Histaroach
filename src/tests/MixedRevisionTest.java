@@ -64,6 +64,11 @@ public class MixedRevisionTest {
 		DIFF_FILES.add(DIFF_FILE_3);
 	}
 	
+	private static final Set<DiffFile> COMBINATION = new HashSet<DiffFile>();
+	static {
+		COMBINATION.addAll(DIFF_FILES);
+	}
+	
 	private static final String COMMIT_1 = "a3e38d0";
 	private static final String COMMIT_2 = "1e7bdee";
 	
@@ -91,7 +96,7 @@ public class MixedRevisionTest {
 		assertTrue(untar(TAR_FILE_CLONE));
 		
 		MixedRevision mr = new MixedRevision(REVISION_2, PATHNAME, PATHNAME_CLONE);
-		mr.revertFiles(DIFF_FILES, REVISION_1);
+		mr.revertFiles(COMBINATION, REVISION_1);
 		
 		checkFile(FILE_1, FILE_1_REVISION_1);
 		assertTrue(FILENAME_2 + " does not exist", FILE_2.exists());
@@ -180,20 +185,20 @@ public class MixedRevisionTest {
 				COMPILABLE.YES, PRJ_TEST_RESULT_2);
 	
 	// not compilable
-	private static final List<DiffFile> COMBINATION_1 = new ArrayList<DiffFile>();
+	private static final Set<DiffFile> COMBINATION_1 = new HashSet<DiffFile>();
 	static {
 		COMBINATION_1.add(PRJ_DIFF_FILE_1);
 	}
 	
 	// compilable, but still fail test
-	private static final List<DiffFile> COMBINATION_2 = new ArrayList<DiffFile>();
+	private static final Set<DiffFile> COMBINATION_2 = new HashSet<DiffFile>();
 	static {
 		COMBINATION_2.add(PRJ_DIFF_FILE_1);
 		COMBINATION_2.add(PRJ_DIFF_FILE_2);
 	}
 	
 	// pass test
-	private static final List<DiffFile> COMBINATION_3 = new ArrayList<DiffFile>();
+	private static final Set<DiffFile> COMBINATION_3 = new HashSet<DiffFile>();
 	static {
 		COMBINATION_3.add(PRJ_DIFF_FILE_3);
 	}
@@ -213,7 +218,7 @@ public class MixedRevisionTest {
 		checkTestResult(COMBINATION_3, COMPILABLE.YES, COMBINATION_3_TEST_RESULT);
 	}
 	
-	public void checkTestResult(List<DiffFile> combination, COMPILABLE expectedCompilable, 
+	public void checkTestResult(Set<DiffFile> combination, COMPILABLE expectedCompilable, 
 			TestResult expectedTestResult) throws Exception {
 		assertTrue(untar(PRJ_TAR_FILE));
 		assertTrue(untar(PRJ_TAR_FILE_CLONE));

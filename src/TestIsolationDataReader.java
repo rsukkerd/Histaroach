@@ -1,5 +1,3 @@
-import java.io.IOException;
-
 import plume.Option;
 import plume.OptionGroup;
 import plume.Options;
@@ -64,9 +62,9 @@ public class TestIsolationDataReader {
 	 * serialized revision files from an input directory.
 	 * 
 	 * @param args : command line arguments.
-	 * @throws IOException 
+	 * @throws Exception 
 	 */
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws Exception {
 		Options plumeOptions = new Options(TestIsolationDataReader.usage_string, TestIsolationDataReader.class);
         plumeOptions.parse_or_usage(args);
 

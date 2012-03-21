@@ -1,15 +1,17 @@
 package common;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import common.Revision.COMPILABLE;
 
 public class MixingTool {
+	
+	private static final Logger LOGGER = Logger.getLogger(MixingTool.class.getName());
 	
 	private final String repoPath;
 	private final String clonedRepoPath;
@@ -31,11 +33,16 @@ public class MixingTool {
 		this.clonedRepoPath = clonedRepoPath;			
 	}
 	
-	public void run() throws IOException {
+	public void run() throws Exception {
+		
 		for (Flip flip : sortedToFailFlips) {
+			LOGGER.info("Flip:\n" + flip);
+			
 			List<MixedRevision> compilableMixedRevisions = revertChildToParent(flip);
 			
-			evaluateCompilableMixedRevisions(flip, compilableMixedRevisions);
+			for (MixedRevision compilableMixedRevision : compilableMixedRevisions) {
+				evaluateCompilableMixedRevision(flip, compilableMixedRevision);
+			}
 		}
 	}
 	
@@ -44,9 +51,9 @@ public class MixingTool {
 	 * @requires flip has only TO_FAIL tests
 	 * @return a list of compilable MixedRevision's sorted by 
 	 * the number of reverted files
-	 * @throws IOException
+	 * @throws Exception 
 	 */
-	public List<MixedRevision> revertChildToParent(Flip flip) throws IOException {
+	public List<MixedRevision> revertChildToParent(Flip flip) throws Exception {
 		List<MixedRevision> compilableMixedRevisions = new ArrayList<MixedRevision>();
 		
 		Revision child = flip.getChildRevision();
@@ -60,7 +67,7 @@ public class MixingTool {
 			
 			while (generator.hasMore()) {
 				int[] indices = generator.getNext();
-				List<DiffFile> combination = new ArrayList<DiffFile>();
+				Set<DiffFile> combination = new HashSet<DiffFile>();
 				
 				for (int index : indices) {
 					DiffFile diffFile = diffFiles.get(index);
@@ -71,8 +78,12 @@ public class MixingTool {
 				mixedRevision.compileAndRunAllTests();
 				
 				if (mixedRevision.isCompilable() == COMPILABLE.YES) {
+					LOGGER.info("compilable MixedRevision:\n" + mixedRevision);
+					
 					MixedRevision mr = mixedRevision.export();
 					compilableMixedRevisions.add(mr);
+				} else {
+					LOGGER.info("non-compilable MixedRevision:\n" + mixedRevision);
 				}
 				
 				mixedRevision.restoreBaseRevision();
@@ -82,8 +93,8 @@ public class MixingTool {
 		return compilableMixedRevisions;
 	}
 	
-	public void evaluateCompilableMixedRevisions(Flip flip, List<MixedRevision> compilableMixedRevisions) {
-		System.out.println(flip);
+	public void evaluateCompilableMixedRevision(Flip flip, MixedRevision compilableMixedRevision) {
+		LOGGER.info("EVALUATION:\n" + "Flip:\n" + flip + "MixedRevision:\n" + compilableMixedRevision);
 		
 		Revision child = flip.getChildRevision();
 		Set<String> childFailedTests = child.getTestResult().getFailedTests();
@@ -97,35 +108,38 @@ public class MixingTool {
 		
 		Set<String> toFailTests = flip.getToFailTests();
 		
-		for (MixedRevision mixedRevision : compilableMixedRevisions) {
-			int numRecoverTest = 0;
-			int numBreakTest = 0;
-			int numUnexpectedRecoverTest = 0;
-			
-			TestResult testResult = mixedRevision.getTestResult();
-			
-			for (String test : toFailTests) {
-				if (testResult.pass(test)) {
-					numRecoverTest++;
-				}
+		// tests pass in parent, fail in child, and pass in MixedRevision
+		List<String> pass_fail_pass = new ArrayList<String>();
+		// tests pass in parent, pass in child, and fail in MixedRevision
+		List<String> pass_pass_fail = new ArrayList<String>();
+		// tests fail in parent, fail in child, and pass in MixedRevision
+		List<String> fail_fail_pass = new ArrayList<String>();
+		
+		TestResult mixedRevisionTestResult = compilableMixedRevision.getTestResult();
+		
+		for (String test : toFailTests) {
+			if (mixedRevisionTestResult.pass(test)) {
+				pass_fail_pass.add(test);
 			}
-			
-			for (String test : childPassedTests) {
-				if (testResult.fail(test)) {
-					numBreakTest++;
-				}
+		}
+		
+		for (String test : childPassedTests) {
+			if (mixedRevisionTestResult.fail(test)) {
+				pass_pass_fail.add(test);
 			}
-			
-			for (String test : childFailedTests) {
-				if (testResult.pass(test) && !toFailTests.contains(test)) {
-					numUnexpectedRecoverTest++;
-				}
+		}
+		
+		for (String test : childFailedTests) {
+			if (mixedRevisionTestResult.pass(test) && !toFailTests.contains(test)) {
+				fail_fail_pass.add(test);
 			}
-			
-			System.out.println(mixedRevision);
-			System.out.println("number of recovered tests: " + numRecoverTest);
-			System.out.println("number of broken tests: " + numBreakTest);
-			System.out.println("number of unexpected recovered tests: " + numUnexpectedRecoverTest);
-		}		
+		}
+		
+		LOGGER.info("Tests that pass in parent, fail in child (flipped tests), and pass in MixedRevision:\n"
+				+ pass_fail_pass);
+		LOGGER.info("Tests that pass in parent, pass in child, and fail in MixedRevision:\n"
+				+ pass_pass_fail);
+		LOGGER.info("Tests that fail in parent, fail in child, and pass in MixedRevision:\n"
+				+ fail_fail_pass);
 	}
 }
