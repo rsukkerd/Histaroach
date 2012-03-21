@@ -3,7 +3,6 @@ package tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -355,25 +354,20 @@ public class RepositoryTest {
 	private static final HistoryGraph[] EXPECTED_HGRAPHS_PARTIAL = {HGRAPH_1, HGRAPH_2, HGRAPH_3_PARTIAL, HGRAPH_4_PARTIAL, HGRAPH_5_PARTIAL};
 	
 	@Test
-	public void testBuildFullHistoryGraph() {
-		assertTrue(untar(SAMPLE_REPOSITORIES_TAR_FILE));
+	public void testBuildFullHistoryGraph() throws FileNotFoundException, IOException {
+		Util.untar(SAMPLE_REPOSITORIES_TAR_FILE, DEST_DIR);
 		
 		for (int i = 0; i < DIRECTORIES.length; i++) {
 			Repository repo = new Repository(DIRECTORIES[i], ANT_COMMAND, STRATEGY);
 	
 			HistoryGraph actualHGraph = null;
-			try {
-				actualHGraph = repo.buildHistoryGraph(START_COMMIT_IDS[i], END_COMMIT_IDS[i]);
-			} catch (Exception e) {
-				e.printStackTrace();
-				fail("Exception thrown in buildHistoryGraph");
-			}
+			actualHGraph = repo.buildHistoryGraph(START_COMMIT_IDS[i], END_COMMIT_IDS[i]);
 			
 			assertNotNull("constructor returns null on " + DIRECTORIES[i], actualHGraph);
 			assertEquals("result mismatched on " + DIRECTORIES[i], EXPECTED_HGRAPHS[i], actualHGraph);
 		}
 		
-		assertTrue(deleteDirectory(SAMPLE_REPOSITORIES));
+		FileUtils.deleteDirectory(new File(SAMPLE_REPOSITORIES));
 	}
 	
 	@Test
@@ -384,12 +378,7 @@ public class RepositoryTest {
 			Repository repo = new Repository(DIRECTORIES[i], ANT_COMMAND, STRATEGY);
 	
 			HistoryGraph actualHGraph = null;
-			try {
-				actualHGraph = repo.buildHistoryGraph(START_COMMIT_IDS[i], END_COMMIT_IDS_PARTIAL[i]);
-			} catch (Exception e) {
-				e.printStackTrace();
-				fail("Exception thrown in buildHistoryGraph");
-			}
+			actualHGraph = repo.buildHistoryGraph(START_COMMIT_IDS[i], END_COMMIT_IDS_PARTIAL[i]);
 			
 			assertNotNull("constructor returns null on " + DIRECTORIES[i], actualHGraph);
 			assertEquals("result mismatched on " + DIRECTORIES[i], EXPECTED_HGRAPHS_PARTIAL[i], actualHGraph);
@@ -492,21 +481,16 @@ public class RepositoryTest {
 	}
 	
 	@Test
-	public void testRun() {
-		assertTrue(untar(PROJ_TAR_FILE));
+	public void testRun() throws FileNotFoundException, IOException {
+		Util.untar(PROJ_TAR_FILE, DEST_DIR);
 		
 		HistoryGraph actualHGraph = null;
-		try {
-			actualHGraph = REPOSITORY_PROJ.buildHistoryGraph(COMMIT_4, COMMIT_1);
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail("Exception thrown in buildHistoryGraph");
-		}
+		actualHGraph = REPOSITORY_PROJ.buildHistoryGraph(COMMIT_4, COMMIT_1);
 		
 		assertNotNull("constructor returns null on " + PROJ, actualHGraph);
 		assertEquals("result mismatched on " + PROJ, EXPECTED_HGRAPH_PROJ, actualHGraph);
 		
-		assertTrue(deleteDirectory(PROJ));
+		FileUtils.deleteDirectory(new File(PROJ));
 	}
 	
 	private static void buildHistoryGraph(HistoryGraph hGraph, Set<Revision> revisions) {

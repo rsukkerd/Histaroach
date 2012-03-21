@@ -3,7 +3,6 @@ package tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -87,29 +86,18 @@ public class MixedRevisionTest {
 	private static final String FILE_1_REVISION_2 = "f1r2";
 	
 	@Test
-	public void testRevertRestoreFiles() {
+	public void testRevertRestoreFiles() throws Exception {
 		assertTrue(untar(TAR_FILE));
 		assertTrue(untar(TAR_FILE_CLONE));
 		
 		MixedRevision mr = new MixedRevision(REVISION_2, PATHNAME, PATHNAME_CLONE);
-		
-		try {
-			mr.revertFiles(DIFF_FILES, REVISION_1);
-		} catch (IOException e) {
-			fail("revertFiles throws exception");
-			e.printStackTrace();
-		}
+		mr.revertFiles(DIFF_FILES, REVISION_1);
 		
 		checkFile(FILE_1, FILE_1_REVISION_1);
 		assertTrue(FILENAME_2 + " does not exist", FILE_2.exists());
 		assertFalse(FILENAME_3 + " exists", FILE_3.exists());
 		
-		try {
-			mr.restoreBaseRevision();
-		} catch (IOException e) {
-			fail("restoreBaseRevision throws exception");
-			e.printStackTrace();
-		}
+		mr.restoreBaseRevision();
 		
 		checkFile(FILE_1, FILE_1_REVISION_2);
 		assertTrue(FILENAME_3 + " does not exist", FILE_3.exists());
@@ -122,21 +110,15 @@ public class MixedRevisionTest {
 	/**
 	 * Helper method 
 	 * Check if the file exists and contains the content
+	 * @throws IOException 
 	 */
-	public void checkFile(File file, String content) {
+	public void checkFile(File file, String content) throws IOException {
 		assertTrue(file.getName() + " does not exist", file.exists());
 		
-		try {
-			BufferedReader reader = new BufferedReader(new FileReader(file));
-			String line = reader.readLine();
-			assertEquals("content of " + file.getName() + " is not as expected", content, line);
-		} catch (FileNotFoundException e) {
-			fail(file.getName() + " not found");
-			e.printStackTrace();
-		} catch (IOException e) {
-			fail(file.getName() + "'s reader throws IOException");
-			e.printStackTrace();
-		}
+		BufferedReader reader = new BufferedReader(new FileReader(file));
+		String line = reader.readLine();
+		
+		assertEquals("content of " + file.getName() + " is not as expected", content, line);
 	}
 	
 	/**********************/
@@ -217,45 +199,34 @@ public class MixedRevisionTest {
 	}
 	
 	@Test
-	public void testRevertNotCompilable() {
+	public void testRevertNotCompilable() throws Exception {
 		checkTestResult(COMBINATION_1, COMPILABLE.NO, null);
 	}
 	
 	@Test
-	public void testRevertFail() {
+	public void testRevertFail() throws Exception {
 		checkTestResult(COMBINATION_2, COMPILABLE.YES, COMBINATION_2_TEST_RESULT);
 	}
 	
 	@Test
-	public void testRevertPass() {
+	public void testRevertPass() throws Exception {
 		checkTestResult(COMBINATION_3, COMPILABLE.YES, COMBINATION_3_TEST_RESULT);
 	}
 	
 	public void checkTestResult(List<DiffFile> combination, COMPILABLE expectedCompilable, 
-			TestResult expectedTestResult) {
+			TestResult expectedTestResult) throws Exception {
 		assertTrue(untar(PRJ_TAR_FILE));
 		assertTrue(untar(PRJ_TAR_FILE_CLONE));
 		
 		MixedRevision mr = new MixedRevision(PRJ_REVISION_2, PRJ_PATHNAME, PRJ_PATHNAME_CLONE);
 		
-		try {
-			mr.revertFiles(combination, PRJ_REVISION_1);
-			mr.compileAndRunAllTests();
+		mr.revertFiles(combination, PRJ_REVISION_1);
+		mr.compileAndRunAllTests();
 			
-			assertTrue(mr.isCompilable() == expectedCompilable);
-			assertEquals(expectedTestResult, mr.getTestResult());
-			
-		} catch (IOException e) {
-			fail("revertFiles throws exception");
-			e.printStackTrace();
-		}
+		assertTrue(mr.isCompilable() == expectedCompilable);
+		assertEquals(expectedTestResult, mr.getTestResult());
 		
-		try {
-			mr.restoreBaseRevision();
-		} catch (IOException e) {
-			fail("restoreBaseRevision throws exception");
-			e.printStackTrace();
-		}
+		mr.restoreBaseRevision();
 		
 		assertTrue(deleteDirectory(PRJ_PATHNAME));
 		assertTrue(deleteDirectory(PRJ_PATHNAME_CLONE));
