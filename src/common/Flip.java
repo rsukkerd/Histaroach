@@ -7,7 +7,8 @@ import java.util.Set;
  * Flip represents a pair of child-parent revisions that contain 
  * some tests which one revision passes and the other revision fails. 
  * Flip class implements Comparable interface: a flip that has fewer 
- * diff files is less a flip that has more diff files.
+ * diff files is less a flip that has more diff files; tie is broken 
+ * by the number of all tests in child revision.
  */
 public class Flip implements Comparable<Flip> {
 	public enum FlipType {
@@ -75,6 +76,11 @@ public class Flip implements Comparable<Flip> {
 		String str = "child commit: " + child.getCommitID() + "\n"
 				+ "parent commit: " + parent.getCommitID() + "\n";
 		
+		str += "diff files: \n";
+		for (DiffFile diffFile : diffFiles) {
+			str += diffFile.toString() + "\n";
+		}
+		
 		if (!toPassTests.isEmpty()) {
 			str += "TO PASS:\n";
 			for (String test : toPassTests) {
@@ -94,6 +100,12 @@ public class Flip implements Comparable<Flip> {
 
 	@Override
 	public int compareTo(Flip other) {
-		return diffFiles.size() - other.diffFiles.size();
+		if (diffFiles.size() > other.diffFiles.size()) {
+			return 1;
+		} else if (diffFiles.size() < other.diffFiles.size()) {
+			return -1;
+		} else {
+			return child.getTestResult().getAllTests().size() - other.child.getTestResult().getAllTests().size();
+		}
 	}
 }
