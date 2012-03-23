@@ -74,13 +74,19 @@ public class MixingTool {
 	}
 	
 	public void runOneFlipOneCombination() throws Exception {
-		Flip flip = sortedToFailFlips.get(0);
-		LOGGER.info("Flip:\n" + flip);
+		Flip targetFlip = null;
+		for (Flip flip : sortedToFailFlips) {
+			if (flip.getChildRevision().getCommitID().equals("e701860")) {
+				targetFlip = flip;
+			}
+		}
+		
+		LOGGER.info("Flip:\n" + targetFlip);
 		
 		Set<DiffFile> combination = new HashSet<DiffFile>();
-		combination.add(flip.getDiffFiles().get(0));
+		combination.add(targetFlip.getDiffFiles().get(0));
 		
-		revertChildToParent(flip, combination);
+		revertChildToParent(targetFlip, combination);
 	}
 	
 	/**
