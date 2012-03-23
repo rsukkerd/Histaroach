@@ -1,0 +1,8 @@
+    [junit] Test voldemort.client.AdminServiceBasicTest FAILED
+    [junit] Test voldemort.client.SocketStoreClientFactoryTest FAILED
+    [junit] Test voldemort.store.compress.CompressingStoreTest FAILED
+    [junit] Test voldemort.store.mysql.MysqlStorageEngineTest FAILED
+    [junit] Test voldemort.store.routed.ReadRepairerTest FAILED
+    [junit] Test voldemort.store.routed.RoutedStoreTest FAILED
+    [junit] Test voldemort.store.socket.ProtocolBuffersSocketStoreTest FAILED
+    [junit] Test voldemort.store.socket.VoldemortNativeSocketStoreTest FAILED

@@ -1,13 +1,20 @@
 package common;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
+
+import voldemort.VoldemortTestParsingStrategy;
 
 import common.DiffFile.DiffType;
 import common.Revision.COMPILABLE;
@@ -20,6 +27,10 @@ import common.Revision.COMPILABLE;
  * the compilability and test result of this MixedRevision.
  */
 public class MixedRevision {
+	
+	private static final String RUN_SCRIPT_COMMAND = "./run_ant_junit.sh";
+	private static final String ANT_JUNIT_OUTPUT = "output/ant_junit_output";
+	private static final String ANT_JUNIT_ERROR = "output/ant_junit_error";
 
     private final Revision baseRevision;
     private final Repository repository;
@@ -213,6 +224,40 @@ public class MixedRevision {
         compilable = pair.getFirst();
         testResult = pair.getSecond();
     }
+    
+    public void runAntJunitViaShell() throws Exception {
+    	String workingDir = System.getProperty("user.dir");
+    	File dir = new File(workingDir);
+    	
+    	String outputStream = workingDir + File.separatorChar + ANT_JUNIT_OUTPUT;
+    	String errorStream = workingDir + File.separatorChar + ANT_JUNIT_ERROR;
+    	
+    	String[] command = new String[] { RUN_SCRIPT_COMMAND, repoDir.getPath(), 
+    			outputStream, errorStream };
+    	
+    	TestParsingStrategy strategy = new VoldemortTestParsingStrategy();
+    	
+        Process process = Util.runProcess(command, dir);
+        
+        if (process == null) {
+        	throw new Exception("./run_ant_junit.sh unsuccessful");
+        }
+
+        BufferedReader stdOutputReader = new BufferedReader(
+                new FileReader(new File(ANT_JUNIT_OUTPUT)));
+
+        BufferedReader stdErrorReader = new BufferedReader(
+                new FileReader(new File(ANT_JUNIT_ERROR)));
+
+        List<String> outputStreamContent = Util.getStreamContent(stdOutputReader);
+        List<String> errorStreamContent = Util.getStreamContent(stdErrorReader);
+        
+        compilable = buildSuccessful(outputStreamContent, errorStreamContent);
+        
+        if (compilable == COMPILABLE.YES) {
+            testResult = strategy.getTestResult(baseRevision.getCommitID(), outputStreamContent, errorStreamContent);
+        }
+    }
 
     /**
      * Copy a file from source directory to destination directory 
@@ -268,8 +313,18 @@ public class MixedRevision {
 	@Override
     public String toString() {
         String str = "base : " + baseRevision.getCommitID() + "\n";
-        str += "compilable : ";
+        if (!revertedFiles.isEmpty()) {
+	        str += "reverted files :\n";
+	        
+	    	for (DiffFile diffFile : revertedFiles.keySet()) {
+	    		str += diffFile.toString() + "\n";
+	    		
+	    		Revision otherRevision = revertedFiles.get(diffFile);
+	    		str += "reference revision : " + otherRevision.getCommitID() + "\n";
+	    	}
+        }
         
+        str += "compilable : ";
         if (compilable == COMPILABLE.YES) {
             str += "yes\n";
             if (testResult != null) {
@@ -286,15 +341,33 @@ public class MixedRevision {
             str += "no build file\n";
         }
         
-        str += "reverted files :\n";
-        
-    	for (DiffFile diffFile : revertedFiles.keySet()) {
-    		str += diffFile.toString() + "\n";
-    		
-    		Revision otherRevision = revertedFiles.get(diffFile);
-    		str += "reference revision : " + otherRevision.getCommitID() + "\n";
-    	}
-
         return str;
     }
+
+	/**
+	 * @return YES if build successful, NO if build failed, 
+	 * and NO_BUILD_FILE if there is no build file
+	 */
+	private COMPILABLE buildSuccessful(List<String> outputStreamContent,
+	        List<String> errorStreamContent) {
+	    Pattern buildSuccessfulPattern = Pattern.compile("BUILD SUCCESSFUL");
+	    Pattern buildFailedPattern = Pattern.compile("BUILD FAILED");
+	
+	    for (String line : outputStreamContent) {
+	        Matcher buildSuccessfulMatcher = buildSuccessfulPattern
+	                .matcher(line);
+	        if (buildSuccessfulMatcher.find()) {
+	            return COMPILABLE.YES;
+	        }
+	    }
+	
+	    for (String line : errorStreamContent) {
+	        Matcher buildFailedMatcher = buildFailedPattern.matcher(line);
+	        if (buildFailedMatcher.find()) {
+	            return COMPILABLE.NO;
+	        }
+	    }
+	
+	    return COMPILABLE.NO_BUILD_FILE;
+	}
 }

@@ -1,0 +1,359 @@
+Buildfile: /Users/Sor/Documents/workspace/Data/voldemort/build.xml
+Trying to override old definition of datatype resources
+
+build:
+   [delete] Deleting directory /Users/Sor/Documents/workspace/Data/voldemort/dist/classes
+    [mkdir] Created dir: /Users/Sor/Documents/workspace/Data/voldemort/dist/classes
+     [copy] Copying 6 files to /Users/Sor/Documents/workspace/Data/voldemort/dist/classes
+     [copy] Copied 58 empty directories to 52 empty directories under /Users/Sor/Documents/workspace/Data/voldemort/dist/classes
+   [delete] Deleting directory /Users/Sor/Documents/workspace/Data/voldemort/dist/resources
+    [mkdir] Created dir: /Users/Sor/Documents/workspace/Data/voldemort/dist/resources
+     [copy] Copying 1 file to /Users/Sor/Documents/workspace/Data/voldemort/dist/resources
+    [javac] /Users/Sor/Documents/workspace/Data/voldemort/build.xml:82: warning: 'includeantruntime' was not set, defaulting to build.sysclasspath=last; set to false for repeatable builds
+    [javac] Compiling 267 source files to /Users/Sor/Documents/workspace/Data/voldemort/dist/classes
+    [javac] Note: /Users/Sor/Documents/workspace/Data/voldemort/src/java/voldemort/store/metadata/MetadataStore.java uses unchecked or unsafe operations.
+    [javac] Note: Recompile with -Xlint:unchecked for details.
+
+buildtest:
+   [delete] Deleting directory /Users/Sor/Documents/workspace/Data/voldemort/dist/testclasses
+    [mkdir] Created dir: /Users/Sor/Documents/workspace/Data/voldemort/dist/testclasses
+     [copy] Copying 12 files to /Users/Sor/Documents/workspace/Data/voldemort/dist/testclasses
+     [copy] Copied 4 empty directories to 2 empty directories under /Users/Sor/Documents/workspace/Data/voldemort/dist/testclasses
+     [copy] Copying 1 file to /Users/Sor/Documents/workspace/Data/voldemort/dist/testclasses
+     [copy] Copied 39 empty directories to 37 empty directories under /Users/Sor/Documents/workspace/Data/voldemort/dist/testclasses
+    [javac] /Users/Sor/Documents/workspace/Data/voldemort/build.xml:102: warning: 'includeantruntime' was not set, defaulting to build.sysclasspath=last; set to false for repeatable builds
+    [javac] Compiling 135 source files to /Users/Sor/Documents/workspace/Data/voldemort/dist/testclasses
+
+junit:
+   [delete] Deleting directory /Users/Sor/Documents/workspace/Data/voldemort/dist/junit-reports
+    [mkdir] Created dir: /Users/Sor/Documents/workspace/Data/voldemort/dist/junit-reports
+    [mkdir] Created dir: /Users/Sor/Documents/workspace/Data/voldemort/dist/junit-reports/html
+    [junit] Running voldemort.client.AdminServiceBasicTest
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.store.metadata.MetadataStore).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] Tests run: 10, Failures: 1, Errors: 0, Time elapsed: 17.487 sec
+    [junit] Running voldemort.client.AdminServiceFailureTest
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.store.metadata.MetadataStore).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 3.776 sec
+    [junit] Running voldemort.client.AdminServiceFilterTest
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.store.metadata.MetadataStore).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 4.904 sec
+    [junit] Running voldemort.client.AdminServiceMultiJVMTest
+    [junit] UnreachableSocketStore sleeping will try again 9 times.
+    [junit] UnreachableSocketStore sleeping will try again 8 times.
+    [junit] UnreachableSocketStore sleeping will try again 7 times.
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.store.socket.SocketResourceFactory).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] teardown called
+    [junit] killing processjava.lang.UNIXProcess@479e0994
+    [junit] 
+    [junit] 
+    [junit] UnreachableSocketStore sleeping will try again 9 times.
+    [junit] UnreachableSocketStore sleeping will try again 8 times.
+    [junit] UnreachableSocketStore sleeping will try again 7 times.
+    [junit] teardown called
+    [junit] killing processjava.lang.UNIXProcess@7cec9b3a
+    [junit] 
+    [junit] UnreachableSocketStore sleeping will try again 9 times.
+    [junit] UnreachableSocketStore sleeping will try again 8 times.
+    [junit] UnreachableSocketStore sleeping will try again 7 times.
+    [junit] teardown called
+    [junit] killing processjava.lang.UNIXProcess@46c8fa1e
+    [junit] 
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 27.672 sec
+    [junit] Running voldemort.client.DefaultStoreClientTest
+    [junit] Tests run: 10, Failures: 0, Errors: 0, Time elapsed: 0.392 sec
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.client.DefaultStoreClient).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] Running voldemort.client.HttpStoreClientFactoryTest
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.store.metadata.MetadataStore).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] Tests run: 5, Failures: 0, Errors: 0, Time elapsed: 8.794 sec
+    [junit] Running voldemort.client.SocketStoreClientFactoryTest
+    [junit] Tests run: 1, Failures: 1, Errors: 0, Time elapsed: 0.439 sec
+    [junit] Running voldemort.client.rebalance.RebalanceTest
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.store.metadata.MetadataStore).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] voldemort.store.InvalidMetadataException: client attempt accessing key belonging to partition:[1] at Node:Node0 partitionList:[]
+    [junit] 	at voldemort.store.StoreUtils.assertValidMetadata(StoreUtils.java:139)
+    [junit] 	at voldemort.store.invalidmetadata.InvalidMetadataCheckingStore.get(InvalidMetadataCheckingStore.java:85)
+    [junit] 	at voldemort.store.invalidmetadata.InvalidMetadataCheckingStore.get(InvalidMetadataCheckingStore.java:39)
+    [junit] 	at voldemort.store.DelegatingStore.get(DelegatingStore.java:60)
+    [junit] 	at voldemort.store.stats.StatTrackingStore.get(StatTrackingStore.java:64)
+    [junit] 	at voldemort.server.protocol.vold.VoldemortNativeRequestHandler.handleGet(VoldemortNativeRequestHandler.java:214)
+    [junit] 	at voldemort.server.protocol.vold.VoldemortNativeRequestHandler.handleRequest(VoldemortNativeRequestHandler.java:62)
+    [junit] 	at voldemort.server.socket.SocketServerSession.run(SocketServerSession.java:73)
+    [junit] 	at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:886)
+    [junit] 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:908)
+    [junit] 	at java.lang.Thread.run(Thread.java:680)
+    [junit] Tests run: 7, Failures: 0, Errors: 0, Time elapsed: 180.743 sec
+    [junit] Running voldemort.cluster.failuredetector.BannagePeriodFailureDetectorTest
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.cluster.failuredetector.BannagePeriodFailureDetector).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] Tests run: 6, Failures: 0, Errors: 0, Time elapsed: 4.261 sec
+    [junit] Running voldemort.cluster.failuredetector.ThresholdFailureDetectorTest
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.cluster.failuredetector.ThresholdFailureDetector).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] Tests run: 5, Failures: 0, Errors: 0, Time elapsed: 41.944 sec
+    [junit] Running voldemort.protocol.pb.ProtocolBuffersRequestFormatTest
+    [junit] Tests run: 6, Failures: 0, Errors: 0, Time elapsed: 0.492 sec
+    [junit] Running voldemort.protocol.vold.VoldemortNativeRequestFormatTest
+    [junit] Tests run: 5, Failures: 0, Errors: 0, Time elapsed: 0.254 sec
+    [junit] Running voldemort.routing.ConsistentRoutingStrategyTest
+    [junit] numNodes = 2, tagsPerNode = 10, numRequests = 1000
+    [junit] master node distribution:
+    [junit] node	reqs	X^2	skew
+    [junit] 0	508	0.1280	1.6%
+    [junit] 1	492	0.1280	-1.6%
+    [junit] X^2 = 0.256
+    [junit] p-value = 0.6128816234132366
+    [junit] 
+    [junit] storage node distribution:
+    [junit] node	reqs	X^2	skew
+    [junit] 0	1000	0.0000	0%
+    [junit] 1	1000	0.0000	0%
+    [junit] X^2 = 0.0
+    [junit] p-value = 1.0
+    [junit] 
+    [junit] numNodes = 6, tagsPerNode = 100, numRequests = 1000
+    [junit] master node distribution:
+    [junit] node	reqs	X^2	skew
+    [junit] 0	157	0.5607	-5.8%
+    [junit] 1	168	0.0107	0.8%
+    [junit] 2	162	0.1307	-2.8%
+    [junit] 3	171	0.1127	2.6%
+    [junit] 4	167	0.0007	0.2%
+    [junit] 5	175	0.4167	5%
+    [junit] X^2 = 1.232
+    [junit] p-value = 0.9417708083317203
+    [junit] 
+    [junit] storage node distribution:
+    [junit] node	reqs	X^2	skew
+    [junit] 0	499	0.0020	-0.2%
+    [junit] 1	500	0.0000	0%
+    [junit] 2	487	0.3380	-2.6%
+    [junit] 3	501	0.0020	0.2%
+    [junit] 4	500	0.0000	0%
+    [junit] 5	513	0.3380	2.6%
+    [junit] X^2 = 0.68
+    [junit] p-value = 0.9840482638713963
+    [junit] 
+    [junit] numNodes = 10, tagsPerNode = 200, numRequests = 10000
+    [junit] master node distribution:
+    [junit] node	reqs	X^2	skew
+    [junit] 0	1016	0.2560	1.6%
+    [junit] 1	957	1.8490	-4.3%
+    [junit] 2	1033	1.0890	3.3%
+    [junit] 3	1017	0.2890	1.7%
+    [junit] 4	967	1.0890	-3.3%
+    [junit] 5	1005	0.0250	0.5%
+    [junit] 6	1004	0.0160	0.4%
+    [junit] 7	943	3.2490	-5.7%
+    [junit] 8	1012	0.1440	1.2%
+    [junit] 9	1046	2.1160	4.6%
+    [junit] X^2 = 10.122
+    [junit] p-value = 0.3406992588342319
+    [junit] 
+    [junit] storage node distribution:
+    [junit] node	reqs	X^2	skew
+    [junit] 0	3074	1.8253	2.4667%
+    [junit] 1	3019	0.1203	0.6333%
+    [junit] 2	3006	0.0120	0.2%
+    [junit] 3	3007	0.0163	0.2333%
+    [junit] 4	3017	0.0963	0.5667%
+    [junit] 5	2989	0.0403	-0.3667%
+    [junit] 6	2976	0.1920	-0.8%
+    [junit] 7	2952	0.7680	-1.6%
+    [junit] 8	2959	0.5603	-1.3667%
+    [junit] 9	3001	0.0003	0.0333%
+    [junit] X^2 = 3.6313333333333335
+    [junit] p-value = 0.9339615051164039
+    [junit] 
+    [junit] Tests run: 6, Failures: 0, Errors: 0, Time elapsed: 0.526 sec
+    [junit] Running voldemort.routing.PartitionedRoutingStrategyTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.222 sec
+    [junit] Running voldemort.scheduled.DataCleanupJobTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.283 sec
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.server.scheduler.DataCleanupJob).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] Running voldemort.scheduled.SlopPusherTest
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.server.scheduler.SlopPusherJob).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.284 sec
+    [junit] Running voldemort.serialization.SlopSerializerTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.251 sec
+    [junit] Running voldemort.serialization.VersionedSerializerTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.255 sec
+    [junit] Running voldemort.serialization.json.JsonBackwardsCompatibilityTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.264 sec
+    [junit] Running voldemort.serialization.json.JsonReaderTest
+    [junit] Tests run: 9, Failures: 0, Errors: 0, Time elapsed: 0.304 sec
+    [junit] Running voldemort.serialization.json.JsonTypeSerializerTest
+    [junit] Tests run: 8, Failures: 0, Errors: 0, Time elapsed: 0.465 sec
+    [junit] Running voldemort.serialization.protobuf.ProtoBufSerializerTest
+    [junit] Tests run: 7, Failures: 0, Errors: 0, Time elapsed: 0.273 sec
+    [junit] Running voldemort.serialization.thrift.ThriftSerializerTest
+    [junit] Tests run: 10, Failures: 0, Errors: 0, Time elapsed: 0.294 sec
+    [junit] Running voldemort.server.ServiceTest
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.server.VoldemortService).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.274 sec
+    [junit] Running voldemort.server.gossip.GossiperTest
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.store.metadata.MetadataStore).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 3.493 sec
+    [junit] Running voldemort.server.protocol.admin.AsyncOperationTest
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.server.protocol.admin.AsyncOperationRunner).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 2.329 sec
+    [junit] Running voldemort.server.socket.SocketPoolTest
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.server.socket.SocketServer[socket-test-server]).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.617 sec
+    [junit] Running voldemort.server.socket.SocketServerTest
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.cluster.Node).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] Exception in thread "Thread-1" voldemort.VoldemortException: java.net.BindException: Address already in use
+    [junit] 	at voldemort.server.socket.SocketServer.run(SocketServer.java:153)
+    [junit] Caused by: java.net.BindException: Address already in use
+    [junit] 	at java.net.PlainSocketImpl.socketBind(Native Method)
+    [junit] 	at java.net.PlainSocketImpl.bind(PlainSocketImpl.java:383)
+    [junit] 	at java.net.ServerSocket.bind(ServerSocket.java:328)
+    [junit] 	at java.net.ServerSocket.bind(ServerSocket.java:286)
+    [junit] 	at voldemort.server.socket.SocketServer.run(SocketServer.java:138)
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 1.073 sec
+    [junit] Running voldemort.server.storage.StorageServiceTest
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.store.metadata.MetadataStore).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 1.337 sec
+    [junit] Running voldemort.store.bdb.BdbSplitStorageEngineTest
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.store.bdb.BdbStorageConfiguration).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] A.size:10030612 B.size:10030612 total:20061224 max:0 cacheMax:32000000
+    [junit] Shared.A:0 nSharedEnv:0
+    [junit] A.size:18030851 B.size:18030851 total:36061702 max:20061224 cacheMax:32000000
+    [junit] Shared.A:0 nSharedEnv:0
+    [junit] A.size:26031777 B.size:26032887 total:52064664 max:36061702 cacheMax:32000000
+    [junit] Shared.A:0 nSharedEnv:0
+    [junit] A.size:10022598 B.size:10022598 total:20045196 max:52064664 cacheMax:32000000
+    [junit] Shared.A:0 nSharedEnv:0
+    [junit] A.size:18022837 B.size:18022837 total:36045674 max:52064664 cacheMax:32000000
+    [junit] Shared.A:0 nSharedEnv:0
+    [junit] A.size:9030612 B.size:9030612 total:18061224 max:0 cacheMax:32000000
+    [junit] Shared.A:18061224 nSharedEnv:2
+    [junit] A.size:1021640 B.size:17024993 total:18046633 max:18061224 cacheMax:32000000
+    [junit] Shared.A:18046633 nSharedEnv:2
+    [junit] A.size:1022486 B.size:25029409 total:26051895 max:18061224 cacheMax:32000000
+    [junit] Shared.A:26051895 nSharedEnv:2
+    [junit] A.size:9022725 B.size:9022598 total:18045323 max:26051895 cacheMax:32000000
+    [junit] Shared.A:18045323 nSharedEnv:2
+    [junit] A.size:1022804 B.size:17022837 total:18045641 max:26051895 cacheMax:32000000
+    [junit] Shared.A:18045641 nSharedEnv:2
+    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 6.781 sec
+    [junit] Running voldemort.store.bdb.BdbStorageEngineTest
+    [junit] Tests run: 21, Failures: 0, Errors: 0, Time elapsed: 1.381 sec
+    [junit] Running voldemort.store.compress.CompressingStoreTest
+    [junit] Tests run: 1, Failures: 1, Errors: 0, Time elapsed: 0.243 sec
+    [junit] Running voldemort.store.configuration.ConfigurationStorageEngineTest
+    [junit] Tests run: 11, Failures: 0, Errors: 0, Time elapsed: 0.636 sec
+    [junit] Running voldemort.store.http.HttpStoreTest
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.store.metadata.MetadataStore).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] Tests run: 13, Failures: 0, Errors: 0, Time elapsed: 4.172 sec
+    [junit] Running voldemort.store.invalidmetadata.InvalidMetadataCheckingStoreTest
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.store.metadata.MetadataStore).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 1.359 sec
+    [junit] Running voldemort.store.invalidmetadata.ServerSideRoutingTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.217 sec
+    [junit] Running voldemort.store.logging.LoggingStoreTest
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.store.memory.InMemoryStorageEngine).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] Tests run: 10, Failures: 0, Errors: 0, Time elapsed: 0.315 sec
+    [junit] Running voldemort.store.memory.CacheStorageEngineTest
+    [junit] Tests run: 19, Failures: 0, Errors: 0, Time elapsed: 79.642 sec
+    [junit] Tests run: 19, Failures: 0, Errors: 0, Time elapsed: 79.642 sec
+    [junit] Running voldemort.store.memory.InMemoryStorageEngineTest
+    [junit] Tests run: 17, Failures: 0, Errors: 0, Time elapsed: 1.189 sec
+    [junit] Tests run: 17, Failures: 0, Errors: 0, Time elapsed: 1.189 sec
+    [junit] Running voldemort.store.metadata.MetadataStoreTest
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.store.metadata.MetadataStore).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] Tests run: 5, Failures: 0, Errors: 0, Time elapsed: 11.499 sec
+    [junit] Running voldemort.store.mysql.MysqlStorageEngineTest
+    [junit] Tests run: 18, Failures: 0, Errors: 18, Time elapsed: 0.447 sec
+    [junit] Tests run: 18, Failures: 0, Errors: 18, Time elapsed: 0.447 sec
+    [junit] Running voldemort.store.readonly.ExternalSorterTest
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.store.readonly.ExternalSorter).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 2.128 sec
+    [junit] Running voldemort.store.readonly.ReadOnlyStorageEngineTest
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.store.readonly.JsonStoreBuilder).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] Tests run: 12, Failures: 0, Errors: 0, Time elapsed: 0.893 sec
+    [junit] Tests run: 12, Failures: 0, Errors: 0, Time elapsed: 0.893 sec
+    [junit] Running voldemort.store.readonly.SearchStrategyTest
+    [junit] Tests run: 10, Failures: 0, Errors: 0, Time elapsed: 0.371 sec
+    [junit] Running voldemort.store.rebalancing.RedirectingStoreTest
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.utils.RebalanceUtils).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 7.516 sec
+    [junit] Running voldemort.store.routed.ReadRepairerTest
+    [junit] Tests run: 1, Failures: 1, Errors: 0, Time elapsed: 0.236 sec
+    [junit] Running voldemort.store.routed.RoutedStoreTest
+    [junit] Tests run: 1, Failures: 1, Errors: 0, Time elapsed: 0.237 sec
+    [junit] Running voldemort.store.serialized.SerializingStoreTest
+    [junit] Tests run: 10, Failures: 0, Errors: 0, Time elapsed: 0.3 sec
+    [junit] Running voldemort.store.slop.SloppyStoreTest
+    [junit] Tests run: 12, Failures: 0, Errors: 0, Time elapsed: 0.33 sec
+    [junit] Running voldemort.store.socket.ProtocolBuffersSocketStoreTest
+    [junit] Tests run: 1, Failures: 1, Errors: 0, Time elapsed: 0.23 sec
+    [junit] Running voldemort.store.socket.VoldemortNativeSocketStoreTest
+    [junit] Tests run: 1, Failures: 1, Errors: 0, Time elapsed: 0.228 sec
+    [junit] Running voldemort.store.views.ViewStorageEngineTest
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.29 sec
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.29 sec
+    [junit] Running voldemort.utils.ByteUtilsTest
+    [junit] Tests run: 13, Failures: 0, Errors: 0, Time elapsed: 0.292 sec
+    [junit] Running voldemort.utils.IoThrottlerTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.341 sec
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.utils.EventThrottler).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] Running voldemort.utils.NetworkClassLoaderTest
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.utils.NetworkClassLoader).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.354 sec
+    [junit] Running voldemort.utils.RebalanceUtilsTest
+    [junit] info:RebalancingStealInfo(0 <--- 1 partitions:[1, 2, 3, 4] stores:[test1, test2])
+    [junit] Tests run: 3, Failures: 0, Errors: 0, Time elapsed: 0.889 sec
+    [junit] Running voldemort.utils.ReflectUtilsTest
+    [junit] Tests run: 4, Failures: 0, Errors: 0, Time elapsed: 0.255 sec
+    [junit] Running voldemort.utils.UtilsTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.237 sec
+    [junit] Running voldemort.utils.pool.KeyedResourcePoolTest
+    [junit] Tests run: 5, Failures: 0, Errors: 0, Time elapsed: 0.441 sec
+    [junit] Running voldemort.versioning.ClockEntryTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.231 sec
+    [junit] Running voldemort.versioning.InconsistentDataExceptionTest
+    [junit] Tests run: 1, Failures: 0, Errors: 0, Time elapsed: 0.235 sec
+    [junit] Running voldemort.versioning.VectorClockInconsistencyResolverTest
+    [junit] Tests run: 6, Failures: 0, Errors: 0, Time elapsed: 0.272 sec
+    [junit] Running voldemort.versioning.VectorClockTest
+    [junit] Tests run: 7, Failures: 0, Errors: 0, Time elapsed: 0.366 sec
+    [junit] Running voldemort.versioning.VersionedTest
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.243 sec
+    [junit] Running voldemort.xml.ClusterMapperTest
+    [junit] log4j:WARN No appenders could be found for logger (voldemort.cluster.Node).
+    [junit] log4j:WARN Please initialize the log4j system properly.
+    [junit] Tests run: 2, Failures: 0, Errors: 0, Time elapsed: 0.691 sec
+    [junit] Running voldemort.xml.StoreDefinitionMapperTest
+    [junit] Tests run: 7, Failures: 0, Errors: 0, Time elapsed: 0.997 sec
+[junitreport] Processing /Users/Sor/Documents/workspace/Data/voldemort/dist/junit-reports/html/TESTS-TestSuites.xml to /var/folders/MG/MGvPeZahEXesyrb0+k5xj++++TI/-Tmp-/null729239910
+[junitreport] Loading stylesheet jar:file:/usr/share/ant/lib/ant-junit.jar!/org/apache/tools/ant/taskdefs/optional/junit/xsl/junit-frames.xsl
+[junitreport] Transform time: 3189ms
+[junitreport] Deleting: /var/folders/MG/MGvPeZahEXesyrb0+k5xj++++TI/-Tmp-/null729239910
+
+BUILD SUCCESSFUL
+Total time: 9 minutes 8 seconds

@@ -98,5 +98,6 @@ public class TestIsolationDataReader {
         
         MixingTool mixing = new MixingTool(historyGraph, clonedRepository);
         mixing.run();
+        // mixing.runOneFlipOneCombination();
 	}
 }

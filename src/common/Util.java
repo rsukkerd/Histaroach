@@ -23,8 +23,14 @@ import org.xeustechnologies.jtar.TarInputStream;
 
 public class Util {
 
-    public static Process runProcess(String[] commands, File processDir) {
-        ProcessBuilder pBuilder = new ProcessBuilder(commands);
+	/**
+	 * Create a process that executes the given command 
+	 * in the given directory
+	 * 
+	 * @return the process
+	 */
+    public static Process runProcess(String[] command, File processDir) {
+        ProcessBuilder pBuilder = new ProcessBuilder(command);
         pBuilder.directory(processDir);
         Process p = null;
         
@@ -47,7 +53,8 @@ public class Util {
     }
     
     /**
-     * read and cache content from reader
+     * Read and cache content from reader
+     * 
      * @return a list of lines obtained by reader.readline()
      * @throws IOException
      */
@@ -68,7 +75,7 @@ public class Util {
     }
     
     /**
-     * write an object to a serialized output file
+     * Write an object to a serialized output file
      */
     public static void writeToSerializedFile(String fileName, Object object) {
     	ObjectOutputStream output;
@@ -85,7 +92,7 @@ public class Util {
     }
     
     /**
-     * write an object in a human-readable form to an output file
+     * Write an object in a human-readable form to an output file
      */
     public static void writeToHumanReadableFile(String fileName, Object object) {
         BufferedWriter outFileWriter;
@@ -100,7 +107,8 @@ public class Util {
     }
     
     /**
-     * read an object from a serialized input file
+     * Read an object from a serialized input file
+     * 
      * @return an object of type T
      */
     public static <T> T readObject(Class<T> type, String fileName) {
@@ -123,7 +131,7 @@ public class Util {
     }
     
     /**
-     * untar a repoTarFile and put its entries in repoDir
+     * Untar a repoTarFile and put its entries in repoDir
      * 
      * @throws FileNotFoundException
      * @throws IOException
@@ -172,7 +180,7 @@ public class Util {
     }
     
     /**
-     * reconstruct HistoryGraph instance from serialized revision files
+     * Reconstruct HistoryGraph instance from serialized revision files
      * 
      * @return a HistoryGraph instance containing all revisions corresponding 
      * to serialized revision files in serializedRevisionsDir

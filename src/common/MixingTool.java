@@ -36,32 +36,22 @@ public class MixingTool {
 	
 	public void run() throws Exception {
 		
-		for (Flip flip : sortedToFailFlips) {
-			LOGGER.info("Flip:\n" + flip);
-			
-			List<MixedRevision> compilableMixedRevisions = revertChildToParent(flip);
-			
-			for (MixedRevision compilableMixedRevision : compilableMixedRevisions) {
-				evaluateCompilableMixedRevision(flip, compilableMixedRevision);
-			}
+		for (Flip flip : sortedToFailFlips) {			
+			List<MixedRevision> mixedRevisions = mixFlip(flip);
 		}
 	}
 	
 	/**
 	 * 
-	 * @requires flip has only TO_FAIL tests
-	 * @return a list of compilable MixedRevision's sorted by 
-	 * the number of reverted files
-	 * @throws Exception 
+	 * @return a list of all possible MixedRevisions of flip
+	 * @throws Exception
 	 */
-	public List<MixedRevision> revertChildToParent(Flip flip) throws Exception {
-		List<MixedRevision> compilableMixedRevisions = new ArrayList<MixedRevision>();
+	public List<MixedRevision> mixFlip(Flip flip) throws Exception {
+		LOGGER.info("Flip:\n" + flip);
 		
-		Revision child = flip.getChildRevision();
-		Revision parent = flip.getParentRevision();
+		List<MixedRevision> mixedRevisions = new ArrayList<MixedRevision>();
+		
 		List<DiffFile> diffFiles = flip.getDiffFiles();
-		
-		MixedRevision mixedRevision = new MixedRevision(child, repository, clonedRepository);
 		
 		for (int r = 1; r < diffFiles.size(); r++) {
 			CombinationGenerator generator = new CombinationGenerator(diffFiles.size(), r);
@@ -75,28 +65,62 @@ public class MixingTool {
 					combination.add(diffFile);
 				}
 				
-				mixedRevision.revertFiles(combination, parent);
-				mixedRevision.compileAndRunAllTests();
-				
-				if (mixedRevision.isCompilable() == COMPILABLE.YES) {
-					LOGGER.info("compilable MixedRevision:\n" + mixedRevision);
-					
-					MixedRevision mr = mixedRevision.export();
-					compilableMixedRevisions.add(mr);
-				} else {
-					LOGGER.info("non-compilable MixedRevision:\n" + mixedRevision);
-				}
-				
-				mixedRevision.restoreBaseRevision();
+				MixedRevision mixedRevision = revertChildToParent(flip, combination);
+				mixedRevisions.add(mixedRevision);
 			}
 		}
-				
-		return compilableMixedRevisions;
+		
+		return mixedRevisions;
 	}
 	
-	public void evaluateCompilableMixedRevision(Flip flip, MixedRevision compilableMixedRevision) {
-		LOGGER.info("EVALUATION:\n" + "Flip:\n" + flip + "MixedRevision:\n" + compilableMixedRevision);
+	public void runOneFlipOneCombination() throws Exception {
+		Flip flip = sortedToFailFlips.get(0);
+		LOGGER.info("Flip:\n" + flip);
 		
+		Set<DiffFile> combination = new HashSet<DiffFile>();
+		combination.add(flip.getDiffFiles().get(0));
+		
+		revertChildToParent(flip, combination);
+	}
+	
+	/**
+	 * 
+	 * @requires flip has only TO_FAIL tests
+	 * @return a MixedRevision that has flip's child as a base revision, 
+	 *         and has files in diffFilesToBeReverted reverted to their 
+	 *         states in flip's parent
+	 * @throws Exception 
+	 */
+	public MixedRevision revertChildToParent(Flip flip, Set<DiffFile> diffFilesToBeReverted) 
+		throws Exception {		
+		Revision child = flip.getChildRevision();
+		Revision parent = flip.getParentRevision();
+		
+		MixedRevision mixedRevision = new MixedRevision(child, repository, clonedRepository);
+		
+		mixedRevision.revertFiles(diffFilesToBeReverted, parent);
+		// mixedRevision.compileAndRunAllTests();
+		mixedRevision.runAntJunitViaShell();
+		
+		MixedRevision exportedMixedRevision = mixedRevision.export();
+		
+		if (exportedMixedRevision.isCompilable() == COMPILABLE.YES) {
+			LOGGER.info("compilable MixedRevision:\n" + exportedMixedRevision);
+			
+			evaluateCompilableMixedRevision(flip, exportedMixedRevision);
+		} else {
+			LOGGER.info("non-compilable MixedRevision:\n" + exportedMixedRevision);
+		}
+		
+		mixedRevision.restoreBaseRevision();
+				
+		return exportedMixedRevision;
+	}
+	
+	/**
+	 * Log evaluation of compilableMixedRevision
+	 */
+	public void evaluateCompilableMixedRevision(Flip flip, MixedRevision compilableMixedRevision) {
 		Revision child = flip.getChildRevision();
 		Set<String> childFailedTests = child.getTestResult().getFailedTests();
 		Set<String> childPassedTests = new HashSet<String>();
@@ -136,11 +160,13 @@ public class MixingTool {
 			}
 		}
 		
-		LOGGER.info("Tests that pass in parent, fail in child (flipped tests), and pass in MixedRevision:\n"
-				+ pass_fail_pass);
-		LOGGER.info("Tests that pass in parent, pass in child, and fail in MixedRevision:\n"
-				+ pass_pass_fail);
-		LOGGER.info("Tests that fail in parent, fail in child, and pass in MixedRevision:\n"
-				+ fail_fail_pass);
+		String eval = "Tests that pass in parent, fail in child (flipped tests), and pass in MixedRevision:\n"
+			+ pass_fail_pass + "\n";
+		eval += "Tests that pass in parent, pass in child, and fail in MixedRevision:\n"
+			+ pass_pass_fail + "\n";
+		eval += "Tests that fail in parent, fail in child, and pass in MixedRevision:\n"
+			+ fail_fail_pass;
+		
+		LOGGER.info("EVALUATION:\n" + eval);
 	}
 }
