@@ -38,6 +38,8 @@ public class MixedRevision {
     private final File repoDir;
     private final File clonedRepoDir;
     
+    private final String antCommand;
+    
     private COMPILABLE compilable;
     private TestResult testResult;
     private Map<DiffFile, Revision> revertedFiles;
@@ -47,11 +49,12 @@ public class MixedRevision {
      * 
      * @throws Exception 
      */
-    public MixedRevision(Revision baseRevision, Repository repository, Repository clonedRepository) 
-    		throws Exception {
+    public MixedRevision(Revision baseRevision, Repository repository, Repository clonedRepository, 
+    		String antCommand) throws Exception {
         this.baseRevision = baseRevision;
         this.repository = repository;
         this.clonedRepository = clonedRepository;
+        this.antCommand = antCommand;
         
         repoDir = repository.getDirectory();
         clonedRepoDir = clonedRepository.getDirectory();
@@ -100,7 +103,7 @@ public class MixedRevision {
      * @throws Exception 
      */
     public MixedRevision export() throws Exception {
-    	MixedRevision copy = new MixedRevision(baseRevision, repository, clonedRepository);
+    	MixedRevision copy = new MixedRevision(baseRevision, repository, clonedRepository, antCommand);
     	copy.compilable = compilable;
     	
     	if (testResult == null) {
@@ -233,7 +236,7 @@ public class MixedRevision {
     	String errorStream = workingDir + File.separatorChar + ANT_JUNIT_ERROR;
     	
     	String[] command = new String[] { RUN_SCRIPT_COMMAND, repoDir.getPath(), 
-    			outputStream, errorStream };
+    			outputStream, errorStream, antCommand };
     	
     	TestParsingStrategy strategy = new VoldemortTestParsingStrategy();
     	

@@ -96,7 +96,7 @@ public class TestIsolationDataReader {
         
         Repository clonedRepository = new Repository(clonedRepoDirName, antCommand, strategy);
         
-        MixingTool mixing = new MixingTool(historyGraph, clonedRepository);
+        MixingTool mixing = new MixingTool(historyGraph, clonedRepository, antCommand);
         // mixing.run();
         mixing.runOneFlipOneCombination();
 	}

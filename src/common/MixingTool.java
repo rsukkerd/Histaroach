@@ -16,9 +16,12 @@ public class MixingTool {
 	private final Repository repository;
 	private final Repository clonedRepository;
 	private final List<Flip> sortedToFailFlips;
+	
+	private final String antCommand;
 
-	public MixingTool(HistoryGraph historyGraph, Repository clonedRepository) {
+	public MixingTool(HistoryGraph historyGraph, Repository clonedRepository, String antCommand) {
 		this.clonedRepository = clonedRepository;
+		this.antCommand = antCommand;
 		
 		Set<Flip> flips = historyGraph.getAllFlips();
 		sortedToFailFlips = new ArrayList<Flip>();
@@ -102,7 +105,7 @@ public class MixingTool {
 		Revision child = flip.getChildRevision();
 		Revision parent = flip.getParentRevision();
 		
-		MixedRevision mixedRevision = new MixedRevision(child, repository, clonedRepository);
+		MixedRevision mixedRevision = new MixedRevision(child, repository, clonedRepository, antCommand);
 		
 		mixedRevision.revertFiles(diffFilesToBeReverted, parent);
 		// mixedRevision.compileAndRunAllTests();
