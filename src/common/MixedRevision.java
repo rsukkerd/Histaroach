@@ -30,30 +30,23 @@ public class MixedRevision {
     private COMPILABLE compilable;
     private TestResult testResult;
     private Map<DiffFile, Revision> revertedFiles;
-    
-    private final String antCommand;
-    private final TestParsingStrategy strategy;
 
     /**
      * Create a MixedRevision
      * 
      * @throws Exception 
      */
-    public MixedRevision(Revision baseRevision, String repoPath, String clonedRepoPath, 
-    		String antCommand, TestParsingStrategy strategy) throws Exception {
+    public MixedRevision(Revision baseRevision, Repository repository, Repository clonedRepository) 
+    		throws Exception {
         this.baseRevision = baseRevision;
-        this.antCommand = antCommand;
-        this.strategy = strategy;
+        this.repository = repository;
+        this.clonedRepository = clonedRepository;
         
-        repository = new Repository(repoPath, antCommand, strategy);        
         repoDir = repository.getDirectory();
-        
-        clonedRepository = new Repository(clonedRepoPath, antCommand, strategy);
         clonedRepoDir = clonedRepository.getDirectory();
         
         compilable = COMPILABLE.UNKNOWN;
         testResult = null;
-        
         revertedFiles = new HashMap<DiffFile, Revision>();
         
         int exitValue = repository.checkoutCommit(baseRevision.getCommitID());
@@ -96,8 +89,7 @@ public class MixedRevision {
      * @throws Exception 
      */
     public MixedRevision export() throws Exception {
-    	MixedRevision copy = new MixedRevision(baseRevision, repoDir.getPath(), 
-    			clonedRepoDir.getPath(), antCommand, strategy);
+    	MixedRevision copy = new MixedRevision(baseRevision, repository, clonedRepository);
     	copy.compilable = compilable;
     	
     	if (testResult == null) {

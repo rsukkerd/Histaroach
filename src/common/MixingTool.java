@@ -13,17 +13,12 @@ public class MixingTool {
 	
 	private static final Logger LOGGER = Logger.getLogger(MixingTool.class.getName());
 	
-	private final String antCommand;
-	private final TestParsingStrategy strategy;
-	
-	private final String repoPath;
-	private final String clonedRepoPath;
+	private final Repository repository;
+	private final Repository clonedRepository;
 	private final List<Flip> sortedToFailFlips;
 
-	public MixingTool(HistoryGraph historyGraph, String repoPath, String clonedRepoPath, 
-			String antCommand, TestParsingStrategy strategy) {
-		this.antCommand = antCommand;
-		this.strategy = strategy;
+	public MixingTool(HistoryGraph historyGraph, Repository clonedRepository) {
+		this.clonedRepository = clonedRepository;
 		
 		Set<Flip> flips = historyGraph.getAllFlips();
 		sortedToFailFlips = new ArrayList<Flip>();
@@ -36,8 +31,7 @@ public class MixingTool {
 		
 		Collections.sort(sortedToFailFlips);
 		
-		this.repoPath = repoPath;
-		this.clonedRepoPath = clonedRepoPath;			
+		repository = historyGraph.getRepository();
 	}
 	
 	public void run() throws Exception {
@@ -67,8 +61,7 @@ public class MixingTool {
 		Revision parent = flip.getParentRevision();
 		List<DiffFile> diffFiles = flip.getDiffFiles();
 		
-		MixedRevision mixedRevision = new MixedRevision(child, repoPath, clonedRepoPath, 
-				antCommand, strategy);
+		MixedRevision mixedRevision = new MixedRevision(child, repository, clonedRepository);
 		
 		for (int r = 1; r < diffFiles.size(); r++) {
 			CombinationGenerator generator = new CombinationGenerator(diffFiles.size(), r);

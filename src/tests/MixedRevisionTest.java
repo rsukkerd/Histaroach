@@ -46,6 +46,7 @@ public class MixedRevisionTest {
 	private static final TestParsingStrategy STRATEGY = new VoldemortTestParsingStrategy();
 	
 	private static final Repository REPOSITORY = new Repository(PATHNAME, ANT_COMMAND, STRATEGY);
+	private static final Repository REPOSITORY_CLONE = new Repository(PATHNAME_CLONE, ANT_COMMAND, STRATEGY);
 	
 	private static final String FILENAME_1 = "f1";
 	private static final String FILENAME_2 = "f2";
@@ -97,8 +98,7 @@ public class MixedRevisionTest {
 		assertTrue(untar(TAR_FILE));
 		assertTrue(untar(TAR_FILE_CLONE));
 		
-		MixedRevision mr = new MixedRevision(REVISION_2, PATHNAME, PATHNAME_CLONE, 
-				ANT_COMMAND, STRATEGY);
+		MixedRevision mr = new MixedRevision(REVISION_2, REPOSITORY, REPOSITORY_CLONE);
 		mr.revertFiles(COMBINATION, REVISION_1);
 		
 		checkFile(FILE_1, FILE_1_REVISION_1);
@@ -140,7 +140,9 @@ public class MixedRevisionTest {
 	private static final String PRJ_PATHNAME = "test/delta_project";
 	private static final String PRJ_PATHNAME_CLONE = "test/delta_project_clone";
 	
-	private static final Repository PRJ_REPOSITORY = new Repository(PRJ_PATHNAME, "ant", STRATEGY);
+	private static final Repository PRJ_REPOSITORY = new Repository(PRJ_PATHNAME, ANT_COMMAND, STRATEGY);
+	private static final Repository PRJ_REPOSITORY_CLONE = new Repository(PRJ_PATHNAME_CLONE, 
+			ANT_COMMAND, STRATEGY);
 	
 	private static final DiffFile PRJ_DIFF_FILE_1 = new DiffFile(DiffType.MODIFIED, "src/proj/F1.java");
 	private static final DiffFile PRJ_DIFF_FILE_2 = new DiffFile(DiffType.MODIFIED, "src/proj/F2.java");
@@ -226,8 +228,7 @@ public class MixedRevisionTest {
 		assertTrue(untar(PRJ_TAR_FILE));
 		assertTrue(untar(PRJ_TAR_FILE_CLONE));
 		
-		MixedRevision mr = new MixedRevision(PRJ_REVISION_2, PRJ_PATHNAME, PRJ_PATHNAME_CLONE, 
-				ANT_COMMAND, STRATEGY);
+		MixedRevision mr = new MixedRevision(PRJ_REVISION_2, PRJ_REPOSITORY, PRJ_REPOSITORY_CLONE);
 		
 		mr.revertFiles(combination, PRJ_REVISION_1);
 		mr.compileAndRunAllTests();

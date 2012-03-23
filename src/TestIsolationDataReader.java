@@ -94,8 +94,9 @@ public class TestIsolationDataReader {
         
         HistoryGraph historyGraph = Util.reconstructHistoryGraph(serializedRevisionsDir, repository);
         
-        MixingTool mixing = new MixingTool(historyGraph, repoDirName, clonedRepoDirName, 
-        		antCommand, strategy);
+        Repository clonedRepository = new Repository(clonedRepoDirName, antCommand, strategy);
+        
+        MixingTool mixing = new MixingTool(historyGraph, clonedRepository);
         mixing.run();
 	}
 }
