@@ -174,16 +174,14 @@ public class Util {
     /**
      * reconstruct HistoryGraph instance from serialized revision files
      * 
-     * @param dirPath : full path to the directory containing serialized revision files
-     * @return a HistoryGraph instance containing all revisions corresponding to 
-     * 			serialized revision files in dirPath
+     * @return a HistoryGraph instance containing all revisions corresponding 
+     * to serialized revision files in serializedRevisionsDir
      */
-    public static HistoryGraph reconstructHistoryGraph(Repository repository) {
+    public static HistoryGraph reconstructHistoryGraph(File serializedRevisionsDir, Repository repository) {
     	HistoryGraph hGraph = new HistoryGraph(repository);
-
-    	File dir = repository.getDirectory();
+    	
     	FileFilter filter = new RevisionFileFilter();
-    	File[] revisionFiles = dir.listFiles(filter);
+    	File[] revisionFiles = serializedRevisionsDir.listFiles(filter);
     	
     	for (File revisionFile : revisionFiles) {
     		Revision revision = readObject(Revision.class, revisionFile.getPath());

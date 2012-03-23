@@ -1,3 +1,5 @@
+import java.io.File;
+
 import plume.Option;
 import plume.OptionGroup;
 import plume.Options;
@@ -87,10 +89,13 @@ public class TestIsolationDataReader {
         
         assert strategy != null;
         
-        Repository repository = new Repository(serializedRevisionsDirName, antCommand, strategy);
-        HistoryGraph historyGraph = Util.reconstructHistoryGraph(repository);
+        Repository repository = new Repository(repoDirName, antCommand, strategy);
+        File serializedRevisionsDir = new File(serializedRevisionsDirName);
         
-        MixingTool mixing = new MixingTool(historyGraph, repoDirName, clonedRepoDirName);
+        HistoryGraph historyGraph = Util.reconstructHistoryGraph(serializedRevisionsDir, repository);
+        
+        MixingTool mixing = new MixingTool(historyGraph, repoDirName, clonedRepoDirName, 
+        		antCommand, strategy);
         mixing.run();
 	}
 }

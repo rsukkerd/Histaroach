@@ -42,8 +42,10 @@ public class MixedRevisionTest {
 	private static final String PATHNAME = "test/delta_files";
 	private static final String PATHNAME_CLONE = "test/delta_files_clone";
 	
+	private static final String ANT_COMMAND = "ant";
 	private static final TestParsingStrategy STRATEGY = new VoldemortTestParsingStrategy();
-	private static final Repository REPOSITORY = new Repository(PATHNAME, "ant", STRATEGY);
+	
+	private static final Repository REPOSITORY = new Repository(PATHNAME, ANT_COMMAND, STRATEGY);
 	
 	private static final String FILENAME_1 = "f1";
 	private static final String FILENAME_2 = "f2";
@@ -95,7 +97,8 @@ public class MixedRevisionTest {
 		assertTrue(untar(TAR_FILE));
 		assertTrue(untar(TAR_FILE_CLONE));
 		
-		MixedRevision mr = new MixedRevision(REVISION_2, PATHNAME, PATHNAME_CLONE);
+		MixedRevision mr = new MixedRevision(REVISION_2, PATHNAME, PATHNAME_CLONE, 
+				ANT_COMMAND, STRATEGY);
 		mr.revertFiles(COMBINATION, REVISION_1);
 		
 		checkFile(FILE_1, FILE_1_REVISION_1);
@@ -223,7 +226,8 @@ public class MixedRevisionTest {
 		assertTrue(untar(PRJ_TAR_FILE));
 		assertTrue(untar(PRJ_TAR_FILE_CLONE));
 		
-		MixedRevision mr = new MixedRevision(PRJ_REVISION_2, PRJ_PATHNAME, PRJ_PATHNAME_CLONE);
+		MixedRevision mr = new MixedRevision(PRJ_REVISION_2, PRJ_PATHNAME, PRJ_PATHNAME_CLONE, 
+				ANT_COMMAND, STRATEGY);
 		
 		mr.revertFiles(combination, PRJ_REVISION_1);
 		mr.compileAndRunAllTests();

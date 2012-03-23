@@ -13,7 +13,7 @@ import java.util.Set;
 /**
  * HistoryGraph represents a graph structure of a particular repository.
  * 
- * HistoryGraph has access to the repository that it represents.
+ * HistoryGraph has access to the repository it represents.
  * 
  * HistoryGraph maintain a set of revisions. It has methods to add 
  * revision and to iterate over its set of revisions.
@@ -23,10 +23,9 @@ import java.util.Set;
  */
 public class HistoryGraph implements Iterable<Revision> {
 	
-    /** revisions' order according to 'git log' **/
-    private final Set<Revision> revisions;
     private final Repository repository;
-
+	private final Set<Revision> revisions;
+	
     public HistoryGraph(Repository repository) {
     	this.repository = repository;
         revisions = new HashSet<Revision>();
@@ -39,6 +38,9 @@ public class HistoryGraph implements Iterable<Revision> {
         revisions.add(revision);
     }
     
+    /**
+     * @return Repository this HistoryGraph represents
+     */
     public Repository getRepository() {
     	return repository;
     }

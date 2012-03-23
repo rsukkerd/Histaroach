@@ -9,8 +9,6 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 
-import voldemort.VoldemortTestParsingStrategy;
-
 import common.DiffFile.DiffType;
 import common.Revision.COMPILABLE;
 
@@ -21,9 +19,7 @@ import common.Revision.COMPILABLE;
  * run tests on the partially reverted base revision. These methods determine 
  * the compilability and test result of this MixedRevision.
  */
-public class MixedRevision {    
-    private static final String ANT_COMMAND = "ant";
-    private static final TestParsingStrategy STRATEGY = new VoldemortTestParsingStrategy();
+public class MixedRevision {
 
     private final Revision baseRevision;
     private final Repository repository;
@@ -33,21 +29,26 @@ public class MixedRevision {
     
     private COMPILABLE compilable;
     private TestResult testResult;
-    
     private Map<DiffFile, Revision> revertedFiles;
+    
+    private final String antCommand;
+    private final TestParsingStrategy strategy;
 
     /**
      * Create a MixedRevision
      * 
      * @throws Exception 
      */
-    public MixedRevision(Revision baseRevision, String repoPath, String clonedRepoPath) throws Exception {
+    public MixedRevision(Revision baseRevision, String repoPath, String clonedRepoPath, 
+    		String antCommand, TestParsingStrategy strategy) throws Exception {
         this.baseRevision = baseRevision;
+        this.antCommand = antCommand;
+        this.strategy = strategy;
         
-        repository = new Repository(repoPath, ANT_COMMAND, STRATEGY);        
+        repository = new Repository(repoPath, antCommand, strategy);        
         repoDir = repository.getDirectory();
         
-        clonedRepository = new Repository(clonedRepoPath, ANT_COMMAND, STRATEGY);
+        clonedRepository = new Repository(clonedRepoPath, antCommand, strategy);
         clonedRepoDir = clonedRepository.getDirectory();
         
         compilable = COMPILABLE.UNKNOWN;
@@ -95,7 +96,8 @@ public class MixedRevision {
      * @throws Exception 
      */
     public MixedRevision export() throws Exception {
-    	MixedRevision copy = new MixedRevision(baseRevision, repoDir.getPath(), clonedRepoDir.getPath());
+    	MixedRevision copy = new MixedRevision(baseRevision, repoDir.getPath(), 
+    			clonedRepoDir.getPath(), antCommand, strategy);
     	copy.compilable = compilable;
     	
     	if (testResult == null) {
