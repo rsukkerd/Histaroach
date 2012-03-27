@@ -300,12 +300,10 @@ public class Repository implements Serializable {
     }
 
     /**
-     * Helper method for build(command) and run(command)
-     * 
      * @return YES if build successful, NO if build failed, 
      * and NO_BUILD_FILE if there is no build file
      */
-    private COMPILABLE buildSuccessful(List<String> outputStreamContent,
+    public COMPILABLE buildSuccessful(List<String> outputStreamContent,
             List<String> errorStreamContent) {
         Pattern buildSuccessfulPattern = Pattern.compile("BUILD SUCCESSFUL");
         Pattern buildFailedPattern = Pattern.compile("BUILD FAILED");

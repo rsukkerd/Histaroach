@@ -9,8 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 
@@ -72,21 +70,22 @@ public class MixedRevision {
      */
     public void revertFiles(Set<DiffFile> diffFiles, Revision otherRevision) throws Exception {
     	int exitValue = clonedRepository.checkoutCommit(otherRevision.getCommitID());
-    	if (exitValue != 0) {
-        	throw new Exception("check out other commit unsuccessful");
-        }
-    	    	
-    	for (DiffFile diffFile : diffFiles) {
-    		String filename = diffFile.getFileName();
-    		DiffType type = diffFile.getDiffType();
-    		
-    		if (type == DiffType.MODIFIED || type == DiffType.DELETED) {
-    			copyFile(filename, clonedRepoDir, repoDir);
-    		} else {
-    			deleteFile(filename, repoDir);
-    		}
-    		
-    		revertedFiles.put(diffFile, otherRevision);
+    	
+    	if (exitValue == 0) {
+	    	for (DiffFile diffFile : diffFiles) {
+	    		String filename = diffFile.getFileName();
+	    		DiffType type = diffFile.getDiffType();
+	    		
+	    		if (type == DiffType.MODIFIED || type == DiffType.DELETED) {
+	    			copyFile(filename, clonedRepoDir, repoDir);
+	    		} else {
+	    			deleteFile(filename, repoDir);
+	    		}
+	    		
+	    		revertedFiles.put(diffFile, otherRevision);
+	    	}
+    	} else {
+    		throw new Exception("check out other commit unsuccessful");
     	}
     }
 
@@ -227,7 +226,8 @@ public class MixedRevision {
     }
     
     /**
-     * Compile and run all tests on this MixedRevision
+     * Compile and run all tests on this MixedRevision 
+     * (an alternative of compileAndRunAllTests method)
      * 
      * @modifies this
      */
@@ -246,23 +246,24 @@ public class MixedRevision {
     	    	
         Process process = Util.runProcess(command, dir);
         
-        if (process == null) {
-        	throw new Exception("./run_ant_junit.sh unsuccessful");
-        }
-
-        BufferedReader stdOutputReader = new BufferedReader(
-                new FileReader(new File(ANT_JUNIT_OUTPUT)));
-
-        BufferedReader stdErrorReader = new BufferedReader(
-                new FileReader(new File(ANT_JUNIT_ERROR)));
-
-        List<String> outputStreamContent = Util.getStreamContent(stdOutputReader);
-        List<String> errorStreamContent = Util.getStreamContent(stdErrorReader);
-        
-        compilable = buildSuccessful(outputStreamContent, errorStreamContent);
-        
-        if (compilable == COMPILABLE.YES) {
-            testResult = strategy.getTestResult(baseRevision.getCommitID(), outputStreamContent, errorStreamContent);
+        if (process != null) { // create dependency
+	        BufferedReader stdOutputReader = new BufferedReader(
+	                new FileReader(new File(ANT_JUNIT_OUTPUT)));
+	
+	        BufferedReader stdErrorReader = new BufferedReader(
+	                new FileReader(new File(ANT_JUNIT_ERROR)));
+	
+	        List<String> outputStreamContent = Util.getStreamContent(stdOutputReader);
+	        List<String> errorStreamContent = Util.getStreamContent(stdErrorReader);
+	        
+	        compilable = repository.buildSuccessful(outputStreamContent, errorStreamContent);
+	        
+	        if (compilable == COMPILABLE.YES) {
+	            testResult = strategy.getTestResult(baseRevision.getCommitID(), outputStreamContent, errorStreamContent);
+	        }
+        } else {
+        	// should not happen; Exception should already be thrown at Util.runProcess
+        	assert false;
         }
     }
 
@@ -350,31 +351,4 @@ public class MixedRevision {
         
         return str;
     }
-
-	/**
-	 * @return YES if build successful, NO if build failed, 
-	 * and NO_BUILD_FILE if there is no build file
-	 */
-	private COMPILABLE buildSuccessful(List<String> outputStreamContent,
-	        List<String> errorStreamContent) {
-	    Pattern buildSuccessfulPattern = Pattern.compile("BUILD SUCCESSFUL");
-	    Pattern buildFailedPattern = Pattern.compile("BUILD FAILED");
-	
-	    for (String line : outputStreamContent) {
-	        Matcher buildSuccessfulMatcher = buildSuccessfulPattern
-	                .matcher(line);
-	        if (buildSuccessfulMatcher.find()) {
-	            return COMPILABLE.YES;
-	        }
-	    }
-	
-	    for (String line : errorStreamContent) {
-	        Matcher buildFailedMatcher = buildFailedPattern.matcher(line);
-	        if (buildFailedMatcher.find()) {
-	            return COMPILABLE.NO;
-	        }
-	    }
-	
-	    return COMPILABLE.NO_BUILD_FILE;
-	}
 }
