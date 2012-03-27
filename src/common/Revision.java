@@ -119,7 +119,7 @@ public class Revision implements Serializable {
 	        compilable = pair.getFirst();
 	        testResult = pair.getSecond();
     	} else {
-    		throw new Exception("git checkout commit unsuccessful");
+    		throw new Exception("git checkout commit " + commitID + " unsuccessful");
     	}
     }
 

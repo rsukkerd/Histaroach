@@ -227,7 +227,7 @@ public class Repository implements Serializable {
 	        	}
 	        }
     	} else {
-    		throw new Exception("git checkout commit unsuccessful");
+    		throw new Exception("git checkout commit " + startCommitID + " unsuccessful");
     	}
     	
     	return hGraph;

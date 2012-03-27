@@ -57,7 +57,7 @@ public class MixedRevision {
         
         int exitValue = repository.checkoutCommit(baseRevision.getCommitID());
         if (exitValue != 0) {
-        	throw new Exception("check out base commit unsuccessful");
+        	throw new Exception("check out base commit " + baseRevision.getCommitID() + " unsuccessful");
         }
     }
     
@@ -85,7 +85,7 @@ public class MixedRevision {
 	    		revertedFiles.put(diffFile, otherRevision);
 	    	}
     	} else {
-    		throw new Exception("check out other commit unsuccessful");
+    		throw new Exception("check out other commit " + otherRevision.getCommitID() + " unsuccessful");
     	}
     }
 
