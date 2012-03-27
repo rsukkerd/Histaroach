@@ -34,8 +34,11 @@ public class Revision implements Serializable {
     /**
      * Create a revision.
      * Compilable state and test result are populated in this constructor.
+     * 
+     * @throws Exception 
      */
-    public Revision(Repository repository, String commitID, Map<Revision, List<DiffFile>> parentToDiffFiles) {
+    public Revision(Repository repository, String commitID, Map<Revision, List<DiffFile>> parentToDiffFiles) 
+    		throws Exception {
     	this.repository = repository;
     	this.commitID = commitID;
     	this.parentToDiffFiles = parentToDiffFiles;
@@ -106,14 +109,18 @@ public class Revision implements Serializable {
      * check out this revision, compile and run all tests
      * 
      * @modifies this
+     * @throws Exception 
      */
-    private void populateTestResult() {
+    private void populateTestResult() throws Exception {
     	int exitValue = repository.checkoutCommit(commitID);
-        assert exitValue == 0;
         
-        Pair<COMPILABLE, TestResult> pair = repository.run(repository.antJunit, commitID);
-        compilable = pair.getFirst();
-        testResult = pair.getSecond();
+    	if (exitValue == 0) {
+	        Pair<COMPILABLE, TestResult> pair = repository.run(repository.antJunit, commitID);
+	        compilable = pair.getFirst();
+	        testResult = pair.getSecond();
+    	} else {
+    		throw new Exception("git checkout commit unsuccessful");
+    	}
     }
 
     @Override

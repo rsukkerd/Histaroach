@@ -1,5 +1,4 @@
 import java.io.File;
-import java.io.IOException;
 
 import common.HistoryGraph;
 import common.Repository;
@@ -87,9 +86,9 @@ public class TestIsolationDataGenerator {
      * 
      * @param args
      *            : command line arguments.
-     * @throws IOException
+     * @throws Exception 
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         Options plumeOptions = new Options(
                 TestIsolationDataGenerator.usage_string,
                 TestIsolationDataGenerator.class);

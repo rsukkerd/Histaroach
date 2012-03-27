@@ -28,26 +28,16 @@ public class Util {
 	 * in the given directory
 	 * 
 	 * @return the process
+	 * @throws IOException 
+	 * @throws InterruptedException 
 	 */
-    public static Process runProcess(String[] command, File processDir) {
+    public static Process runProcess(String[] command, File processDir) throws IOException, InterruptedException {
         ProcessBuilder pBuilder = new ProcessBuilder(command);
         pBuilder.directory(processDir);
         Process p = null;
         
-        try {
-            p = pBuilder.start();
-
-            try {
-                // make current thread waits until this process terminates
-                p.waitFor();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                System.exit(1);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
+        p = pBuilder.start();
+        p.waitFor(); // make current thread waits until this process terminates
         
         return p;
     }

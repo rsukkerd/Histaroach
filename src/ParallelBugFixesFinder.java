@@ -1,4 +1,3 @@
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +70,7 @@ public class ParallelBugFixesFinder {
     /** One line synopsis of usage */
     public static final String usage_string = "ParallelBugFixesFinder [options]";
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         Options plumeOptions = new Options(ParallelBugFixesFinder.usage_string);
         plumeOptions.parse_or_usage(args);
 
@@ -92,9 +91,9 @@ public class ParallelBugFixesFinder {
     
     /**
      * @return a set of all parallel bug fixes
-     * @throws IOException
+     * @throws Exception 
      */
-    public static Set<ParallelBugFixes> findAllParallelBugFixes() throws IOException {
+    public static Set<ParallelBugFixes> findAllParallelBugFixes() throws Exception {
     	TestParsingStrategy strategy = null;
         if (projectName.equals(TestIsolationDataGenerator.VOLDEMORT_PROJECT_NAME)) {
         	strategy = new VoldemortTestParsingStrategy();

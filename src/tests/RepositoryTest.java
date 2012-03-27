@@ -354,7 +354,7 @@ public class RepositoryTest {
 	private static final HistoryGraph[] EXPECTED_HGRAPHS_PARTIAL = {HGRAPH_1, HGRAPH_2, HGRAPH_3_PARTIAL, HGRAPH_4_PARTIAL, HGRAPH_5_PARTIAL};
 	
 	@Test
-	public void testBuildFullHistoryGraph() throws FileNotFoundException, IOException {
+	public void testBuildFullHistoryGraph() throws Exception {
 		Util.untar(SAMPLE_REPOSITORIES_TAR_FILE, DEST_DIR);
 		
 		for (int i = 0; i < DIRECTORIES.length; i++) {
@@ -371,7 +371,7 @@ public class RepositoryTest {
 	}
 	
 	@Test
-	public void testBuildPartialHistoryGraph() {
+	public void testBuildPartialHistoryGraph() throws Exception {
 		assertTrue(untar(SAMPLE_REPOSITORIES_TAR_FILE));
 		
 		for (int i = 2; i < DIRECTORIES.length; i++) {
@@ -481,7 +481,7 @@ public class RepositoryTest {
 	}
 	
 	@Test
-	public void testRun() throws FileNotFoundException, IOException {
+	public void testRun() throws Exception {
 		Util.untar(PROJ_TAR_FILE, DEST_DIR);
 		
 		HistoryGraph actualHGraph = null;

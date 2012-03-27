@@ -14,8 +14,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 
-import voldemort.VoldemortTestParsingStrategy;
-
 import common.DiffFile.DiffType;
 import common.Revision.COMPILABLE;
 
@@ -38,8 +36,6 @@ public class MixedRevision {
     private final File repoDir;
     private final File clonedRepoDir;
     
-    private final String antCommand;
-    
     private COMPILABLE compilable;
     private TestResult testResult;
     private Map<DiffFile, Revision> revertedFiles;
@@ -49,12 +45,10 @@ public class MixedRevision {
      * 
      * @throws Exception 
      */
-    public MixedRevision(Revision baseRevision, Repository repository, Repository clonedRepository, 
-    		String antCommand) throws Exception {
+    public MixedRevision(Revision baseRevision, Repository repository, Repository clonedRepository) throws Exception {
         this.baseRevision = baseRevision;
         this.repository = repository;
         this.clonedRepository = clonedRepository;
-        this.antCommand = antCommand;
         
         repoDir = repository.getDirectory();
         clonedRepoDir = clonedRepository.getDirectory();
@@ -103,7 +97,7 @@ public class MixedRevision {
      * @throws Exception 
      */
     public MixedRevision export() throws Exception {
-    	MixedRevision copy = new MixedRevision(baseRevision, repository, clonedRepository, antCommand);
+    	MixedRevision copy = new MixedRevision(baseRevision, repository, clonedRepository);
     	copy.compilable = compilable;
     	
     	if (testResult == null) {
@@ -199,8 +193,10 @@ public class MixedRevision {
      * Compile this MixedRevision
      * 
      * @modifies this
+     * @throws InterruptedException 
+     * @throws IOException 
      */
-    public void compile() {
+    public void compile() throws IOException, InterruptedException {
     	COMPILABLE antBuild = repository.build(repository.antBuild);
     	
     	if (antBuild == COMPILABLE.YES) {
@@ -221,13 +217,20 @@ public class MixedRevision {
      * Compile and run all tests on this MixedRevision
      * 
      * @modifies this
+     * @throws InterruptedException 
+     * @throws IOException 
      */
-    public void compileAndRunAllTests() {
+    public void compileAndRunAllTests() throws IOException, InterruptedException {
         Pair<COMPILABLE, TestResult> pair = repository.run(repository.antJunit, baseRevision.getCommitID());
         compilable = pair.getFirst();
         testResult = pair.getSecond();
     }
     
+    /**
+     * Compile and run all tests on this MixedRevision
+     * 
+     * @modifies this
+     */
     public void runAntJunitViaShell() throws Exception {
     	String workingDir = System.getProperty("user.dir");
     	File dir = new File(workingDir);
@@ -235,11 +238,12 @@ public class MixedRevision {
     	String outputStream = workingDir + File.separatorChar + ANT_JUNIT_OUTPUT;
     	String errorStream = workingDir + File.separatorChar + ANT_JUNIT_ERROR;
     	
+    	TestParsingStrategy strategy = repository.getTestParsingStrategy();
+    	String antCommand = repository.getAntCommand();
+    	
     	String[] command = new String[] { RUN_SCRIPT_COMMAND, repoDir.getPath(), 
     			outputStream, errorStream, antCommand };
-    	
-    	TestParsingStrategy strategy = new VoldemortTestParsingStrategy();
-    	
+    	    	
         Process process = Util.runProcess(command, dir);
         
         if (process == null) {

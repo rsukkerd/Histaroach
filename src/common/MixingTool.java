@@ -17,11 +17,9 @@ public class MixingTool {
 	private final Repository clonedRepository;
 	private final List<Flip> sortedToFailFlips;
 	
-	private final String antCommand;
-
-	public MixingTool(HistoryGraph historyGraph, Repository clonedRepository, String antCommand) {
+	public MixingTool(HistoryGraph historyGraph, Repository clonedRepository) {
+		repository = historyGraph.getRepository();
 		this.clonedRepository = clonedRepository;
-		this.antCommand = antCommand;
 		
 		Set<Flip> flips = historyGraph.getAllFlips();
 		sortedToFailFlips = new ArrayList<Flip>();
@@ -33,14 +31,13 @@ public class MixingTool {
 		}
 		
 		Collections.sort(sortedToFailFlips);
-		
-		repository = historyGraph.getRepository();
 	}
 	
 	public void run() throws Exception {
 		
 		for (Flip flip : sortedToFailFlips) {			
 			List<MixedRevision> mixedRevisions = mixFlip(flip);
+			// TODO: store data
 		}
 	}
 	
@@ -76,22 +73,6 @@ public class MixingTool {
 		return mixedRevisions;
 	}
 	
-	public void runOneFlipOneCombination() throws Exception {
-		Flip targetFlip = null;
-		for (Flip flip : sortedToFailFlips) {
-			if (flip.getChildRevision().getCommitID().equals("e701860")) {
-				targetFlip = flip;
-			}
-		}
-		
-		LOGGER.info("Flip:\n" + targetFlip);
-		
-		Set<DiffFile> combination = new HashSet<DiffFile>();
-		combination.add(targetFlip.getDiffFiles().get(0));
-		
-		revertChildToParent(targetFlip, combination);
-	}
-	
 	/**
 	 * 
 	 * @requires flip has only TO_FAIL tests
@@ -105,7 +86,7 @@ public class MixingTool {
 		Revision child = flip.getChildRevision();
 		Revision parent = flip.getParentRevision();
 		
-		MixedRevision mixedRevision = new MixedRevision(child, repository, clonedRepository, antCommand);
+		MixedRevision mixedRevision = new MixedRevision(child, repository, clonedRepository);
 		
 		mixedRevision.revertFiles(diffFilesToBeReverted, parent);
 		// mixedRevision.compileAndRunAllTests();
@@ -132,13 +113,7 @@ public class MixingTool {
 	public void evaluateCompilableMixedRevision(Flip flip, MixedRevision compilableMixedRevision) {
 		Revision child = flip.getChildRevision();
 		Set<String> childFailedTests = child.getTestResult().getFailedTests();
-		Set<String> childPassedTests = new HashSet<String>();
-		
-		for (String test : child.getTestResult().getAllTests()) {
-			if (!childFailedTests.contains(test)) {
-				childPassedTests.add(test);
-			}
-		}
+		Set<String> childPassedTests = child.getTestResult().getPassedTests();
 		
 		Set<String> toFailTests = flip.getToFailTests();
 		

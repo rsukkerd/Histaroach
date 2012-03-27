@@ -1,6 +1,7 @@
 package common;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -18,6 +19,7 @@ public class TestResult implements Serializable {
 	private final String commitID;
     private /*@Non-Null*/ Set<String> allTests;
     private /*@Non-Null*/ Set<String> failedTests;
+    private /*@Non-Null*/ Set<String> passedTests;
 
     /**
      * Create a TestResult instance
@@ -27,6 +29,13 @@ public class TestResult implements Serializable {
         this.commitID = commitID;
         this.allTests = allTests;
         this.failedTests = failedTests;
+        
+        passedTests = new HashSet<String>();
+        for (String test : allTests) {
+        	if (!failedTests.contains(test)) {
+        		passedTests.add(test);
+        	}
+        }
     }
     
     /**
@@ -49,19 +58,26 @@ public class TestResult implements Serializable {
     public Set<String> getFailedTests() {
         return failedTests;
     }
+    
+    /**
+     * @return a set of passed tests
+     */
+    public Set<String> getPassedTests() {
+        return passedTests;
+    }
 
     /**
      * @return true iff this revision passes the test
      */
     public boolean pass(String test) {
-        return !this.getFailedTests().contains(test) && this.getAllTests().contains(test);
+        return passedTests.contains(test);
     }
 
     /**
      * @return true iff this revision fails the test
      */
     public boolean fail(String test) {
-        return this.getFailedTests().contains(test);
+        return failedTests.contains(test);
     }
 
     @Override

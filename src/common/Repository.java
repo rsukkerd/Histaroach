@@ -2,6 +2,7 @@ package common;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ public class Repository implements Serializable {
     public static final String JUNIT_TEST_COMMAND = "junit-test -Dtest.name=";
 
     private final File directory;
+    private final String antCommand;
     private final TestParsingStrategy strategy;
 
     protected final String[] antBuild;
@@ -55,6 +57,7 @@ public class Repository implements Serializable {
      */
     public Repository(String pathname, String antCommand, TestParsingStrategy strategy) {
         directory = new File(pathname);
+        this.antCommand = antCommand;
         this.strategy = strategy;
 
         String[] ant = antCommand.split(" ");
@@ -79,135 +82,153 @@ public class Repository implements Serializable {
     public File getDirectory() {
         return directory;
     }
+    
+    /**
+     * @return ant command
+     */
+    public String getAntCommand() {
+    	return antCommand;
+    }
+    
+    /**
+     * @return TestParsingStrategy of this repository
+     */
+    public TestParsingStrategy getTestParsingStrategy() {
+    	return strategy;
+    }
 
     /**
      * Build a history graph containing revisions from startCommit to 
      * endCommit.
      * 
      * @return a history graph of this repository
+     * @throws Exception
      */
-    public HistoryGraph buildHistoryGraph(String startCommitID, String endCommitID) {
+    public HistoryGraph buildHistoryGraph(String startCommitID, String endCommitID) throws Exception {
     	HistoryGraph hGraph = new HistoryGraph(this);
     	
     	int exitValue = checkoutCommit(startCommitID);
-        assert (exitValue == 0);
-
-        Process logProcess = Util.runProcess(LOG_COMMAND, directory);
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(
-                logProcess.getInputStream()));
-
-        List<String> lines = Util.getStreamContent(reader);
-        
-        // parent id -> a list of its children's ids
-        Map<String, List<String>> parentIDToChildrenIDs = new HashMap<String, List<String>>();
-        // child id -> a list of its parents' ids
-        Map<String, List<String>> childIDToParentsIDs = new HashMap<String, List<String>>();
-        
-        // special case : the start revision has no children
-        if (!lines.isEmpty()) {
-        	String line = lines.get(0);
-        	String[] hashes = line.split(" ");
-        	
-        	String topID = hashes[0];
-        	parentIDToChildrenIDs.put(topID, new ArrayList<String>());
-        }
-        
-        for (String line : lines) {
-        	String[] hashes = line.split(" ");
-
-            String childID = hashes[0];
-            List<String> parentsIDs = new ArrayList<String>();
-            
-            for (int i = 1; i < hashes.length; i++) {
-            	String parentID = hashes[i];
-            	parentsIDs.add(parentID);
-            	
-            	if (parentIDToChildrenIDs.containsKey(parentID)) {
-            		parentIDToChildrenIDs.get(parentID).add(childID);
-            	} else {
-            		List<String> childrenIDs = new ArrayList<String>();
-            		childrenIDs.add(childID);
-            		parentIDToChildrenIDs.put(parentID, childrenIDs);
-            	}
-            }
-            
-            childIDToParentsIDs.put(childID, parentsIDs);
-            
-            if (childID.equals(endCommitID)) {
-            	break;
-            }
-        }
-        
-        // commit id -> number of its parents
-        Map<String, Integer> incomingEdgeCounter = new HashMap<String, Integer>();
-        
-        for (String childID : childIDToParentsIDs.keySet()) {
-        	int incomingEdges = 0;
-        	List<String> parentsIDs = childIDToParentsIDs.get(childID);
-        	for (String parentID : parentsIDs) {
-        		if (childIDToParentsIDs.containsKey(parentID)) {
-        			incomingEdges++;
-        		}
-        	}
-        	
-        	incomingEdgeCounter.put(childID, incomingEdges);
-        }
-        
-        Set<String> noIncomingEdge = new HashSet<String>();
-        
-        for (String commitID : incomingEdgeCounter.keySet()) {
-        	int count = incomingEdgeCounter.get(commitID);
-        	if (count == 0) {
-        		noIncomingEdge.add(commitID);
-        	}
-        }
-        
-        // commit id -> its revision object
-        Map<String, Revision> revisions = new HashMap<String, Revision>();
-        
-        while (!noIncomingEdge.isEmpty()) {
-        	Iterator<String> itr = noIncomingEdge.iterator();
-        	String commitID = itr.next();
-        	noIncomingEdge.remove(commitID);
-        	
-        	Map<Revision, List<DiffFile>> parentToDiffFiles = new HashMap<Revision, List<DiffFile>>();
-        	
-        	List<String> parentsIDs = childIDToParentsIDs.get(commitID);
-        	for (String parentID : parentsIDs) {
-        		Revision parent;
-        		if (revisions.containsKey(parentID)) {
-        			parent = revisions.get(parentID);
-        		} else {
-        			// dummy revision of parent
-        			parent = new Revision(this, parentID, new HashMap<Revision, List<DiffFile>>(), 
-        					COMPILABLE.UNKNOWN, null);
-        		}
-        		
-        		List<DiffFile> diffFiles = getDiffFiles(commitID, parentID);
-        		
-        		parentToDiffFiles.put(parent, diffFiles);
-        	}
-        	
-        	Revision revision = new Revision(this, commitID, parentToDiffFiles);
-        	hGraph.addRevision(revision);
-        	
-        	/* print progress to standard out */
-        	System.out.println(revision);
-        	
-        	revisions.put(commitID, revision);
-        	
-        	List<String> childrenIDs = parentIDToChildrenIDs.get(commitID);
-        	
-        	for (String childID : childrenIDs) {
-        		int edges = incomingEdgeCounter.get(childID);
-        		incomingEdgeCounter.put(childID, edges - 1);
-        		
-        		if (edges - 1 == 0) {
-        			noIncomingEdge.add(childID);
-        		}
-        	}
-        }
+    	
+    	if (exitValue == 0) {
+	        Process logProcess = Util.runProcess(LOG_COMMAND, directory);
+	
+	        BufferedReader reader = new BufferedReader(new InputStreamReader(
+	                logProcess.getInputStream()));
+	
+	        List<String> lines = Util.getStreamContent(reader);
+	        
+	        // parent id -> a list of its children's ids
+	        Map<String, List<String>> parentIDToChildrenIDs = new HashMap<String, List<String>>();
+	        // child id -> a list of its parents' ids
+	        Map<String, List<String>> childIDToParentsIDs = new HashMap<String, List<String>>();
+	        
+	        // special case : the start revision has no children
+	        if (!lines.isEmpty()) {
+	        	String line = lines.get(0);
+	        	String[] hashes = line.split(" ");
+	        	
+	        	String topID = hashes[0];
+	        	parentIDToChildrenIDs.put(topID, new ArrayList<String>());
+	        }
+	        
+	        for (String line : lines) {
+	        	String[] hashes = line.split(" ");
+	
+	            String childID = hashes[0];
+	            List<String> parentsIDs = new ArrayList<String>();
+	            
+	            for (int i = 1; i < hashes.length; i++) {
+	            	String parentID = hashes[i];
+	            	parentsIDs.add(parentID);
+	            	
+	            	if (parentIDToChildrenIDs.containsKey(parentID)) {
+	            		parentIDToChildrenIDs.get(parentID).add(childID);
+	            	} else {
+	            		List<String> childrenIDs = new ArrayList<String>();
+	            		childrenIDs.add(childID);
+	            		parentIDToChildrenIDs.put(parentID, childrenIDs);
+	            	}
+	            }
+	            
+	            childIDToParentsIDs.put(childID, parentsIDs);
+	            
+	            if (childID.equals(endCommitID)) {
+	            	break;
+	            }
+	        }
+	        
+	        // commit id -> number of its parents
+	        Map<String, Integer> incomingEdgeCounter = new HashMap<String, Integer>();
+	        
+	        for (String childID : childIDToParentsIDs.keySet()) {
+	        	int incomingEdges = 0;
+	        	List<String> parentsIDs = childIDToParentsIDs.get(childID);
+	        	for (String parentID : parentsIDs) {
+	        		if (childIDToParentsIDs.containsKey(parentID)) {
+	        			incomingEdges++;
+	        		}
+	        	}
+	        	
+	        	incomingEdgeCounter.put(childID, incomingEdges);
+	        }
+	        
+	        Set<String> noIncomingEdge = new HashSet<String>();
+	        
+	        for (String commitID : incomingEdgeCounter.keySet()) {
+	        	int count = incomingEdgeCounter.get(commitID);
+	        	if (count == 0) {
+	        		noIncomingEdge.add(commitID);
+	        	}
+	        }
+	        
+	        // commit id -> its revision object
+	        Map<String, Revision> revisions = new HashMap<String, Revision>();
+	        
+	        while (!noIncomingEdge.isEmpty()) {
+	        	Iterator<String> itr = noIncomingEdge.iterator();
+	        	String commitID = itr.next();
+	        	noIncomingEdge.remove(commitID);
+	        	
+	        	Map<Revision, List<DiffFile>> parentToDiffFiles = new HashMap<Revision, List<DiffFile>>();
+	        	
+	        	List<String> parentsIDs = childIDToParentsIDs.get(commitID);
+	        	for (String parentID : parentsIDs) {
+	        		Revision parent;
+	        		if (revisions.containsKey(parentID)) {
+	        			parent = revisions.get(parentID);
+	        		} else {
+	        			// dummy revision of parent
+	        			parent = new Revision(this, parentID, new HashMap<Revision, List<DiffFile>>(), 
+	        					COMPILABLE.UNKNOWN, null);
+	        		}
+	        		
+	        		List<DiffFile> diffFiles = getDiffFiles(commitID, parentID);
+	        		
+	        		parentToDiffFiles.put(parent, diffFiles);
+	        	}
+	        	
+	        	Revision revision = new Revision(this, commitID, parentToDiffFiles);
+	        	hGraph.addRevision(revision);
+	        	
+	        	/* print progress to standard out */
+	        	System.out.println(revision);
+	        	
+	        	revisions.put(commitID, revision);
+	        	
+	        	List<String> childrenIDs = parentIDToChildrenIDs.get(commitID);
+	        	
+	        	for (String childID : childrenIDs) {
+	        		int edges = incomingEdgeCounter.get(childID);
+	        		incomingEdgeCounter.put(childID, edges - 1);
+	        		
+	        		if (edges - 1 == 0) {
+	        			noIncomingEdge.add(childID);
+	        		}
+	        	}
+	        }
+    	} else {
+    		throw new Exception("git checkout commit unsuccessful");
+    	}
     	
     	return hGraph;
     }
@@ -216,8 +237,10 @@ public class Repository implements Serializable {
      * Checks out a given commit from this repository.
      * 
      * @return exit value of 'git checkout' process
+     * @throws InterruptedException 
+     * @throws IOException 
      */
-    public int checkoutCommit(String commitID) {
+    public int checkoutCommit(String commitID) throws IOException, InterruptedException {
         Process p = Util.runProcess(
                 new String[] { "git", "checkout", commitID }, directory);
         return p.exitValue();
@@ -228,8 +251,10 @@ public class Repository implements Serializable {
      * 
      * @return YES if build successful, NO if build failed, 
      * and NO_BUILD_FILE if there is no build file
+     * @throws InterruptedException 
+     * @throws IOException 
      */
-    public COMPILABLE build(String[] buildCommand) {
+    public COMPILABLE build(String[] buildCommand) throws IOException, InterruptedException {
         Process process = Util.runProcess(buildCommand, directory);
 
         BufferedReader stdOutputReader = new BufferedReader(
@@ -249,8 +274,10 @@ public class Repository implements Serializable {
      * run a given test command
      * 
      * @return a pair of compilable flag and test result
+     * @throws InterruptedException 
+     * @throws IOException 
      */
-    public Pair<COMPILABLE, TestResult> run(String[] testCommand, String commitID) {
+    public Pair<COMPILABLE, TestResult> run(String[] testCommand, String commitID) throws IOException, InterruptedException {
         Process process = Util.runProcess(testCommand, directory);
 
         BufferedReader stdOutputReader = new BufferedReader(
@@ -305,9 +332,11 @@ public class Repository implements Serializable {
      * Helper method for buildHistoryGraph
      * 
      * @return a list of diff files between childCommit and parentCommit
+     * @throws InterruptedException 
+     * @throws IOException 
      */
     private List<DiffFile> getDiffFiles(String childCommitID,
-            String parentCommitID) {
+            String parentCommitID) throws IOException, InterruptedException {
         List<DiffFile> diffFiles = new ArrayList<DiffFile>();
 
         Process p = Util.runProcess(new String[] { "git", "diff",
