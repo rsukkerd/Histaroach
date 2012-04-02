@@ -1,16 +1,18 @@
+import git.GitRepository;
+
 import java.io.File;
 
+import ant.AntBuildStrategy;
+
+import common.BuildStrategy;
 import common.HistoryGraph;
 import common.Repository;
 import common.Revision;
-import common.TestParsingStrategy;
 import common.Util;
 
 import plume.Option;
 import plume.OptionGroup;
 import plume.Options;
-
-import voldemort.VoldemortTestParsingStrategy;
 
 /**
  * TestIsolationDataGenerator builds a HistoryGraph from voldemort repository
@@ -26,7 +28,8 @@ public class TestIsolationDataGenerator {
     // Extension of human-readable files.
     public static final String HUMAN_READ_EXTENSION = ".log";
     
-    public static final String VOLDEMORT_PROJECT_NAME = "voldemort";
+    public static final String GIT = "Git";
+    public static final String ANT = "Ant";
     
     /**
      * Print the short usage message.
@@ -36,11 +39,38 @@ public class TestIsolationDataGenerator {
     public static boolean showHelp = false;
 
     /**
-     * The ant command used for running ant. By default this is just 'ant'.
+	 * Full path to the repository directory.
+	 */
+	@Option(value = "-r Full path to the repository directory (Required)",
+	        aliases = { "-repoPath" })
+	public static String repoPath = null;
+    
+	/**
+	 * Type of the repository. Default is Git.
+	 */
+    @Option(value = "-R repository type (Optional)", 
+    		aliases = { "-repoType" })
+    public static String repoType = "Git";
+    
+    /**
+     * Build tool used by the project. Default is Ant.
      */
-    @Option(value = "-a ant command (Optional)", aliases = { "-antCommand" })
-    public static String antCommand = "ant";
-
+    @Option(value = "-B build tool (Optional)", 
+    		aliases = { "-buildTool" })
+    public static String buildTool = "Ant";
+    
+    /**
+     * Build command. Default is 'ant'.
+     */
+    @Option(value = "-b build command (Optional)", aliases = { "-buildCommand" })
+    public static String buildCommand = "ant";
+    
+    /**
+     * Command to compile the project and run all unit tests.
+     */
+    @Option(value = "-t test command (Required)", aliases = { "-testCommand" })
+    public static String testCommand = null;
+    
     /**
      * The commit ID from which to begin the HistoryGraph analysis.
      */
@@ -56,27 +86,13 @@ public class TestIsolationDataGenerator {
     public static String endCommitID = null;
 
     /**
-     * Full path to the repository directory.
-     */
-    @Option(value = "-r Full path to the repository directory (Required)",
-            aliases = { "-repoDir" })
-    public static String repositoryDirName = null;
-
-    /**
      * Full path to the output directory. 
      * Must NOT contain '/' at the end of the path.
      */
     @Option(value = "-o Full path to the output directory (Required)",
-            aliases = { "-outputDir" })
-    public static String outputDirName = null;
+            aliases = { "-outputPath" })
+    public static String outputPath = null;
     
-    /**
-     * Project name
-     */
-    @Option(value = "-p Project name (Required)",
-    		aliases = { "-projectName" })
-    public static String projectName = null;
-
     /** One line synopsis of usage */
     public static final String usage_string = "TestIsolationDataGenerator [options]";
 
@@ -100,36 +116,44 @@ public class TestIsolationDataGenerator {
             return;
         }
 
-        if (startCommitID == null || endCommitID == null || repositoryDirName == null 
-        		|| outputDirName == null || projectName == null) {
+        if (repoPath == null || testCommand == null 
+        		|| startCommitID == null || endCommitID == null 
+        		|| outputPath == null) {
             plumeOptions.print_usage();
             return;
         }
         
-        TestParsingStrategy strategy = null;
-        if (projectName.equals(VOLDEMORT_PROJECT_NAME)) {
-        	strategy = new VoldemortTestParsingStrategy();
+        File repoDir = new File(repoPath);
+        
+        Repository repository = null;
+        BuildStrategy buildStrategy = null;
+        
+        if (buildTool.equals(ANT)) {
+        	buildStrategy = new AntBuildStrategy(repoDir, buildCommand, testCommand);
         }
         
-        assert strategy != null;
-
-        Repository repository = new Repository(repositoryDirName, antCommand, strategy);
+        if (repoType.equals(GIT)) {
+        	repository = new GitRepository(repoDir, buildStrategy);
+        }
+        
+        assert buildStrategy != null && repository != null;
+        
         HistoryGraph historyGraph = repository.buildHistoryGraph(startCommitID, endCommitID);
         
         exportTestResults(historyGraph);
 
         String fileName = "_" + startCommitID + "_" + endCommitID;
         
-        Util.writeToHumanReadableFile(outputDirName + File.separatorChar + HGRAPH_FILE_PREFIX + fileName
+        Util.writeToHumanReadableFile(outputPath + File.separatorChar + HGRAPH_FILE_PREFIX + fileName
                 + HUMAN_READ_EXTENSION, historyGraph);
     }
 
     /**
-     * write each revision in the historyGraph to a serialized file
+     * Write each Revision in the HistoryGraph to a serialized file.
      */
     public static void exportTestResults(HistoryGraph historyGraph) {
     	for (Revision revision : historyGraph) {
-    		String filename = outputDirName + File.separatorChar + revision.getCommitID() + SERIALIZED_EXTENSION;
+    		String filename = outputPath + File.separatorChar + revision.getCommitID() + SERIALIZED_EXTENSION;
     		Util.writeToSerializedFile(filename, revision);
     	}
     }
