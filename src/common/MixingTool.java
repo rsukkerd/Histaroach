@@ -89,8 +89,7 @@ public class MixingTool {
 		MixedRevision mixedRevision = new MixedRevision(child, repository, clonedRepository);
 		
 		mixedRevision.revertFiles(diffFilesToBeReverted, parent);
-		// mixedRevision.compileAndRunAllTests();
-		mixedRevision.runAntJunitViaShell();
+		mixedRevision.runTest();
 		
 		MixedRevision exportedMixedRevision = mixedRevision.export();
 		

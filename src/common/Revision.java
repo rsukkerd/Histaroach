@@ -6,9 +6,12 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Revision represents a state of a particular commit. Revision has access to
- * its repository, commit ID, a set of its parents and their corresponding diff
- * files, compilable state, and test result. 
+ * Revision represents a state of a particular commit. 
+ * 
+ * Revision has access to its Repository, commit ID, 
+ * a set of its parents and their corresponding DiffFile's, 
+ * COMPILABLE state, and TestResult. 
+ * 
  * Revision is immutable.
  */
 public class Revision implements Serializable {
@@ -32,8 +35,8 @@ public class Revision implements Serializable {
     private/* @Nullable */TestResult testResult;
 
     /**
-     * Create a revision.
-     * Compilable state and test result are populated in this constructor.
+     * Create a Revision. 
+     * COMPILABLE state and TestResult are populated in this constructor.
      * 
      * @throws Exception 
      */
@@ -50,8 +53,8 @@ public class Revision implements Serializable {
     }
     
     /**
-     * Create a revision.
-     * Compilable state and test result are given.
+     * Create a Revision. 
+     * COMPILABLE state and TestResult are given.
      */
     public Revision(Repository repository, String commitID, Map<Revision, List<DiffFile>> parentToDiffFiles, 
     		COMPILABLE compilable, TestResult testResult) {
@@ -63,50 +66,51 @@ public class Revision implements Serializable {
     }
 
     /**
-     * @return repository of this revision
+     * @return a Repository of this Revision
      */
     public Repository getRepository() {
         return repository;
     }
 
     /**
-     * @return commit ID of this revision
+     * @return a commit ID of this Revision
      */
     public String getCommitID() {
         return commitID;
     }
 
     /**
-     * @return set of parents of this revision
+     * @return a set of parents of this Revision
      */
     public Set<Revision> getParents() {
         return parentToDiffFiles.keySet();
     }
 
     /**
-     * @return list of diff files corresponding to the given parent, 
-     * null if parent is not a parent of this revision
+     * @return a list of DiffFile's corresponding to the given parent, 
+     *         null if parent is not a parent of this Revision
      */
     public List<DiffFile> getDiffFiles(Revision parent) {
         return parentToDiffFiles.get(parent);
     }
 
     /**
-     * @return compilable flag of this revision
+     * @return a COMPILABLE state of this Revision
      */
     public COMPILABLE isCompilable() {
         return compilable;
     }
 
     /**
-     * @return test result of this revision
+     * @return a TestResult of this Revision
      */
     public TestResult getTestResult() {
         return testResult;
     }
 
     /**
-     * check out this revision, compile and run all tests
+     * Check out this Revision from the Repository, 
+     * compile and run all tests.
      * 
      * @modifies this
      * @throws Exception 
@@ -115,7 +119,8 @@ public class Revision implements Serializable {
     	int exitValue = repository.checkoutCommit(commitID);
         
     	if (exitValue == 0) {
-	        Pair<COMPILABLE, TestResult> pair = repository.run(repository.antJunit, commitID);
+    		BuildStrategy buildStrategy = repository.getBuildStrategy();
+	        Pair<COMPILABLE, TestResult> pair = buildStrategy.runTest(commitID);
 	        compilable = pair.getFirst();
 	        testResult = pair.getSecond();
     	} else {

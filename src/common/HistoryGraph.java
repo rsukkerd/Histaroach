@@ -11,35 +11,38 @@ import java.util.Queue;
 import java.util.Set;
 
 /**
- * HistoryGraph represents a graph structure of a particular repository.
+ * HistoryGraph represents a graph structure of a particular Repository. 
  * 
- * HistoryGraph has access to the repository it represents.
+ * HistoryGraph has access to the Repository it represents. 
  * 
- * HistoryGraph maintain a set of revisions. It has methods to add 
- * revision and to iterate over its set of revisions.
+ * HistoryGraph maintain a set of Revision's. It has methods to add 
+ * a Revision and to iterate over its set of Revision's. 
  * 
- * HistoryGraph has a method to get a set of flips that are present 
- * in its list of revisions.
+ * HistoryGraph has a method to get a set of Flip's that are present 
+ * in its list of Revision's.
  */
 public class HistoryGraph implements Iterable<Revision> {
 	
     private final Repository repository;
 	private final Set<Revision> revisions;
 	
+	/**
+	 * Create an empty HistoryGraph.
+	 */
     public HistoryGraph(Repository repository) {
     	this.repository = repository;
         revisions = new HashSet<Revision>();
     }
 
     /**
-     * Add a revision to this HistoryGraph
+     * Add a Revision to this HistoryGraph.
      */
     public void addRevision(Revision revision) {
         revisions.add(revision);
     }
     
     /**
-     * @return Repository this HistoryGraph represents
+     * @return a Repository this HistoryGraph represents
      */
     public Repository getRepository() {
     	return repository;
@@ -47,7 +50,7 @@ public class HistoryGraph implements Iterable<Revision> {
 
     /**
      * @return true if and only if revision_A and revision_B 
-     * are parallel in this HistoryGraph
+     *         are parallel in this HistoryGraph
      */
     public boolean parallel(Revision revision_A, Revision revision_B) {
         return !revision_A.equals(revision_B)
@@ -90,7 +93,7 @@ public class HistoryGraph implements Iterable<Revision> {
     }
     
     /**
-     * @return a set of all flips in this HistoryGraph
+     * @return a set of all Flip's in this HistoryGraph
      */
     public Set<Flip> getAllFlips() {
         Set<Flip> flips = new HashSet<Flip>();

@@ -25,7 +25,7 @@ public class Util {
 
 	/**
 	 * Create a process that executes the given command 
-	 * in the given directory
+	 * in the given directory.
 	 * 
 	 * @return the process
 	 * @throws IOException 
@@ -43,7 +43,7 @@ public class Util {
     }
     
     /**
-     * Read and cache content from reader
+     * Read and cache content from reader.
      * 
      * @return a list of lines obtained by reader.readline()
      * @throws IOException
@@ -65,7 +65,7 @@ public class Util {
     }
     
     /**
-     * Write an object to a serialized output file
+     * Write an object to a serialized output file.
      */
     public static void writeToSerializedFile(String fileName, Object object) {
     	ObjectOutputStream output;
@@ -82,7 +82,7 @@ public class Util {
     }
     
     /**
-     * Write an object in a human-readable form to an output file
+     * Write an object in a human-readable form to an output file.
      */
     public static void writeToHumanReadableFile(String fileName, Object object) {
         BufferedWriter outFileWriter;
@@ -97,7 +97,7 @@ public class Util {
     }
     
     /**
-     * Read an object from a serialized input file
+     * Read an object from a serialized input file.
      * 
      * @return an object of type T
      */
@@ -121,7 +121,7 @@ public class Util {
     }
     
     /**
-     * Untar a repoTarFile and put its entries in repoDir
+     * Untar a repoTarFile and put its entries in repoDir.
      * 
      * @throws FileNotFoundException
      * @throws IOException
@@ -170,10 +170,10 @@ public class Util {
     }
     
     /**
-     * Reconstruct HistoryGraph instance from serialized revision files
+     * Reconstruct a HistoryGraph instance from serialized Revision files.
      * 
-     * @return a HistoryGraph instance containing all revisions corresponding 
-     * to serialized revision files in serializedRevisionsDir
+     * @return a HistoryGraph containing all revisions corresponding 
+     *         to serialized revision files in serializedRevisionsDir
      */
     public static HistoryGraph reconstructHistoryGraph(File serializedRevisionsDir, Repository repository) {
     	HistoryGraph hGraph = new HistoryGraph(repository);
