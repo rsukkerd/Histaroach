@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import git.GitRepository;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -17,40 +19,57 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
-import voldemort.VoldemortTestParsingStrategy;
+import ant.AntBuildStrategy;
 
+import common.BuildStrategy;
 import common.DiffFile;
 import common.DiffFile.DiffType;
 import common.HistoryGraph;
 import common.Repository;
 import common.Revision;
-import common.TestParsingStrategy;
 import common.Revision.COMPILABLE;
 import common.TestResult;
 import common.Util;
 
 public class RepositoryTest {
-	public static final String ANT_COMMAND = "ant";
-
+	private static final String ANT_COMMAND = "ant";
+	private static final String TEST_COMMAND = "junit";
+	private static final String DEST_PATH = "test";
+	
+	/****************************/
+	/** in sample_repositories **/
+	/****************************/
 	private static final String SAMPLE_REPOSITORIES = "test/sample_repositories";
 	private static final String SAMPLE_REPOSITORIES_TAR_FILE = "test/sample_repositories.tar";
-	private static final String PROJ = "test/project";
-	private static final String PROJ_TAR_FILE = "test/project.tar";
-	private static final String DEST_DIR = "test";
 	
-	private static final String[] DIRECTORIES = {"test/sample_repositories/repo1", 
-    											"test/sample_repositories/repo2",
-    											"test/sample_repositories/repo3",
-    											"test/sample_repositories/repo4",
-    											"test/sample_repositories/repo5"};
-    
-	private static final TestParsingStrategy STRATEGY = new VoldemortTestParsingStrategy();
+	private static final String[] PATHS = { "test/sample_repositories/repo1", 
+		"test/sample_repositories/repo2", 
+		"test/sample_repositories/repo3", 
+		"test/sample_repositories/repo4", 
+		"test/sample_repositories/repo5"};
 	
-    private static final Repository REPOSITORY_1 = new Repository(DIRECTORIES[0], ANT_COMMAND, STRATEGY);
-    private static final Repository REPOSITORY_2 = new Repository(DIRECTORIES[1], ANT_COMMAND, STRATEGY);
-    private static final Repository REPOSITORY_3 = new Repository(DIRECTORIES[2], ANT_COMMAND, STRATEGY);
-    private static final Repository REPOSITORY_4 = new Repository(DIRECTORIES[3], ANT_COMMAND, STRATEGY);
-    private static final Repository REPOSITORY_5 = new Repository(DIRECTORIES[4], ANT_COMMAND, STRATEGY);
+	private static final File[] DIRECTORIES = new File[5];
+	static {
+		for (int i = 0; i < PATHS.length; i++) {
+			File dir = new File(PATHS[i]);
+			DIRECTORIES[i] = dir;
+		}
+	}
+	
+	private static final BuildStrategy[] BUILD_STRATEGIES = new AntBuildStrategy[5];
+	static {
+		for (int i = 0; i < DIRECTORIES.length; i++) {
+			BuildStrategy buildStrategy = new AntBuildStrategy(DIRECTORIES[i], 
+					ANT_COMMAND, TEST_COMMAND);
+			BUILD_STRATEGIES[i] = buildStrategy;
+		}
+	}
+	
+    private static final Repository REPOSITORY_1 = new GitRepository(DIRECTORIES[0], BUILD_STRATEGIES[0]);
+    private static final Repository REPOSITORY_2 = new GitRepository(DIRECTORIES[1], BUILD_STRATEGIES[1]);
+    private static final Repository REPOSITORY_3 = new GitRepository(DIRECTORIES[2], BUILD_STRATEGIES[2]);
+    private static final Repository REPOSITORY_4 = new GitRepository(DIRECTORIES[3], BUILD_STRATEGIES[3]);
+    private static final Repository REPOSITORY_5 = new GitRepository(DIRECTORIES[4], BUILD_STRATEGIES[4]);
     
 	private static final List<DiffFile> DIFF_FILES = new ArrayList<DiffFile>();
 	static {
@@ -355,10 +374,10 @@ public class RepositoryTest {
 	
 	@Test
 	public void testBuildFullHistoryGraph() throws Exception {
-		Util.untar(SAMPLE_REPOSITORIES_TAR_FILE, DEST_DIR);
+		assertTrue(untar(SAMPLE_REPOSITORIES_TAR_FILE));
 		
 		for (int i = 0; i < DIRECTORIES.length; i++) {
-			Repository repo = new Repository(DIRECTORIES[i], ANT_COMMAND, STRATEGY);
+			Repository repo = new GitRepository(DIRECTORIES[i], BUILD_STRATEGIES[i]);
 	
 			HistoryGraph actualHGraph = null;
 			actualHGraph = repo.buildHistoryGraph(START_COMMIT_IDS[i], END_COMMIT_IDS[i]);
@@ -367,7 +386,7 @@ public class RepositoryTest {
 			assertEquals("result mismatched on " + DIRECTORIES[i], EXPECTED_HGRAPHS[i], actualHGraph);
 		}
 		
-		FileUtils.deleteDirectory(new File(SAMPLE_REPOSITORIES));
+		assertTrue(deleteDirectory(SAMPLE_REPOSITORIES));
 	}
 	
 	@Test
@@ -375,7 +394,7 @@ public class RepositoryTest {
 		assertTrue(untar(SAMPLE_REPOSITORIES_TAR_FILE));
 		
 		for (int i = 2; i < DIRECTORIES.length; i++) {
-			Repository repo = new Repository(DIRECTORIES[i], ANT_COMMAND, STRATEGY);
+			Repository repo = new GitRepository(DIRECTORIES[i], BUILD_STRATEGIES[i]);
 	
 			HistoryGraph actualHGraph = null;
 			actualHGraph = repo.buildHistoryGraph(START_COMMIT_IDS[i], END_COMMIT_IDS_PARTIAL[i]);
@@ -387,8 +406,18 @@ public class RepositoryTest {
 		assertTrue(deleteDirectory(SAMPLE_REPOSITORIES));
 	}
 	
-	/** in proj **/
-	private static final Repository REPOSITORY_PROJ = new Repository(PROJ, ANT_COMMAND, STRATEGY);
+	/****************/
+	/** in project **/
+	/****************/
+	private static final String PROJ = "test/project";
+	private static final String PROJ_TAR_FILE = "test/project.tar";
+	
+	private static final File PROJ_DIR = new File(PROJ);
+	
+	private static final BuildStrategy PROJ_BUILD_STARTEGY = new AntBuildStrategy(PROJ_DIR, 
+			ANT_COMMAND, TEST_COMMAND);
+	
+	private static final Repository REPOSITORY_PROJ = new GitRepository(PROJ_DIR, PROJ_BUILD_STARTEGY);
 	
 	private static final String COMMIT_1 = "8a75644";
 	private static final String COMMIT_2 = "57451b4";
@@ -482,7 +511,7 @@ public class RepositoryTest {
 	
 	@Test
 	public void testRun() throws Exception {
-		Util.untar(PROJ_TAR_FILE, DEST_DIR);
+		Util.untar(PROJ_TAR_FILE, DEST_PATH);
 		
 		HistoryGraph actualHGraph = null;
 		actualHGraph = REPOSITORY_PROJ.buildHistoryGraph(COMMIT_4, COMMIT_1);
@@ -490,7 +519,7 @@ public class RepositoryTest {
 		assertNotNull("constructor returns null on " + PROJ, actualHGraph);
 		assertEquals("result mismatched on " + PROJ, EXPECTED_HGRAPH_PROJ, actualHGraph);
 		
-		FileUtils.deleteDirectory(new File(PROJ));
+		FileUtils.deleteDirectory(PROJ_DIR);
 	}
 	
 	private static void buildHistoryGraph(HistoryGraph hGraph, Set<Revision> revisions) {
@@ -501,7 +530,7 @@ public class RepositoryTest {
 
 	private static boolean untar(String tarFile) {
 		try {
-			Util.untar(tarFile, DEST_DIR);
+			Util.untar(tarFile, DEST_PATH);
 			return true;
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -512,10 +541,10 @@ public class RepositoryTest {
 		return false;
 	}
 	
-	private static boolean deleteDirectory(String dir) {
-		File target = new File(dir);
+	private static boolean deleteDirectory(String path) {
+		File dir = new File(path);
 		try {
-			FileUtils.deleteDirectory(target);
+			FileUtils.deleteDirectory(dir);
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import git.GitRepository;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,8 +21,9 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
-import voldemort.VoldemortTestParsingStrategy;
+import ant.AntBuildStrategy;
 
+import common.BuildStrategy;
 import common.DiffFile;
 import common.DiffFile.DiffType;
 import common.MixedRevision;
@@ -28,11 +31,13 @@ import common.Repository;
 import common.Revision;
 import common.Util;
 import common.Revision.COMPILABLE;
-import common.TestParsingStrategy;
 import common.TestResult;
 
-
 public class MixedRevisionTest {
+	
+	private static final String ANT_COMMAND = "ant";
+	private static final String TEST_COMMAND = "junit";
+	
 	/********************/
 	/** in delta_files **/
 	/********************/
@@ -42,11 +47,16 @@ public class MixedRevisionTest {
 	private static final String PATHNAME = "test/delta_files";
 	private static final String PATHNAME_CLONE = "test/delta_files_clone";
 	
-	private static final String ANT_COMMAND = "ant";
-	private static final TestParsingStrategy STRATEGY = new VoldemortTestParsingStrategy();
+	private static final File DIR = new File(PATHNAME);
+	private static final File DIR_CLONE = new File(PATHNAME_CLONE);
 	
-	private static final Repository REPOSITORY = new Repository(PATHNAME, ANT_COMMAND, STRATEGY);
-	private static final Repository REPOSITORY_CLONE = new Repository(PATHNAME_CLONE, ANT_COMMAND, STRATEGY);
+	private static final BuildStrategy BUILD_STRATEGY = new AntBuildStrategy(DIR, 
+			ANT_COMMAND, TEST_COMMAND);
+	private static final BuildStrategy BUILD_STRATEGY_CLONE = new AntBuildStrategy(DIR_CLONE, 
+			ANT_COMMAND, TEST_COMMAND);
+	
+	private static final Repository REPOSITORY = new GitRepository(DIR, BUILD_STRATEGY);
+	private static final Repository REPOSITORY_CLONE = new GitRepository(DIR_CLONE, BUILD_STRATEGY_CLONE);
 	
 	private static final String FILENAME_1 = "f1";
 	private static final String FILENAME_2 = "f2";
@@ -111,8 +121,8 @@ public class MixedRevisionTest {
 		assertTrue(FILENAME_3 + " does not exist", FILE_3.exists());
 		assertFalse(FILENAME_2 + " exists", FILE_2.exists());
 		
-		assertTrue(deleteDirectory(PATHNAME));
-		assertTrue(deleteDirectory(PATHNAME_CLONE));
+		assertTrue(deleteDirectory(DIR));
+		assertTrue(deleteDirectory(DIR_CLONE));
 	}
 
 	/**
@@ -132,7 +142,7 @@ public class MixedRevisionTest {
 	/**********************/
 	/** in delta_project **/
 	/**********************/
-	private static final String DEST_DIR = "test";
+	private static final String DEST_PATH = "test";
 	
 	private static final String PRJ_TAR_FILE = "test/delta_project.tar";
 	private static final String PRJ_TAR_FILE_CLONE = "test/delta_project_clone.tar";
@@ -140,9 +150,17 @@ public class MixedRevisionTest {
 	private static final String PRJ_PATHNAME = "test/delta_project";
 	private static final String PRJ_PATHNAME_CLONE = "test/delta_project_clone";
 	
-	private static final Repository PRJ_REPOSITORY = new Repository(PRJ_PATHNAME, ANT_COMMAND, STRATEGY);
-	private static final Repository PRJ_REPOSITORY_CLONE = new Repository(PRJ_PATHNAME_CLONE, 
-			ANT_COMMAND, STRATEGY);
+	private static final File PRJ = new File(PRJ_PATHNAME);
+	private static final File PRJ_CLONE = new File(PRJ_PATHNAME_CLONE);
+	
+	private static final BuildStrategy PRJ_BUILD_STRATEGY = new AntBuildStrategy(
+			PRJ, ANT_COMMAND, TEST_COMMAND);
+	private static final BuildStrategy PRJ_BUILD_STRATEGY_CLONE = new AntBuildStrategy(
+			PRJ_CLONE, ANT_COMMAND, TEST_COMMAND);
+	
+	private static final Repository PRJ_REPOSITORY = new GitRepository(PRJ, PRJ_BUILD_STRATEGY);
+	private static final Repository PRJ_REPOSITORY_CLONE = new GitRepository(PRJ_CLONE, 
+			PRJ_BUILD_STRATEGY_CLONE);
 	
 	private static final DiffFile PRJ_DIFF_FILE_1 = new DiffFile(DiffType.MODIFIED, "src/proj/F1.java");
 	private static final DiffFile PRJ_DIFF_FILE_2 = new DiffFile(DiffType.MODIFIED, "src/proj/F2.java");
@@ -231,20 +249,20 @@ public class MixedRevisionTest {
 		MixedRevision mr = new MixedRevision(PRJ_REVISION_2, PRJ_REPOSITORY, PRJ_REPOSITORY_CLONE);
 		
 		mr.revertFiles(combination, PRJ_REVISION_1);
-		mr.compileAndRunAllTests();
+		mr.runTest();
 			
 		assertTrue(mr.isCompilable() == expectedCompilable);
 		assertEquals(expectedTestResult, mr.getTestResult());
 		
 		mr.restoreBaseRevision();
 		
-		assertTrue(deleteDirectory(PRJ_PATHNAME));
-		assertTrue(deleteDirectory(PRJ_PATHNAME_CLONE));
+		assertTrue(deleteDirectory(PRJ));
+		assertTrue(deleteDirectory(PRJ_CLONE));
 	}
 	
 	private static boolean untar(String tarFile) {
 		try {
-			Util.untar(tarFile, DEST_DIR);
+			Util.untar(tarFile, DEST_PATH);
 			return true;
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -255,10 +273,9 @@ public class MixedRevisionTest {
 		return false;
 	}
 	
-	private static boolean deleteDirectory(String dirpath) {
-		File target = new File(dirpath);
+	private static boolean deleteDirectory(File dir) {
 		try {
-			FileUtils.deleteDirectory(target);
+			FileUtils.deleteDirectory(dir);
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
