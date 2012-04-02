@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,7 +22,12 @@ import common.Revision.COMPILABLE;
  * AntBuildStrategy is an implementation of BuildStrategy. 
  * AntBuildStrategy is associated with Ant.
  */
-public class AntBuildStrategy implements BuildStrategy {
+public class AntBuildStrategy implements BuildStrategy, Serializable {
+	
+	/**
+	 * serial version ID
+	 */
+	private static final long serialVersionUID = 5365077245485076752L;
 	
 	private static final String TEST_PATTERN = "\\s*\\[junit\\] Running (\\S+)";
 	private static final String FAILED_TEST_PATTERN = "\\s*\\[junit\\] Test (\\S+) FAILED";
