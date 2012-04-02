@@ -14,6 +14,16 @@ import common.Revision.COMPILABLE;
 public interface BuildStrategy {
 	
 	/**
+	 * Ensure haltonfailure="no" in build.xml.
+	 * 
+	 * @return true if and only if the method successfully 
+	 *         ensures haltonfailure="no" in build.xml
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	public boolean ensureNoHaltOnFailure() throws IOException, InterruptedException;
+	
+	/**
      * Compile and run all unit tests.
      * 
      * @return a pair of COMPILABLE state and TestResult of the commit

@@ -54,11 +54,11 @@ public class GitRepository implements Repository, Serializable {
 	}
 
 	@Override
-	public int checkoutCommit(String commitID) throws IOException,
+	public boolean checkoutCommit(String commitID) throws IOException,
 			InterruptedException {
 		Process p = Util.runProcess(
                 new String[] { "git", "checkout", commitID }, directory);
-        return p.exitValue();
+        return p.exitValue() == 0;
 	}
 
 	@Override
@@ -99,9 +99,9 @@ public class GitRepository implements Repository, Serializable {
 			String endCommitID) throws Exception {
 		HistoryGraph hGraph = new HistoryGraph(this);
 		
-		int exitValue = checkoutCommit(startCommitID);
+		boolean checkoutCommitSuccessful = checkoutCommit(startCommitID);
 		
-		if (exitValue == 0) {
+		if (checkoutCommitSuccessful) {
 	        Process logProcess = Util.runProcess(LOG_COMMAND, directory);
 	
 	        BufferedReader reader = new BufferedReader(new InputStreamReader(
@@ -223,6 +223,16 @@ public class GitRepository implements Repository, Serializable {
 		}
 		
 		return hGraph;
+	}
+
+	@Override
+	public boolean discardFileChange(String filename) throws IOException,
+			InterruptedException {
+		File file = new File(directory.getPath() + File.separatorChar + filename);
+		
+		Process p = Util.runProcess(
+                new String[] { "git", "checkout", filename }, directory);
+        return !file.exists() || p.exitValue() == 0;
 	}
 
 	@Override

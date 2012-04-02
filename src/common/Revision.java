@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import ant.AntBuildStrategy;
+
 /**
  * Revision represents a state of a particular commit. 
  * 
@@ -49,7 +51,13 @@ public class Revision implements Serializable {
     	compilable = COMPILABLE.UNKNOWN;
         testResult = null;
         
-        populateTestResult();
+        boolean checkoutCommitSuccessful = repository.checkoutCommit(commitID);
+        
+        if (checkoutCommitSuccessful) {
+        	populateTestResult();
+        } else {
+    		throw new Exception("git checkout commit " + commitID + " unsuccessful");
+    	}
     }
     
     /**
@@ -109,23 +117,29 @@ public class Revision implements Serializable {
     }
 
     /**
-     * Check out this Revision from the Repository, 
-     * compile and run all tests.
+     * Compile and run all unit tests.
      * 
      * @modifies this
      * @throws Exception 
      */
     private void populateTestResult() throws Exception {
-    	int exitValue = repository.checkoutCommit(commitID);
-        
-    	if (exitValue == 0) {
-    		BuildStrategy buildStrategy = repository.getBuildStrategy();
-	        Pair<COMPILABLE, TestResult> pair = buildStrategy.runTest(commitID);
-	        compilable = pair.getFirst();
-	        testResult = pair.getSecond();
-    	} else {
-    		throw new Exception("git checkout commit " + commitID + " unsuccessful");
-    	}
+    	Pair<COMPILABLE, TestResult> pair = null;
+    	BuildStrategy buildStrategy = repository.getBuildStrategy();
+    		
+		if (buildStrategy.ensureNoHaltOnFailure()) {
+			pair = buildStrategy.runTest(commitID);
+			
+			if (pair != null) { // force dependency
+				if (!repository.discardFileChange(AntBuildStrategy.BUILD_XML)) {
+					throw new Exception("discard change in build.xml unsuccessful");
+				}
+				
+				compilable = pair.getFirst();
+				testResult = pair.getSecond();
+			}
+		} else {
+			throw new Exception("ensure haltonfailure=no unsuccessful");
+		}
     }
 
     @Override

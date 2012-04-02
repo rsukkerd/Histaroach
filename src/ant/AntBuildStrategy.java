@@ -25,6 +25,11 @@ import common.Revision.COMPILABLE;
 public class AntBuildStrategy implements BuildStrategy, Serializable {
 	
 	/**
+	 * Ant's build file.
+	 */
+	public static final String BUILD_XML = "build.xml";
+	
+	/**
 	 * serial version ID
 	 */
 	private static final long serialVersionUID = 5365077245485076752L;
@@ -37,16 +42,26 @@ public class AntBuildStrategy implements BuildStrategy, Serializable {
 	private static final String RUN_SCRIPT_COMMAND = "./run_test.sh";
 	private static final String TEST_OUTPUT = "output/run_test_output";
 	private static final String TEST_ERROR = "output/run_test_error";
-
+	
+	private static final String[] ENSURE_NO_HALT_ON_FAILURE = { "sed", "-i", "-e", 
+		"s/haltonfailure=\"yes\"/haltonfailure=\"no\"/", "build.xml" };
+	
 	private final File directory;
 	private final String[] antTestCommand;
 	private final String antTestString;
 	
 	public AntBuildStrategy(File directory, String antCommand, String testCommand) {
 		this.directory = directory;
-		
 		antTestString = antCommand + " " + testCommand;
 		antTestCommand = antTestString.split(" ");
+	}
+	
+	@Override
+	public boolean ensureNoHaltOnFailure() throws IOException, InterruptedException {
+		File builFile = new File(directory.getPath() + File.separatorChar + BUILD_XML);
+
+		Process sedProcess = Util.runProcess(ENSURE_NO_HALT_ON_FAILURE, directory);
+		return !builFile.exists() || sedProcess.exitValue() == 0;
 	}
 	
 	@Override
@@ -104,11 +119,10 @@ public class AntBuildStrategy implements BuildStrategy, Serializable {
 	        }
 	        
 	        return new Pair<COMPILABLE, TestResult>(compilable, testResult);
-        } else {
-        	// should not happen; Exception should already be thrown at Util.runProcess
-        	assert false;
-        	return null;
         }
+		// should not happen; Exception should already be thrown at Util.runProcess
+		assert false;
+		return null;
 	}
 
 	@Override

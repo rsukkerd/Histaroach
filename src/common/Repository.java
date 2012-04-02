@@ -27,13 +27,24 @@ public interface Repository {
 	public BuildStrategy getBuildStrategy();
 	
 	/**
-     * Checks out a given commit from this Repository
+     * Checks out a given commit from this Repository.
      * 
-     * @return an exit value of the checkout process
+     * @return true if and only if the method successfully 
+     *         checked out the commit
      * @throws InterruptedException 
      * @throws IOException 
      */
-	public int checkoutCommit(String commitID) throws IOException, InterruptedException;
+	public boolean checkoutCommit(String commitID) throws IOException, InterruptedException;
+	
+	/**
+	 * Discard any change made in the file.
+	 * 
+	 * @return true if and only if the method successfully 
+	 *         resumed the file if there was any change
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	public boolean discardFileChange(String filename) throws IOException, InterruptedException;
 	
 	/**
      * @return a list of DiffFile's between childCommit and parentCommit

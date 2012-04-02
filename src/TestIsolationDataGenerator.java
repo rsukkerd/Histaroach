@@ -37,6 +37,10 @@ public class TestIsolationDataGenerator {
     @OptionGroup("General Options")
     @Option(value = "-h Print short usage message", aliases = { "-help" })
     public static boolean showHelp = false;
+    
+    @Option(value = "-m Require modification to build.xml", 
+    		aliases = "-modifyBuild")
+    public static boolean modifyBuild = false;
 
     /**
 	 * Full path to the repository directory.

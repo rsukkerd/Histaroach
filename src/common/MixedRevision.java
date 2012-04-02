@@ -50,8 +50,8 @@ public class MixedRevision {
         testResult = null;
         revertedFiles = new HashMap<DiffFile, Revision>();
         
-        int exitValue = repository.checkoutCommit(baseRevision.getCommitID());
-        if (exitValue != 0) {
+        boolean checkoutCommitSuccessful = repository.checkoutCommit(baseRevision.getCommitID());
+        if (!checkoutCommitSuccessful) {
         	throw new Exception("check out base commit " + baseRevision.getCommitID() + " unsuccessful");
         }
     }
@@ -64,9 +64,9 @@ public class MixedRevision {
      * @throws Exception 
      */
     public void revertFiles(Set<DiffFile> diffFiles, Revision otherRevision) throws Exception {
-    	int exitValue = clonedRepository.checkoutCommit(otherRevision.getCommitID());
+    	boolean checkoutCommitSuccessful = clonedRepository.checkoutCommit(otherRevision.getCommitID());
     	
-    	if (exitValue == 0) {
+    	if (checkoutCommitSuccessful) {
 	    	for (DiffFile diffFile : diffFiles) {
 	    		String filename = diffFile.getFileName();
 	    		DiffType type = diffFile.getDiffType();
@@ -122,12 +122,11 @@ public class MixedRevision {
     	DiffType type = diffFile.getDiffType();
     	
     	if (type == DiffType.MODIFIED || type == DiffType.ADDED) {
-    		Process restoreProcess = Util.runProcess(
-    				new String[] { "git", "checkout", filename }, repoDir);
-    		int exitValue = restoreProcess.exitValue();
-    		if (exitValue != 0) {
-            	throw new Exception("check out file unsuccessful");
-            }
+    		boolean restoreFileSuccessful = repository.discardFileChange(filename);
+    		
+    		if (!restoreFileSuccessful) {
+    			throw new Exception("restore file unsuccessful");
+    		}
     	} else {
     		deleteFile(filename, repoDir);
     	}
