@@ -41,7 +41,7 @@ public class TestIsolationDataReader {
 	/**
 	 * Full path to the cloned repository directory.
 	 */
-	@Option(value = "-r Full path to the cloned repository directory (Required)",
+	@Option(value = "-c Full path to the cloned repository directory (Required)",
 	        aliases = { "-clonedRepoPath" })
 	public static String clonedRepoPath = null;
 
