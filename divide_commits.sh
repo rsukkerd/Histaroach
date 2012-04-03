@@ -1,6 +1,6 @@
 if [ $# -ne 2 ]
 then
-	echo "Usage : $0 voldemort_dir section_size"
+	echo "Usage : $0 repository_dir section_size"
 	exit 1
 fi
 cd $1
