@@ -127,7 +127,8 @@ public class Revision implements Serializable {
     	BuildStrategy buildStrategy = repository.getBuildStrategy();
     		
 		if (buildStrategy.ensureNoHaltOnFailure()) {
-			pair = buildStrategy.runTest(commitID);
+			// pair = buildStrategy.runTest(commitID);
+			pair = buildStrategy.runTestViaShellScript(commitID);
 			
 			if (pair != null) { // force dependency
 				if (!repository.discardFileChange(AntBuildStrategy.BUILD_XML)) {
