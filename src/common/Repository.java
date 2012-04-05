@@ -47,12 +47,12 @@ public interface Repository {
 	public boolean discardFileChange(String filename) throws IOException, InterruptedException;
 	
 	/**
-     * @return a list of DiffFile's between childCommit and parentCommit
+     * @return a list of DiffFile's between baseCommit and otherCommit
      * @throws InterruptedException 
      * @throws IOException 
      */
-	public List<DiffFile> getDiffFiles(String childCommitID,
-            String parentCommitID) throws IOException, InterruptedException;
+	public List<DiffFile> getDiffFiles(String baseCommitID,
+            String otherCommitID) throws IOException, InterruptedException;
 
 	/**
 	 * Build a HistoryGraph containing revisions from startCommit 

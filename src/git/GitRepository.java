@@ -62,12 +62,12 @@ public class GitRepository implements Repository, Serializable {
 	}
 
 	@Override
-	public List<DiffFile> getDiffFiles(String childCommitID,
-			String parentCommitID) throws IOException, InterruptedException {
+	public List<DiffFile> getDiffFiles(String baseCommitID,
+			String otherCommitID) throws IOException, InterruptedException {
 		List<DiffFile> diffFiles = new ArrayList<DiffFile>();
 
         Process p = Util.runProcess(new String[] { "git", "diff",
-                "--name-status", parentCommitID, childCommitID }, directory);
+                "--name-status", otherCommitID, baseCommitID }, directory);
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(
                 p.getInputStream()));
