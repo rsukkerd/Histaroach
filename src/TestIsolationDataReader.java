@@ -2,7 +2,8 @@ import git.GitRepository;
 
 import java.io.File;
 
-import ant.AntBuildStrategy;
+import ant.JodatimeBuildStrateygy;
+import ant.VoldemortBuildStrategy;
 
 import plume.Option;
 import plume.OptionGroup;
@@ -25,6 +26,13 @@ public class TestIsolationDataReader {
     public static boolean showHelp = false;
 
     /**
+	 * Project name.
+	 */
+	@Option(value = "-p Project name (Required)",
+	        aliases = { "-projName" })
+	public static String projName = null;
+
+	/**
      * Full path to the directory containing serialized revision files.
      */
     @Option(value = "-z Directory containing serialized revision files (Required)", 
@@ -46,30 +54,10 @@ public class TestIsolationDataReader {
 	public static String clonedRepoPath = null;
 
 	/**
-	 * Type of the repository. Default is Git.
-	 */
-	@Option(value = "-R repository type (Optional)", 
-			aliases = { "-repoType" })
-	public static String repoType = "Git";
-
-	/**
-	 * Build tool used by the project. Default is Ant.
-	 */
-	@Option(value = "-B build tool (Optional)", 
-			aliases = { "-buildTool" })
-	public static String buildTool = "Ant";
-
-	/**
 	 * Build command. Default is 'ant'.
 	 */
 	@Option(value = "-b build command (Optional)", aliases = { "-buildCommand" })
 	public static String buildCommand = "ant";
-
-	/**
-	 * Command to compile the project and run all unit tests.
-	 */
-	@Option(value = "-t test command (Required)", aliases = { "-testCommand" })
-	public static String testCommand = null;
 
 	/** One line synopsis of usage */
 	public static final String usage_string = "TestIsolationDataReader [options]";
@@ -91,33 +79,30 @@ public class TestIsolationDataReader {
 	        return;
 	    }
 	    
-	    if (serializedRevisionsDirName == null 
-	    		|| repoPath == null || clonedRepoPath == null 
-	    		|| testCommand == null) {
+	    if (projName == null || serializedRevisionsDirName == null 
+	    		|| repoPath == null || clonedRepoPath == null) {
 	    	plumeOptions.print_usage();
 	    	return;
 	    }
 	    
 	    File repoDir = new File(repoPath);
 	    File clonedRepoDir = new File(clonedRepoPath);
-        
-        Repository repository = null;
-        Repository clonedRepository = null;
+                
         BuildStrategy buildStrategy = null;
         BuildStrategy clonedBuildStrategy = null;
         
-        if (buildTool.equals(TestIsolationDataGenerator.ANT)) {
-        	buildStrategy = new AntBuildStrategy(repoDir, buildCommand, testCommand);
-        	clonedBuildStrategy = new AntBuildStrategy(clonedRepoDir, buildCommand, testCommand);
+        if (projName.equals(TestIsolationDataGenerator.VOLDEMORT)) {
+        	buildStrategy = new VoldemortBuildStrategy(repoDir, buildCommand);
+        	clonedBuildStrategy = new VoldemortBuildStrategy(clonedRepoDir, buildCommand);
+        } else if (projName.equals(TestIsolationDataGenerator.JODA_TIME)) {
+        	buildStrategy = new JodatimeBuildStrateygy(repoDir, buildCommand);
+        	clonedBuildStrategy = new JodatimeBuildStrateygy(clonedRepoDir, buildCommand);
         }
         
-        if (repoType.equals(TestIsolationDataGenerator.GIT)) {
-        	repository = new GitRepository(repoDir, buildStrategy);
-        	clonedRepository = new GitRepository(clonedRepoDir, clonedBuildStrategy);
-        }
+        assert buildStrategy != null && clonedBuildStrategy != null;
         
-        assert buildStrategy != null && repository != null 
-        		&& clonedBuildStrategy != null && clonedRepository != null;
+        Repository repository = new GitRepository(repoDir, buildStrategy);
+        Repository clonedRepository = new GitRepository(clonedRepoDir, clonedBuildStrategy);
 	    
 	    File serializedRevisionsDir = new File(serializedRevisionsDirName);
 	    

@@ -20,6 +20,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import ant.AntBuildStrategy;
+import ant.VoldemortBuildStrategy;
 
 import common.BuildStrategy;
 import common.DiffFile;
@@ -33,7 +34,6 @@ import common.Util;
 
 public class RepositoryTest {
 	private static final String ANT_COMMAND = "ant";
-	private static final String TEST_COMMAND = "junit";
 	private static final String DEST_PATH = "test";
 	
 	/****************************/
@@ -59,8 +59,8 @@ public class RepositoryTest {
 	private static final BuildStrategy[] BUILD_STRATEGIES = new AntBuildStrategy[5];
 	static {
 		for (int i = 0; i < DIRECTORIES.length; i++) {
-			BuildStrategy buildStrategy = new AntBuildStrategy(DIRECTORIES[i], 
-					ANT_COMMAND, TEST_COMMAND);
+			BuildStrategy buildStrategy = new VoldemortBuildStrategy(DIRECTORIES[i], 
+					ANT_COMMAND);
 			BUILD_STRATEGIES[i] = buildStrategy;
 		}
 	}
@@ -414,8 +414,8 @@ public class RepositoryTest {
 	
 	private static final File PROJ_DIR = new File(PROJ);
 	
-	private static final BuildStrategy PROJ_BUILD_STARTEGY = new AntBuildStrategy(PROJ_DIR, 
-			ANT_COMMAND, TEST_COMMAND);
+	private static final BuildStrategy PROJ_BUILD_STARTEGY = new VoldemortBuildStrategy(PROJ_DIR, 
+			ANT_COMMAND);
 	
 	private static final Repository REPOSITORY_PROJ = new GitRepository(PROJ_DIR, PROJ_BUILD_STARTEGY);
 	

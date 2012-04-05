@@ -2,7 +2,8 @@ import git.GitRepository;
 
 import java.io.File;
 
-import ant.AntBuildStrategy;
+import ant.JodatimeBuildStrateygy;
+import ant.VoldemortBuildStrategy;
 
 import common.BuildStrategy;
 import common.HistoryGraph;
@@ -28,8 +29,8 @@ public class TestIsolationDataGenerator {
     // Extension of human-readable files.
     public static final String HUMAN_READ_EXTENSION = ".log";
     
-    public static final String GIT = "Git";
-    public static final String ANT = "Ant";
+    public static final String VOLDEMORT = "voldemort";
+    public static final String JODA_TIME = "joda-time";
     
     /**
      * Print the short usage message.
@@ -39,6 +40,13 @@ public class TestIsolationDataGenerator {
     public static boolean showHelp = false;
     
     /**
+	 * Project name.
+	 */
+	@Option(value = "-p Project name (Required)",
+	        aliases = { "-projName" })
+	public static String projName = null;
+    
+    /**
 	 * Full path to the repository directory.
 	 */
 	@Option(value = "-r Full path to the repository directory (Required)",
@@ -46,30 +54,11 @@ public class TestIsolationDataGenerator {
 	public static String repoPath = null;
     
 	/**
-	 * Type of the repository. Default is Git.
-	 */
-    @Option(value = "-R repository type (Optional)", 
-    		aliases = { "-repoType" })
-    public static String repoType = "Git";
-    
-    /**
-     * Build tool used by the project. Default is Ant.
-     */
-    @Option(value = "-B build tool (Optional)", 
-    		aliases = { "-buildTool" })
-    public static String buildTool = "Ant";
-    
-    /**
      * Build command. Default is 'ant'.
      */
-    @Option(value = "-b build command (Optional)", aliases = { "-buildCommand" })
+    @Option(value = "-b build command (Optional)", 
+    		aliases = { "-buildCommand" })
     public static String buildCommand = "ant";
-    
-    /**
-     * Command to compile the project and run all unit tests.
-     */
-    @Option(value = "-t test command (Required)", aliases = { "-testCommand" })
-    public static String testCommand = null;
     
     /**
      * The commit ID from which to begin the HistoryGraph analysis.
@@ -116,7 +105,7 @@ public class TestIsolationDataGenerator {
             return;
         }
 
-        if (repoPath == null || testCommand == null 
+        if (projName == null || repoPath == null 
         		|| startCommitID == null || endCommitID == null 
         		|| outputPath == null) {
             plumeOptions.print_usage();
@@ -125,18 +114,17 @@ public class TestIsolationDataGenerator {
         
         File repoDir = new File(repoPath);
         
-        Repository repository = null;
         BuildStrategy buildStrategy = null;
         
-        if (buildTool.equals(ANT)) {
-        	buildStrategy = new AntBuildStrategy(repoDir, buildCommand, testCommand);
+        if (projName.equals(VOLDEMORT)) {
+        	buildStrategy = new VoldemortBuildStrategy(repoDir, buildCommand);
+        } else if (projName.equals(JODA_TIME)) {
+        	buildStrategy = new JodatimeBuildStrateygy(repoDir, buildCommand);
         }
         
-        if (repoType.equals(GIT)) {
-        	repository = new GitRepository(repoDir, buildStrategy);
-        }
+        assert buildStrategy != null;
         
-        assert buildStrategy != null && repository != null;
+        Repository repository = new GitRepository(repoDir, buildStrategy);
         
         HistoryGraph historyGraph = repository.buildHistoryGraph(startCommitID, endCommitID);
         

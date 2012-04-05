@@ -21,7 +21,7 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
-import ant.AntBuildStrategy;
+import ant.VoldemortBuildStrategy;
 
 import common.BuildStrategy;
 import common.DiffFile;
@@ -36,7 +36,6 @@ import common.TestResult;
 public class MixedRevisionTest {
 	
 	private static final String ANT_COMMAND = "ant";
-	private static final String TEST_COMMAND = "junit";
 	
 	/********************/
 	/** in delta_files **/
@@ -50,10 +49,8 @@ public class MixedRevisionTest {
 	private static final File DIR = new File(PATHNAME);
 	private static final File DIR_CLONE = new File(PATHNAME_CLONE);
 	
-	private static final BuildStrategy BUILD_STRATEGY = new AntBuildStrategy(DIR, 
-			ANT_COMMAND, TEST_COMMAND);
-	private static final BuildStrategy BUILD_STRATEGY_CLONE = new AntBuildStrategy(DIR_CLONE, 
-			ANT_COMMAND, TEST_COMMAND);
+	private static final BuildStrategy BUILD_STRATEGY = new VoldemortBuildStrategy(DIR, ANT_COMMAND);
+	private static final BuildStrategy BUILD_STRATEGY_CLONE = new VoldemortBuildStrategy(DIR_CLONE, ANT_COMMAND);
 	
 	private static final Repository REPOSITORY = new GitRepository(DIR, BUILD_STRATEGY);
 	private static final Repository REPOSITORY_CLONE = new GitRepository(DIR_CLONE, BUILD_STRATEGY_CLONE);
@@ -153,10 +150,10 @@ public class MixedRevisionTest {
 	private static final File PRJ = new File(PRJ_PATHNAME);
 	private static final File PRJ_CLONE = new File(PRJ_PATHNAME_CLONE);
 	
-	private static final BuildStrategy PRJ_BUILD_STRATEGY = new AntBuildStrategy(
-			PRJ, ANT_COMMAND, TEST_COMMAND);
-	private static final BuildStrategy PRJ_BUILD_STRATEGY_CLONE = new AntBuildStrategy(
-			PRJ_CLONE, ANT_COMMAND, TEST_COMMAND);
+	private static final BuildStrategy PRJ_BUILD_STRATEGY = new VoldemortBuildStrategy(
+			PRJ, ANT_COMMAND);
+	private static final BuildStrategy PRJ_BUILD_STRATEGY_CLONE = new VoldemortBuildStrategy(
+			PRJ_CLONE, ANT_COMMAND);
 	
 	private static final Repository PRJ_REPOSITORY = new GitRepository(PRJ, PRJ_BUILD_STRATEGY);
 	private static final Repository PRJ_REPOSITORY_CLONE = new GitRepository(PRJ_CLONE, 
