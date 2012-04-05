@@ -40,7 +40,7 @@ public interface Repository {
 	 * Discard any change made in the file.
 	 * 
 	 * @return true if and only if the method successfully 
-	 *         resumed the file if there was any change
+	 *         restored the file if there was any change
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */

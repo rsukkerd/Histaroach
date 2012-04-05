@@ -1,58 +1,31 @@
 package common;
 
-import java.io.IOException;
-import java.util.List;
-
 import common.Revision.COMPILABLE;
 
 /**
- * BuildStrategy determines how to compile a project, 
- * run unit tests, and parse the test results. 
- * 
- * BuildStrategy is immutable.
+ * BuildStrategy is an interface that determines 
+ * how to compile a project, run all unit tests, 
+ * and parse the test results.
  */
 public interface BuildStrategy {
-	
-	/**
-	 * Ensure haltonfailure="no" in build.xml.
-	 * 
-	 * @return true if and only if the method successfully 
-	 *         ensures haltonfailure="no" in build.xml
-	 * @throws IOException
-	 * @throws InterruptedException
-	 */
-	public boolean ensureNoHaltOnFailure() throws IOException, InterruptedException;
 	
 	/**
      * Compile and run all unit tests.
      * 
      * @return a pair of COMPILABLE state and TestResult of the commit
-     * @throws InterruptedException 
-     * @throws IOException 
+     * @throws Exception
      */
 	public Pair<COMPILABLE, TestResult> runTest(String commitID) 
-			throws IOException, InterruptedException;
+			throws Exception;
 	
 	/**
-     * Compile and run all unit tests on this MixedRevision. 
-     * (Alternative of runTest() method.)
+     * Compile and run all unit tests. 
+     * Alternative of runTest(commitID) method.
      * 
      * @return a pair of COMPILABLE state and TestResult of the commit
      * @throws Exception
      */
 	public Pair<COMPILABLE, TestResult> runTestViaShellScript(String commitID) 
 			throws Exception;
-	
-	/**
-     * @return YES if build successful, NO if build failed, 
-     *         and NO_BUILD_FILE if there is no build file
-     */
-	public COMPILABLE buildSuccessful(List<String> outputStreamContent,
-            List<String> errorStreamContent);
-	
-	/**
-	 * @return a TestResult of the commit
-	 */
-	public TestResult getTestResult(String commitID, List<String> outputStreamContent, 
-			List<String> errorStreamContent);
+
 }

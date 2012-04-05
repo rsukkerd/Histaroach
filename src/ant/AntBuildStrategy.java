@@ -3,12 +3,9 @@ package ant;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,9 +17,13 @@ import common.Revision.COMPILABLE;
 
 /**
  * AntBuildStrategy is an implementation of BuildStrategy. 
- * AntBuildStrategy is associated with Ant.
+ * AntBuildStrategy is an abstract class; it contains 
+ * an abstract method getTestResult(commitID, outputStreamContent, 
+ * errorStreamContent). 
+ * 
+ * AntBuildStrategy is immutable.
  */
-public class AntBuildStrategy implements BuildStrategy, Serializable {
+public abstract class AntBuildStrategy implements BuildStrategy, Serializable {
 	
 	/**
 	 * Ant's build file.
@@ -34,8 +35,6 @@ public class AntBuildStrategy implements BuildStrategy, Serializable {
 	 */
 	private static final long serialVersionUID = 5365077245485076752L;
 	
-	private static final String TEST_PATTERN = "\\s*\\[junit\\] Running (\\S+)";
-	private static final String FAILED_TEST_PATTERN = "\\s*\\[junit\\] Test (\\S+) FAILED";
 	private static final String BUILD_SUCCESSFUL_PATTERN = "BUILD SUCCESSFUL";
 	private static final String BUILD_FAILED_PATTERN = "BUILD FAILED";
 	
@@ -43,31 +42,19 @@ public class AntBuildStrategy implements BuildStrategy, Serializable {
 	private static final String TEST_OUTPUT = "output/run_test_output";
 	private static final String TEST_ERROR = "output/run_test_error";
 	
-	private static final String[] ENSURE_NO_HALT_ON_FAILURE = { "sed", "-i", "-e", 
-		"s/haltonfailure=\"yes\"/haltonfailure=\"no\"/", "build.xml" };
-	
 	private final File directory;
-	private final String[] antTestCommand;
-	private final String antTestString;
+	private final String antTestCmdStr;
+	private final String[] antTestCmdArr;
 	
-	public AntBuildStrategy(File directory, String antCommand, String testCommand) {
+	protected AntBuildStrategy(File directory, String antCommand, String testCommand) {
 		this.directory = directory;
-		antTestString = antCommand + " " + testCommand;
-		antTestCommand = antTestString.split(" ");
+		antTestCmdStr = antCommand + Util.SINGLE_SPACE_CHAR + testCommand;
+		antTestCmdArr = antTestCmdStr.split(Util.SINGLE_SPACE_CHAR);
 	}
 	
 	@Override
-	public boolean ensureNoHaltOnFailure() throws IOException, InterruptedException {
-		File builFile = new File(directory.getPath() + File.separatorChar + BUILD_XML);
-
-		Process sedProcess = Util.runProcess(ENSURE_NO_HALT_ON_FAILURE, directory);
-		return !builFile.exists() || sedProcess.exitValue() == 0;
-	}
-	
-	@Override
-	public Pair<COMPILABLE, TestResult> runTest(String commitID) 
-			throws IOException, InterruptedException {
-		Process process = Util.runProcess(antTestCommand, directory);
+	public Pair<COMPILABLE, TestResult> runTest(String commitID) throws Exception {
+		Process process = Util.runProcess(antTestCmdArr, directory);
 
         BufferedReader stdOutputReader = new BufferedReader(
                 new InputStreamReader(process.getInputStream()));
@@ -97,43 +84,46 @@ public class AntBuildStrategy implements BuildStrategy, Serializable {
     	String errorStream = workingDir + File.separatorChar + TEST_ERROR;
     	
     	String[] command = new String[] { RUN_SCRIPT_COMMAND, directory.getPath(), 
-    			antTestString, outputStream, errorStream, };
+    			antTestCmdStr, outputStream, errorStream, };
     	    	
-        Process process = Util.runProcess(command, dir);
+        Util.runProcess(command, dir);
         
-        if (process != null) { // create dependency
-	        BufferedReader stdOutputReader = new BufferedReader(
-	                new FileReader(new File(TEST_OUTPUT)));
-	
-	        BufferedReader stdErrorReader = new BufferedReader(
-	                new FileReader(new File(TEST_ERROR)));
-	
-	        List<String> outputStreamContent = Util.getStreamContent(stdOutputReader);
-	        List<String> errorStreamContent = Util.getStreamContent(stdErrorReader);
-	        
-	        COMPILABLE compilable = buildSuccessful(outputStreamContent, errorStreamContent);
-	        TestResult testResult = null;
-	        
-	        if (compilable == COMPILABLE.YES) {
-	            testResult = getTestResult(commitID, outputStreamContent, errorStreamContent);
-	        }
-	        
-	        return new Pair<COMPILABLE, TestResult>(compilable, testResult);
-        }
-		// should not happen; Exception should already be thrown at Util.runProcess
-		assert false;
-		return null;
-	}
+        BufferedReader stdOutputReader = new BufferedReader(
+                new FileReader(new File(TEST_OUTPUT)));
 
-	@Override
-	public COMPILABLE buildSuccessful(List<String> outputStreamContent,
+        BufferedReader stdErrorReader = new BufferedReader(
+                new FileReader(new File(TEST_ERROR)));
+
+        List<String> outputStreamContent = Util.getStreamContent(stdOutputReader);
+        List<String> errorStreamContent = Util.getStreamContent(stdErrorReader);
+        
+        COMPILABLE compilable = buildSuccessful(outputStreamContent, errorStreamContent);
+        TestResult testResult = null;
+        
+        if (compilable == COMPILABLE.YES) {
+            testResult = getTestResult(commitID, outputStreamContent, errorStreamContent);
+        }
+        
+        return new Pair<COMPILABLE, TestResult>(compilable, testResult);
+	}
+	
+	/**
+	 * @return a TestResult of the commit
+	 */
+	protected abstract TestResult getTestResult(String commitID, 
+			List<String> outputStreamContent, List<String> errorStreamContent);
+
+	/**
+     * @return YES if build successful, NO if build failed, 
+     *         and NO_BUILD_FILE if there is no build file
+     */
+	private COMPILABLE buildSuccessful(List<String> outputStreamContent,
 			List<String> errorStreamContent) {
 		Pattern buildSuccessfulPattern = Pattern.compile(BUILD_SUCCESSFUL_PATTERN);
 	    Pattern buildFailedPattern = Pattern.compile(BUILD_FAILED_PATTERN);
 	
 	    for (String line : outputStreamContent) {
-	        Matcher buildSuccessfulMatcher = buildSuccessfulPattern
-	                .matcher(line);
+	        Matcher buildSuccessfulMatcher = buildSuccessfulPattern.matcher(line);
 	        if (buildSuccessfulMatcher.find()) {
 	            return COMPILABLE.YES;
 	        }
@@ -150,34 +140,6 @@ public class AntBuildStrategy implements BuildStrategy, Serializable {
 	}
 
 	@Override
-	public TestResult getTestResult(String commitID,
-			List<String> outputStreamContent, List<String> errorStreamContent) {
-		Set<String> allTests = new HashSet<String>();
-		Set<String> failedTests = new HashSet<String>();
-		
-		Pattern testPattern = Pattern.compile(TEST_PATTERN);
-    	Pattern failedTestPattern = Pattern.compile(FAILED_TEST_PATTERN);
-    	
-    	for (String line : outputStreamContent) {
-    		Matcher testMatcher = testPattern.matcher(line);
-            if (testMatcher.find()) {
-                allTests.add(testMatcher.group(1));
-            }
-    	}
-    	
-    	for (String line : errorStreamContent) {
-    		Matcher failedTestMatcher = failedTestPattern.matcher(line);
-            if (failedTestMatcher.find()) {
-                failedTests.add(failedTestMatcher.group(1));
-            }
-    	}
-    	
-    	TestResult testResult = new TestResult(commitID, allTests, failedTests);
-    	
-		return testResult;
-	}
-
-	@Override
 	public boolean equals(Object other) {
 		if (other == null || !other.getClass().equals(this.getClass())) {
             return false;
@@ -186,12 +148,12 @@ public class AntBuildStrategy implements BuildStrategy, Serializable {
         AntBuildStrategy buildStrategy = (AntBuildStrategy) other;
         
         return directory.equals(buildStrategy.directory) 
-        		&& antTestCommand.equals(buildStrategy.antTestCommand);
+        		&& antTestCmdStr.equals(buildStrategy.antTestCmdStr);
 	}
 	
 	@Override
 	public int hashCode() {
-		return 11 * directory.hashCode() + 13 * antTestCommand.hashCode();
+		return 11 * directory.hashCode() + 13 * antTestCmdStr.hashCode();
 	}
 
 }

@@ -22,6 +22,11 @@ import org.xeustechnologies.jtar.TarEntry;
 import org.xeustechnologies.jtar.TarInputStream;
 
 public class Util {
+	
+	/**
+	 * Single space character
+	 */
+	public static final String SINGLE_SPACE_CHAR = " ";
 
 	/**
 	 * Create a process that executes the given command 

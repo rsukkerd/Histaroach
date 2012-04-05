@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ant.AntBuildStrategy;
-
 /**
  * Revision represents a state of a particular commit. 
  * 
@@ -123,24 +121,11 @@ public class Revision implements Serializable {
      * @throws Exception 
      */
     private void populateTestResult() throws Exception {
-    	Pair<COMPILABLE, TestResult> pair = null;
     	BuildStrategy buildStrategy = repository.getBuildStrategy();
-    		
-		if (buildStrategy.ensureNoHaltOnFailure()) {
-			// pair = buildStrategy.runTest(commitID);
-			pair = buildStrategy.runTestViaShellScript(commitID);
-			
-			if (pair != null) { // force dependency
-				if (!repository.discardFileChange(AntBuildStrategy.BUILD_XML)) {
-					throw new Exception("discard change in build.xml unsuccessful");
-				}
-				
-				compilable = pair.getFirst();
-				testResult = pair.getSecond();
-			}
-		} else {
-			throw new Exception("ensure haltonfailure=no unsuccessful");
-		}
+    	
+    	Pair<COMPILABLE, TestResult> result = buildStrategy.runTestViaShellScript(commitID);
+    	compilable = result.getFirst();
+		testResult = result.getSecond();
     }
 
     @Override
