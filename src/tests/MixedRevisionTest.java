@@ -8,7 +8,6 @@ import git.GitRepository;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -102,8 +101,8 @@ public class MixedRevisionTest {
 	
 	@Test
 	public void testRevertRestoreFiles() throws Exception {
-		assertTrue(untar(TAR_FILE));
-		assertTrue(untar(TAR_FILE_CLONE));
+		Util.untar(TAR_FILE, DEST_PATH);
+		Util.untar(TAR_FILE_CLONE, DEST_PATH);
 		
 		MixedRevision mr = new MixedRevision(REVISION_2, REPOSITORY, REPOSITORY_CLONE);
 		mr.revertFiles(COMBINATION, REVISION_1);
@@ -118,8 +117,8 @@ public class MixedRevisionTest {
 		assertTrue(FILENAME_3 + " does not exist", FILE_3.exists());
 		assertFalse(FILENAME_2 + " exists", FILE_2.exists());
 		
-		assertTrue(deleteDirectory(DIR));
-		assertTrue(deleteDirectory(DIR_CLONE));
+		FileUtils.deleteDirectory(DIR);
+		FileUtils.deleteDirectory(DIR_CLONE);
 	}
 
 	/**
@@ -240,8 +239,8 @@ public class MixedRevisionTest {
 	
 	public void checkTestResult(Set<DiffFile> combination, COMPILABLE expectedCompilable, 
 			TestResult expectedTestResult) throws Exception {
-		assertTrue(untar(PRJ_TAR_FILE));
-		assertTrue(untar(PRJ_TAR_FILE_CLONE));
+		Util.untar(PRJ_TAR_FILE, DEST_PATH);
+		Util.untar(PRJ_TAR_FILE_CLONE, DEST_PATH);
 		
 		MixedRevision mr = new MixedRevision(PRJ_REVISION_2, PRJ_REPOSITORY, PRJ_REPOSITORY_CLONE);
 		
@@ -253,30 +252,7 @@ public class MixedRevisionTest {
 		
 		mr.restoreBaseRevision();
 		
-		assertTrue(deleteDirectory(PRJ));
-		assertTrue(deleteDirectory(PRJ_CLONE));
-	}
-	
-	private static boolean untar(String tarFile) {
-		try {
-			Util.untar(tarFile, DEST_PATH);
-			return true;
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return false;
-	}
-	
-	private static boolean deleteDirectory(File dir) {
-		try {
-			FileUtils.deleteDirectory(dir);
-			return true;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
+		FileUtils.deleteDirectory(PRJ);
+		FileUtils.deleteDirectory(PRJ_CLONE);
 	}
 }

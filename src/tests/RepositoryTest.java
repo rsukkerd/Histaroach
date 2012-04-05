@@ -2,13 +2,10 @@ package tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import git.GitRepository;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -374,7 +371,7 @@ public class RepositoryTest {
 	
 	@Test
 	public void testBuildFullHistoryGraph() throws Exception {
-		assertTrue(untar(SAMPLE_REPOSITORIES_TAR_FILE));
+		Util.untar(SAMPLE_REPOSITORIES_TAR_FILE, DEST_PATH);
 		
 		for (int i = 0; i < DIRECTORIES.length; i++) {
 			Repository repo = new GitRepository(DIRECTORIES[i], BUILD_STRATEGIES[i]);
@@ -386,12 +383,12 @@ public class RepositoryTest {
 			assertEquals("result mismatched on " + DIRECTORIES[i], EXPECTED_HGRAPHS[i], actualHGraph);
 		}
 		
-		assertTrue(deleteDirectory(SAMPLE_REPOSITORIES));
+		FileUtils.deleteDirectory(new File(SAMPLE_REPOSITORIES));
 	}
 	
 	@Test
 	public void testBuildPartialHistoryGraph() throws Exception {
-		assertTrue(untar(SAMPLE_REPOSITORIES_TAR_FILE));
+		Util.untar(SAMPLE_REPOSITORIES_TAR_FILE, DEST_PATH);
 		
 		for (int i = 2; i < DIRECTORIES.length; i++) {
 			Repository repo = new GitRepository(DIRECTORIES[i], BUILD_STRATEGIES[i]);
@@ -403,7 +400,7 @@ public class RepositoryTest {
 			assertEquals("result mismatched on " + DIRECTORIES[i], EXPECTED_HGRAPHS_PARTIAL[i], actualHGraph);
 		}
 		
-		assertTrue(deleteDirectory(SAMPLE_REPOSITORIES));
+		FileUtils.deleteDirectory(new File(SAMPLE_REPOSITORIES));
 	}
 	
 	/****************/
@@ -525,30 +522,6 @@ public class RepositoryTest {
 	private static void buildHistoryGraph(HistoryGraph hGraph, Set<Revision> revisions) {
 		for (Revision revision : revisions) {
 			hGraph.addRevision(revision);
-		}
-	}
-
-	private static boolean untar(String tarFile) {
-		try {
-			Util.untar(tarFile, DEST_PATH);
-			return true;
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return false;
-	}
-	
-	private static boolean deleteDirectory(String path) {
-		File dir = new File(path);
-		try {
-			FileUtils.deleteDirectory(dir);
-			return true;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
 		}
 	}
 }
