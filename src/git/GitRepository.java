@@ -65,6 +65,16 @@ public class GitRepository implements Repository, Serializable {
 	}
 
 	@Override
+	public boolean discardFileChange(String filename) throws IOException,
+			InterruptedException {
+		File file = new File(directory.getPath() + File.separatorChar + filename);
+		
+		Process p = Util.runProcess(
+	            new String[] { "git", "checkout", filename }, directory);
+	    return !file.exists() || p.exitValue() == 0;
+	}
+
+	@Override
 	public List<DiffFile> getDiffFiles(String baseCommitID,
 			String otherCommitID) throws IOException, InterruptedException {
 		List<DiffFile> diffFiles = new ArrayList<DiffFile>();
@@ -226,16 +236,6 @@ public class GitRepository implements Repository, Serializable {
 		}
 		
 		return hGraph;
-	}
-
-	@Override
-	public boolean discardFileChange(String filename) throws IOException,
-			InterruptedException {
-		File file = new File(directory.getPath() + File.separatorChar + filename);
-		
-		Process p = Util.runProcess(
-                new String[] { "git", "checkout", filename }, directory);
-        return !file.exists() || p.exitValue() == 0;
 	}
 
 	@Override

@@ -27,6 +27,8 @@ public class HistoryGraph implements Iterable<Revision> {
 	
     private final Repository repository;
 	private final Set<Revision> revisions;
+	// for consistency of Revisions' order in toString() and iterator()
+	private final List<Revision> orderedRevisions;
 	
 	/**
 	 * Create an empty HistoryGraph associated with a Repository.
@@ -34,6 +36,7 @@ public class HistoryGraph implements Iterable<Revision> {
     public HistoryGraph(Repository repository) {
     	this.repository = repository;
         revisions = new HashSet<Revision>();
+        orderedRevisions = new ArrayList<Revision>();
     }
 
     /**
@@ -50,6 +53,7 @@ public class HistoryGraph implements Iterable<Revision> {
      */
     public void addRevision(Revision revision) {
         revisions.add(revision);
+        orderedRevisions.add(revision);
     }
     
     /**
@@ -257,7 +261,7 @@ public class HistoryGraph implements Iterable<Revision> {
     @Override
     public String toString() {
         String str = repository.toString() + "\n";
-        for (Revision revision : revisions) {
+        for (Revision revision : orderedRevisions) {
             str += revision.toString() + "\n";
         }
 
@@ -266,6 +270,6 @@ public class HistoryGraph implements Iterable<Revision> {
 
     @Override
     public Iterator<Revision> iterator() {
-        return revisions.iterator();
+        return orderedRevisions.iterator();
     }
 }
