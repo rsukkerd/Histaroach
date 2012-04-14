@@ -23,8 +23,11 @@ import common.DiffFile.DiffType;
 import common.Revision.COMPILABLE;
 
 /**
- * GitRepository is an implementation of Repository. 
- * GitRepository represents a git software repository.
+ * GitRepository is an implementation of Repository Interface. 
+ * 
+ * For git version control. 
+ * 
+ * GitRepository is immutable.
  */
 public class GitRepository implements Repository, Serializable {
 	

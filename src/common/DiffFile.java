@@ -3,8 +3,13 @@ package common;
 import java.io.Serializable;
 
 /**
- * DiffFile represents a file that is different between a child revision and its parent revision.
- * DiffFile contains a file name and a type of difference: Added, Modified, or Deleted.
+ * DiffFile represents a file that is different between any 2 Revisions. 
+ * 
+ * DiffFile contains the following public methods: 
+ *  - getFileName(): returns a file name 
+ *  - getDiffType(): returns a DiffType (ADDED, MODIFIED, or DELETED). 
+ * 
+ * DiffFile is immutable.
  */
 public class DiffFile implements Serializable {
 	/**
@@ -21,17 +26,30 @@ public class DiffFile implements Serializable {
 	private final DiffType type;
 	private final String fileName;
 	
+	/**
+	 * Create a DiffFile.
+	 */
 	public DiffFile(DiffType type, String fileName) {
 		this.type = type;
 		this.fileName = fileName;
 	}
 	
-	public DiffType getDiffType() {
-		return type;
-	}
-	
+	/**
+	 * Get a file name.
+	 * 
+	 * @return a file name.
+	 */
 	public String getFileName() {
 		return fileName;
+	}
+	
+	/**
+	 * Get a DiffType.
+	 * 
+	 * @return a DiffType (ADDED, MODIFIED, or DELETED)
+	 */
+	public DiffType getDiffType() {
+		return type;
 	}
 	
 	@Override

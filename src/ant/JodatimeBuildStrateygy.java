@@ -12,6 +12,11 @@ import common.TestResult;
 import common.Revision.COMPILABLE;
 import common.Util;
 
+/**
+ * JodatimeBuildStrateygy is a concrete subclass of AntBuildStrategy. 
+ * 
+ * For joda-time project.
+ */
 public class JodatimeBuildStrateygy extends AntBuildStrategy {
 
 	/**

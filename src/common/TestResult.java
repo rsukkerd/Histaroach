@@ -5,9 +5,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * TestResult represents junit test results of a particular revision.
- * TestResult has a commit id and contains 2 sets of tests: 
- * a set of all tests and a set of failed tests. 
+ * TestResult represents test results of a particular Revision. 
+ * 
+ * TestResult contains the following public methods: 
+ *  - getCommitID(): returns a commit ID of its Revision 
+ *  - getAllTests(): returns a set of all tests 
+ *  - getFailedTests(): returns a set of failed tests 
+ *  - getPassedTests(): returns a set of passed tests 
+ *  - pass(test): returns whether its Revision passes a test 
+ *  - fail(test): returns whether its Revision fails a test. 
+ * 
  * TestResult is immutable.
  */
 public class TestResult implements Serializable {
@@ -17,15 +24,17 @@ public class TestResult implements Serializable {
 	private static final long serialVersionUID = 2210640650733708242L;
 	
 	private final String commitID;
-    private /*@Non-Null*/ Set<String> allTests;
-    private /*@Non-Null*/ Set<String> failedTests;
-    private /*@Non-Null*/ Set<String> passedTests;
+    private final /*@Non-Null*/ Set<String> allTests;
+    private final /*@Non-Null*/ Set<String> failedTests;
+    private final /*@Non-Null*/ Set<String> passedTests;
 
     /**
-     * Create a TestResult instance
-     * precondition : allTests and failedTests are Non-Null
+     * Create a TestResult.
+     * 
+     * @precondition allTests and failedTests are Non-Null
      */
-    public TestResult(String commitID, /*@Non-Null*/ Set<String> allTests, /*@Non-Null*/ Set<String> failedTests) {
+    public TestResult(String commitID, /*@Non-Null*/ Set<String> allTests, 
+    		/*@Non-Null*/ Set<String> failedTests) {
         this.commitID = commitID;
         this.allTests = allTests;
         this.failedTests = failedTests;
@@ -39,13 +48,17 @@ public class TestResult implements Serializable {
     }
     
     /**
-     * @return commit id of the revision associated with this TestResult
+     * Get a commit ID of its Revision.
+     * 
+     * @return a commit ID of this TestResult's Revision
      */
     public String getCommitID() {
         return commitID;
     }
     
     /**
+     * Get a set of all tests.
+     * 
      * @return a set of all tests
      */
     public Set<String> getAllTests() {
@@ -53,6 +66,8 @@ public class TestResult implements Serializable {
     }
 
     /**
+     * Get a set of failed tests.
+     * 
      * @return a set of failed tests
      */
     public Set<String> getFailedTests() {
@@ -60,6 +75,8 @@ public class TestResult implements Serializable {
     }
     
     /**
+     * Get a set of passed tests.
+     * 
      * @return a set of passed tests
      */
     public Set<String> getPassedTests() {
@@ -67,14 +84,18 @@ public class TestResult implements Serializable {
     }
 
     /**
-     * @return true iff this revision passes the test
+     * Does its Revision pass a test?
+     * 
+     * @return true if and only if this TestResult's Revision passes the test
      */
     public boolean pass(String test) {
         return passedTests.contains(test);
     }
 
     /**
-     * @return true iff this revision fails the test
+     * Does its Revision fail a test?
+     * 
+     * @return true if and only if this TestResult's Revision fails the test
      */
     public boolean fail(String test) {
         return failedTests.contains(test);

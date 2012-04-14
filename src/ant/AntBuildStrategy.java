@@ -16,10 +16,14 @@ import common.Util;
 import common.Revision.COMPILABLE;
 
 /**
- * AntBuildStrategy is an implementation of BuildStrategy. 
- * AntBuildStrategy is an abstract class; it contains 
- * an abstract method getTestResult(commitID, outputStreamContent, 
- * errorStreamContent). 
+ * AntBuildStrategy is an implementation of BuildStrategy Interface. 
+ * 
+ * For ant build tool. 
+ * 
+ * AntBuildStrategy is an abstract class; it contains the following 
+ * abstract method: 
+ *  - getTestResult(commitID, outputStreamContent, errorStreamContent): 
+ *    parses test results and returns a TestResult of a commit. 
  * 
  * AntBuildStrategy is immutable.
  */
@@ -46,6 +50,9 @@ public abstract class AntBuildStrategy implements BuildStrategy, Serializable {
 	private final String antTestCmdStr;
 	private final String[] antTestCmdArr;
 	
+	/**
+	 * Create an AntBuildStrategy.
+	 */
 	protected AntBuildStrategy(File directory, String antCommand, String testCommand) {
 		this.directory = directory;
 		antTestCmdStr = antCommand + Util.SINGLE_SPACE_CHAR + testCommand;
@@ -108,7 +115,9 @@ public abstract class AntBuildStrategy implements BuildStrategy, Serializable {
 	}
 	
 	/**
-	 * @return a TestResult of the commit
+	 * Parse test results and return a TestResult of a commit.
+	 * 
+	 * @return a TestResult of a commit
 	 */
 	protected abstract TestResult getTestResult(String commitID, 
 			List<String> outputStreamContent, List<String> errorStreamContent);

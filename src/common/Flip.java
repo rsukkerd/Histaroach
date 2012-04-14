@@ -4,11 +4,25 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Flip represents a pair of child-parent revisions that contain 
- * some tests which one revision passes and the other revision fails. 
- * Flip class implements Comparable interface: a flip that has fewer 
- * diff files is less a flip that has more diff files; tie is broken 
- * by the number of all tests in child revision.
+ * Flip represents a pair of child-parent Revisions that contain 
+ * some tests which one Revision passes and the other fails. 
+ * 
+ * Flip has access to its child parent Revisions. 
+ * It contains the following public methods: 
+ *  - getChildRevision(): returns a child Revision 
+ *  - getParentRevision(): returns a parent Revision 
+ *  - getDiffFiles(): returns a list of DiffFiles between 
+ *    child and parent 
+ *  - getToPassTests(): returns a set of tests that fail in 
+ *    parent but pass in child 
+ *  - getToFailTests(): returns a set of tests that pass in 
+ *    parent but fail in child 
+ * 
+ * Flip is comparable. A Flip that has fewer DiffFiles is less 
+ * than a Flip that has more DiffFiles; tie is broken by the 
+ * number of all tests in a child Revision.
+ * 
+ * Flip is immutable.
  */
 public class Flip implements Comparable<Flip> {
 	public enum FlipType {
@@ -20,35 +34,65 @@ public class Flip implements Comparable<Flip> {
 	private final Revision parent;
 	private final List<DiffFile> diffFiles;
 	// set of tests that flip from fail to pass
-	private final Set<String> toPassTests;
+	private final /*@Non-Null*/ Set<String> toPassTests;
 	// set of tests that flip from pass to fail
-	private final Set<String> toFailTests;
-
-	public Flip(Revision child, Revision parent, Set<String> toPassTests,
-			Set<String> toFailTests) {
+	private final /*@Non-Null*/ Set<String> toFailTests;
+	
+	/**
+	 * Create a Flip.
+	 * 
+	 * @precondition toPassTests and toFailTests are Non-Null
+	 */
+	public Flip(Revision child, Revision parent, /*@Non-Null*/ Set<String> toPassTests,
+			/*@Non-Null*/ Set<String> toFailTests) {
 		this.child = child;
 		this.parent = parent;
 		diffFiles = child.getDiffFiles(parent);
 		this.toPassTests = toPassTests;
 		this.toFailTests = toFailTests;
 	}
-
+	
+	/**
+	 * Get a child Revision.
+	 * 
+	 * @return a child Revision of this Flip
+	 */
 	public Revision getChildRevision() {
 		return child;
 	}
-
+	
+	/**
+	 * Get a parent Revision.
+	 * 
+	 * @return a parent Revision of this Flip
+	 */
 	public Revision getParentRevision() {
 		return parent;
 	}
-
+	
+	/**
+	 * Get a list of DiffFiles between child and parent.
+	 * 
+	 * @return a list of DiffFiles between child and parent of this Flip
+	 */
 	public List<DiffFile> getDiffFiles() {
 		return diffFiles;
 	}
 	
+	/**
+	 * Get a set of tests that fail in parent but pass in child.
+	 * 
+	 * @return a set of tests that fail in parent but pass in child
+	 */
 	public Set<String> getToPassTests() {
 		return toPassTests;
 	}
 	
+	/**
+	 * Get a set of tests that pass in parent but fail in child.
+	 * 
+	 * @return a set of tests that pass in parent but fail in child
+	 */
 	public Set<String> getToFailTests() {
 		return toFailTests;
 	}

@@ -8,9 +8,15 @@ import java.util.Set;
 /**
  * Revision represents a state of a particular commit. 
  * 
- * Revision has access to its Repository, commit ID, 
- * a set of its parents and their corresponding DiffFile's, 
- * COMPILABLE state, and TestResult. 
+ * Revision has access to its Repository. 
+ * It contains the following public methods: 
+ *  - getRepository(): returns a Repository 
+ *  - getCommitID(): returns a commit ID 
+ *  - getParents(): returns a set of parents 
+ *  - getDiffFiles(parent): returns a list of DiffFiles 
+ *    corresponding to a parent 
+ *  - isCompilable(): returns a COMPIABLE state 
+ *  - getTestResult(): returns a TestResult.
  * 
  * Revision is immutable.
  */
@@ -26,13 +32,9 @@ public class Revision implements Serializable {
 
     private final Repository repository;
     private final String commitID;
-    /**
-     * mapping : parent revision -> a list of files that are different
-     * between the parent and this revision
-     */
     private final Map<Revision, List<DiffFile>> parentToDiffFiles;
     private COMPILABLE compilable;
-    private/* @Nullable */TestResult testResult;
+    private /*@Nullable*/ TestResult testResult;
 
     /**
      * Create a Revision. 
@@ -72,6 +74,8 @@ public class Revision implements Serializable {
     }
 
     /**
+     * Get a Repository.
+     * 
      * @return a Repository of this Revision
      */
     public Repository getRepository() {
@@ -79,6 +83,8 @@ public class Revision implements Serializable {
     }
 
     /**
+     * Get a commit ID.
+     * 
      * @return a commit ID of this Revision
      */
     public String getCommitID() {
@@ -86,6 +92,8 @@ public class Revision implements Serializable {
     }
 
     /**
+     * Get a set of parents.
+     * 
      * @return a set of parents of this Revision
      */
     public Set<Revision> getParents() {
@@ -93,14 +101,18 @@ public class Revision implements Serializable {
     }
 
     /**
-     * @return a list of DiffFile's corresponding to the given parent, 
-     *         null if parent is not a parent of this Revision
+     * Get a list of DiffFiles corresponding to a parent.
+     * 
+     * @return a list of DiffFiles corresponding to the parent, 
+     *         null if the parent is not a parent of this Revision
      */
     public List<DiffFile> getDiffFiles(Revision parent) {
         return parentToDiffFiles.get(parent);
     }
 
     /**
+     * Get a COMPILABLE state.
+     * 
      * @return a COMPILABLE state of this Revision
      */
     public COMPILABLE isCompilable() {
@@ -108,6 +120,8 @@ public class Revision implements Serializable {
     }
 
     /**
+     * Get a TestResult.
+     * 
      * @return a TestResult of this Revision
      */
     public TestResult getTestResult() {
@@ -115,7 +129,7 @@ public class Revision implements Serializable {
     }
 
     /**
-     * Compile and run all unit tests.
+     * Compile, run tests, and parse the test results.
      * 
      * @modifies this
      * @throws Exception 

@@ -9,6 +9,11 @@ import java.util.regex.Pattern;
 
 import common.TestResult;
 
+/**
+ * VoldemortBuildStrategy is a concrete subclass of AntBuildStrategy. 
+ * 
+ * For voldemort project.
+ */
 public class VoldemortBuildStrategy extends AntBuildStrategy {
 
 	/**
@@ -25,7 +30,7 @@ public class VoldemortBuildStrategy extends AntBuildStrategy {
 	}
 
 	@Override
-	public TestResult getTestResult(String commitID,
+	protected TestResult getTestResult(String commitID,
 			List<String> outputStreamContent, List<String> errorStreamContent) {
 		Set<String> allTests = new HashSet<String>();
 		Set<String> failedTests = new HashSet<String>();

@@ -3,14 +3,19 @@ package common;
 import common.Revision.COMPILABLE;
 
 /**
- * BuildStrategy is an interface that determines 
- * how to compile a project, run all unit tests, 
- * and parse the test results.
+ * BuildStrategy represents a way to compile a project, 
+ * run tests, and parse the test results. 
+ * 
+ * BuildStrateggy contains the following public methods: 
+ *  - runTest(commitID): compiles, runs tests, and 
+ *    parses the test results of a commit 
+ *  - runTestViaShellScript(commitID): an alternative 
+ *    method of runTest.
  */
 public interface BuildStrategy {
 	
 	/**
-     * Compile and run all unit tests.
+     * Compile, run tests, and parse the test results of a commit.
      * 
      * @return a pair of COMPILABLE state and TestResult of the commit
      * @throws Exception
@@ -19,8 +24,9 @@ public interface BuildStrategy {
 			throws Exception;
 	
 	/**
-     * Compile and run all unit tests. 
-     * Alternative of runTest(commitID) method.
+     * Compile, run tests, and parse the test results of a commit.
+     * 
+     * Alternative of runTest.
      * 
      * @return a pair of COMPILABLE state and TestResult of the commit
      * @throws Exception

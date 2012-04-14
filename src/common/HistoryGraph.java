@@ -11,15 +11,17 @@ import java.util.Queue;
 import java.util.Set;
 
 /**
- * HistoryGraph represents a graph structure of a particular Repository. 
+ * HistoryGraph represents a graph of revision history 
+ * of a particular Repository. 
  * 
- * HistoryGraph has access to the Repository it represents. 
- * 
- * HistoryGraph maintain a set of Revision's. It has methods to add 
- * a Revision and to iterate over its set of Revision's. 
- * 
- * HistoryGraph has a method to get a set of Flip's that are present 
- * in its list of Revision's.
+ * HistoryGraph has access to its associated Repository. 
+ * It contains the following public methods: 
+ *  - getRepository(): returns a Repository 
+ *  - addRevision(revision): adds a Revision 
+ *  - getAllFlips(): returns a set of all Flips occurred. 
+ *    
+ * HistoryGraph is iterable. The order of Revisions returned by 
+ * an iterator is from ancestor to descendant.
  */
 public class HistoryGraph implements Iterable<Revision> {
 	
@@ -27,7 +29,7 @@ public class HistoryGraph implements Iterable<Revision> {
 	private final Set<Revision> revisions;
 	
 	/**
-	 * Create an empty HistoryGraph.
+	 * Create an empty HistoryGraph associated with a Repository.
 	 */
     public HistoryGraph(Repository repository) {
     	this.repository = repository;
@@ -35,20 +37,77 @@ public class HistoryGraph implements Iterable<Revision> {
     }
 
     /**
-     * Add a Revision to this HistoryGraph.
+     * Get a Repository.
+     * 
+	 * @return a Repository associated with this HistoryGraph
+	 */
+	public Repository getRepository() {
+		return repository;
+	}
+
+	/**
+     * Add a Revision.
      */
     public void addRevision(Revision revision) {
         revisions.add(revision);
     }
     
     /**
-     * @return a Repository this HistoryGraph represents
-     */
-    public Repository getRepository() {
-    	return repository;
-    }
+     * Get a set of all Flips occurred.
+     * 
+	 * @return a set of all Flips in this HistoryGraph
+	 */
+	public Set<Flip> getAllFlips() {
+	    Set<Flip> flips = new HashSet<Flip>();
+	
+	    for (Revision revision : revisions) {
+	        TestResult childResult = revision.getTestResult();
+	        
+	        if (childResult == null) { continue; }
+	
+	        Set<String> allTests = childResult.getAllTests();
+	
+	        Set<Revision> parents = revision.getParents();
+	
+	        for (/*@NonNull*/Revision parent : parents) {            	
+	            TestResult parentResult = parent.getTestResult();
+	            
+	            if (parentResult == null) { continue; }
+	            
+	            Set<String> toPassTests = null;
+	            Set<String> toFailTests = null;
+	
+	            for (String test : allTests) {
+	                if (childResult.pass(test) && parentResult.fail(test)) {
+	                    if (toPassTests == null) {
+	                    	toPassTests = new HashSet<String>();
+	                    }
+	                    toPassTests.add(test);
+	                } else if (childResult.fail(test) && parentResult.pass(test)) {
+	                    if (toFailTests == null) {
+	                    	toFailTests = new HashSet<String>();
+	                    }
+	                    toFailTests.add(test);
+	                }
+	            }
+	
+	            if (toPassTests != null || toFailTests != null) {
+	            	if (toPassTests == null) {
+	            		toPassTests = new HashSet<String>();
+	            	} else if (toFailTests == null) {
+	            		toFailTests = new HashSet<String>();
+	            	}
+	            	
+	                Flip flip = new Flip(revision, parent, toPassTests, toFailTests);
+	                flips.add(flip);
+	            }
+	        }
+	    }
+	
+	    return flips;
+	}
 
-    /**
+	/**
      * @return true if and only if revision_A and revision_B 
      *         are parallel in this HistoryGraph
      */
@@ -90,59 +149,6 @@ public class HistoryGraph implements Iterable<Revision> {
         }
 
         return false;
-    }
-    
-    /**
-     * @return a set of all Flip's in this HistoryGraph
-     */
-    public Set<Flip> getAllFlips() {
-        Set<Flip> flips = new HashSet<Flip>();
-
-        for (Revision revision : revisions) {
-            TestResult childResult = revision.getTestResult();
-            
-            if (childResult == null) { continue; }
-
-            Set<String> allTests = childResult.getAllTests();
-
-            Set<Revision> parents = revision.getParents();
-
-            for (/*@NonNull*/Revision parent : parents) {            	
-                TestResult parentResult = parent.getTestResult();
-                
-                if (parentResult == null) { continue; }
-                
-                Set<String> toPassTests = null;
-                Set<String> toFailTests = null;
-
-                for (String test : allTests) {
-                    if (childResult.pass(test) && parentResult.fail(test)) {
-                        if (toPassTests == null) {
-                        	toPassTests = new HashSet<String>();
-                        }
-                        toPassTests.add(test);
-                    } else if (childResult.fail(test) && parentResult.pass(test)) {
-                        if (toFailTests == null) {
-                        	toFailTests = new HashSet<String>();
-                        }
-                        toFailTests.add(test);
-                    }
-                }
-
-                if (toPassTests != null || toFailTests != null) {
-                	if (toPassTests == null) {
-                		toPassTests = new HashSet<String>();
-                	} else if (toFailTests == null) {
-                		toFailTests = new HashSet<String>();
-                	}
-                	
-	                Flip flip = new Flip(revision, parent, toPassTests, toFailTests);
-	                flips.add(flip);
-                }
-            }
-        }
-
-        return flips;
     }
     
     /**
