@@ -20,7 +20,7 @@ import common.Repository;
 import common.Revision;
 import common.Util;
 import common.DiffFile.DiffType;
-import common.Revision.COMPILABLE;
+import common.Revision.Compilable;
 
 /**
  * GitRepository is an implementation of Repository Interface. 
@@ -204,7 +204,7 @@ public class GitRepository implements Repository, Serializable {
 	        		} else {
 	        			// dummy revision of parent
 	        			parent = new Revision(this, parentID, new HashMap<Revision, List<DiffFile>>(), 
-	        					COMPILABLE.UNKNOWN, null);
+	        					Compilable.UNKNOWN, null);
 	        		}
 	        		
 	        		List<DiffFile> diffFiles = getDiffFiles(commitID, parentID);

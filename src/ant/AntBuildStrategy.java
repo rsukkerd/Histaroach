@@ -13,7 +13,7 @@ import common.BuildStrategy;
 import common.Pair;
 import common.TestResult;
 import common.Util;
-import common.Revision.COMPILABLE;
+import common.Revision.Compilable;
 
 /**
  * AntBuildStrategy is an implementation of BuildStrategy Interface. 
@@ -60,7 +60,7 @@ public abstract class AntBuildStrategy implements BuildStrategy, Serializable {
 	}
 	
 	@Override
-	public Pair<COMPILABLE, TestResult> runTest(String commitID) throws Exception {
+	public Pair<Compilable, TestResult> runTest(String commitID) throws Exception {
 		Process process = Util.runProcess(antTestCmdArr, directory);
 
         BufferedReader stdOutputReader = new BufferedReader(
@@ -72,18 +72,18 @@ public abstract class AntBuildStrategy implements BuildStrategy, Serializable {
         List<String> outputStreamContent = Util.getStreamContent(stdOutputReader);
         List<String> errorStreamContent = Util.getStreamContent(stdErrorReader);
 
-        COMPILABLE compilable = buildSuccessful(outputStreamContent, errorStreamContent);
+        Compilable compilable = buildSuccessful(outputStreamContent, errorStreamContent);
         TestResult testResult = null;
         
-        if (compilable == COMPILABLE.YES) {
+        if (compilable == Compilable.YES) {
             testResult = getTestResult(commitID, outputStreamContent, errorStreamContent);
         }
 
-        return new Pair<COMPILABLE, TestResult>(compilable, testResult);
+        return new Pair<Compilable, TestResult>(compilable, testResult);
 	}
 
 	@Override
-	public Pair<COMPILABLE, TestResult> runTestViaShellScript(String commitID) throws Exception {
+	public Pair<Compilable, TestResult> runTestViaShellScript(String commitID) throws Exception {
 		String workingDir = System.getProperty("user.dir");
     	File dir = new File(workingDir);
     	
@@ -104,14 +104,14 @@ public abstract class AntBuildStrategy implements BuildStrategy, Serializable {
         List<String> outputStreamContent = Util.getStreamContent(stdOutputReader);
         List<String> errorStreamContent = Util.getStreamContent(stdErrorReader);
         
-        COMPILABLE compilable = buildSuccessful(outputStreamContent, errorStreamContent);
+        Compilable compilable = buildSuccessful(outputStreamContent, errorStreamContent);
         TestResult testResult = null;
         
-        if (compilable == COMPILABLE.YES) {
+        if (compilable == Compilable.YES) {
             testResult = getTestResult(commitID, outputStreamContent, errorStreamContent);
         }
         
-        return new Pair<COMPILABLE, TestResult>(compilable, testResult);
+        return new Pair<Compilable, TestResult>(compilable, testResult);
 	}
 	
 	/**
@@ -126,7 +126,7 @@ public abstract class AntBuildStrategy implements BuildStrategy, Serializable {
      * @return YES if build successful, NO if build failed, 
      *         and NO_BUILD_FILE if there is no build file
      */
-	private COMPILABLE buildSuccessful(List<String> outputStreamContent,
+	private Compilable buildSuccessful(List<String> outputStreamContent,
 			List<String> errorStreamContent) {
 		Pattern buildSuccessfulPattern = Pattern.compile(BUILD_SUCCESSFUL_PATTERN);
 	    Pattern buildFailedPattern = Pattern.compile(BUILD_FAILED_PATTERN);
@@ -134,18 +134,18 @@ public abstract class AntBuildStrategy implements BuildStrategy, Serializable {
 	    for (String line : outputStreamContent) {
 	        Matcher buildSuccessfulMatcher = buildSuccessfulPattern.matcher(line);
 	        if (buildSuccessfulMatcher.find()) {
-	            return COMPILABLE.YES;
+	            return Compilable.YES;
 	        }
 	    }
 	
 	    for (String line : errorStreamContent) {
 	        Matcher buildFailedMatcher = buildFailedPattern.matcher(line);
 	        if (buildFailedMatcher.find()) {
-	            return COMPILABLE.NO;
+	            return Compilable.NO;
 	        }
 	    }
 	
-	    return COMPILABLE.NO_BUILD_FILE;
+	    return Compilable.NO_BUILD_FILE;
 	}
 
 	@Override

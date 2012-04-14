@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import common.Revision.COMPILABLE;
+import common.Revision.Compilable;
 
 public class MixingTool {
 	
@@ -93,7 +93,7 @@ public class MixingTool {
 		
 		MixedRevision exportedMixedRevision = mixedRevision.export();
 		
-		if (exportedMixedRevision.isCompilable() == COMPILABLE.YES) {
+		if (exportedMixedRevision.isCompilable() == Compilable.YES) {
 			LOGGER.info("compilable MixedRevision:\n" + exportedMixedRevision);
 			
 			evaluateCompilableMixedRevision(flip, exportedMixedRevision);

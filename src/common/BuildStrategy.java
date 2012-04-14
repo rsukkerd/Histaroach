@@ -1,6 +1,6 @@
 package common;
 
-import common.Revision.COMPILABLE;
+import common.Revision.Compilable;
 
 /**
  * BuildStrategy represents a way to compile a project, 
@@ -20,7 +20,7 @@ public interface BuildStrategy {
      * @return a pair of COMPILABLE state and TestResult of the commit
      * @throws Exception
      */
-	public Pair<COMPILABLE, TestResult> runTest(String commitID) 
+	public Pair<Compilable, TestResult> runTest(String commitID) 
 			throws Exception;
 	
 	/**
@@ -31,7 +31,7 @@ public interface BuildStrategy {
      * @return a pair of COMPILABLE state and TestResult of the commit
      * @throws Exception
      */
-	public Pair<COMPILABLE, TestResult> runTestViaShellScript(String commitID) 
+	public Pair<Compilable, TestResult> runTestViaShellScript(String commitID) 
 			throws Exception;
 
 }

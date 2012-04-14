@@ -29,7 +29,7 @@ import common.MixedRevision;
 import common.Repository;
 import common.Revision;
 import common.Util;
-import common.Revision.COMPILABLE;
+import common.Revision.Compilable;
 import common.TestResult;
 
 public class MixedRevisionTest {
@@ -85,7 +85,7 @@ public class MixedRevisionTest {
 		= new HashMap<Revision, List<DiffFile>>();
 	
 	private static final Revision REVISION_1 
-		= new Revision(REPOSITORY, COMMIT_1, PARENT_TO_DIFF_FILES_1, COMPILABLE.UNKNOWN, null);
+		= new Revision(REPOSITORY, COMMIT_1, PARENT_TO_DIFF_FILES_1, Compilable.UNKNOWN, null);
 	
 	private static final Map<Revision, List<DiffFile>> PARENT_TO_DIFF_FILES_2 
 		= new HashMap<Revision, List<DiffFile>>();
@@ -94,7 +94,7 @@ public class MixedRevisionTest {
 	}
 	
 	private static final Revision REVISION_2 
-		= new Revision(REPOSITORY, COMMIT_2, PARENT_TO_DIFF_FILES_2, COMPILABLE.UNKNOWN, null);
+		= new Revision(REPOSITORY, COMMIT_2, PARENT_TO_DIFF_FILES_2, Compilable.UNKNOWN, null);
 	
 	private static final String FILE_1_REVISION_1 = "f1r1";
 	private static final String FILE_1_REVISION_2 = "f1r2";
@@ -191,7 +191,7 @@ public class MixedRevisionTest {
 
 	private static final Revision PRJ_REVISION_1 
 		= new Revision(PRJ_REPOSITORY, PRJ_COMMIT_1, PRJ_PARENT_TO_DIFF_FILES_1, 
-				COMPILABLE.YES, PRJ_TEST_RESULT_1);
+				Compilable.YES, PRJ_TEST_RESULT_1);
 	
 	private static final Map<Revision, List<DiffFile>> PRJ_PARENT_TO_DIFF_FILES_2 
 		= new HashMap<Revision, List<DiffFile>>();
@@ -201,7 +201,7 @@ public class MixedRevisionTest {
 	
 	private static final Revision PRJ_REVISION_2 
 		= new Revision(PRJ_REPOSITORY, PRJ_COMMIT_2, PRJ_PARENT_TO_DIFF_FILES_2, 
-				COMPILABLE.YES, PRJ_TEST_RESULT_2);
+				Compilable.YES, PRJ_TEST_RESULT_2);
 	
 	// not compilable
 	private static final Set<DiffFile> COMBINATION_1 = new HashSet<DiffFile>();
@@ -224,20 +224,20 @@ public class MixedRevisionTest {
 	
 	@Test
 	public void testRevertNotCompilable() throws Exception {
-		checkTestResult(COMBINATION_1, COMPILABLE.NO, null);
+		checkTestResult(COMBINATION_1, Compilable.NO, null);
 	}
 	
 	@Test
 	public void testRevertFail() throws Exception {
-		checkTestResult(COMBINATION_2, COMPILABLE.YES, COMBINATION_2_TEST_RESULT);
+		checkTestResult(COMBINATION_2, Compilable.YES, COMBINATION_2_TEST_RESULT);
 	}
 	
 	@Test
 	public void testRevertPass() throws Exception {
-		checkTestResult(COMBINATION_3, COMPILABLE.YES, COMBINATION_3_TEST_RESULT);
+		checkTestResult(COMBINATION_3, Compilable.YES, COMBINATION_3_TEST_RESULT);
 	}
 	
-	public void checkTestResult(Set<DiffFile> combination, COMPILABLE expectedCompilable, 
+	public void checkTestResult(Set<DiffFile> combination, Compilable expectedCompilable, 
 			TestResult expectedTestResult) throws Exception {
 		Util.untar(PRJ_TAR_FILE, DEST_PATH);
 		Util.untar(PRJ_TAR_FILE_CLONE, DEST_PATH);

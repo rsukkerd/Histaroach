@@ -10,7 +10,7 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 
 import common.DiffFile.DiffType;
-import common.Revision.COMPILABLE;
+import common.Revision.Compilable;
 
 /**
  * MixedRevision represents a hypothetical Revision. 
@@ -28,7 +28,7 @@ public class MixedRevision {
     private final File repoDir;
     private final File clonedRepoDir;
     
-    private COMPILABLE compilable;
+    private Compilable compilable;
     private TestResult testResult;
     private Map<DiffFile, Revision> revertedFiles;
 
@@ -46,7 +46,7 @@ public class MixedRevision {
         repoDir = repository.getDirectory();
         clonedRepoDir = clonedRepository.getDirectory();
         
-        compilable = COMPILABLE.UNKNOWN;
+        compilable = Compilable.UNKNOWN;
         testResult = null;
         revertedFiles = new HashMap<DiffFile, Revision>();
         
@@ -132,7 +132,7 @@ public class MixedRevision {
     	}
     	
     	revertedFiles.remove(diffFile);
-    	compilable = COMPILABLE.UNKNOWN;
+    	compilable = Compilable.UNKNOWN;
     	testResult = null;
     }
     
@@ -164,7 +164,7 @@ public class MixedRevision {
     /**
      * @return a current COMPILABLE state of this MixedRevision
      */
-    public COMPILABLE isCompilable() {
+    public Compilable isCompilable() {
         return compilable;
     }
 
@@ -191,7 +191,7 @@ public class MixedRevision {
     public void runTest() throws Exception {
     	BuildStrategy buildStrategy = repository.getBuildStrategy();
     	// Pair<COMPILABLE, TestResult> pair = buildStrategy.runTest(baseRevision.getCommitID());
-    	Pair<COMPILABLE, TestResult> pair = buildStrategy.runTestViaShellScript(baseRevision.getCommitID());
+    	Pair<Compilable, TestResult> pair = buildStrategy.runTestViaShellScript(baseRevision.getCommitID());
         compilable = pair.getFirst();
         testResult = pair.getSecond();
     }
@@ -262,13 +262,13 @@ public class MixedRevision {
         }
         
         str += "compilable : ";
-        if (compilable == COMPILABLE.YES) {
+        if (compilable == Compilable.YES) {
         	assert testResult != null;
             str += "yes\n";
             str += testResult.toString();
-        } else if (compilable == COMPILABLE.NO) {
+        } else if (compilable == Compilable.NO) {
             str += "no\n";
-        } else if (compilable == COMPILABLE.UNKNOWN) {
+        } else if (compilable == Compilable.UNKNOWN) {
             str += "unknown\n";
         } else {
             str += "no build file\n";

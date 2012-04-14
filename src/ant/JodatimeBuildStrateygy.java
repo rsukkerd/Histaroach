@@ -9,7 +9,7 @@ import git.GitRepository;
 import common.Pair;
 import common.Repository;
 import common.TestResult;
-import common.Revision.COMPILABLE;
+import common.Revision.Compilable;
 import common.Util;
 
 /**
@@ -41,12 +41,12 @@ public class JodatimeBuildStrateygy extends AntBuildStrategy {
 	}
 	
 	@Override
-	public Pair<COMPILABLE, TestResult> runTest(String commitID) throws Exception {
+	public Pair<Compilable, TestResult> runTest(String commitID) throws Exception {
 		if (!ensureNoHaltOnFailure()) {
 			throw new Exception(ENSURE_EXCEPTION_MESSAGE);
 		}
 		
-		Pair<COMPILABLE, TestResult> result = super.runTest(commitID);
+		Pair<Compilable, TestResult> result = super.runTest(commitID);
 		
 		if (!restoreBuildFile()) {
 			throw new Exception(RESTORE_EXCEPTION_MESSAGE);
@@ -56,12 +56,12 @@ public class JodatimeBuildStrateygy extends AntBuildStrategy {
 	}
 	
 	@Override
-	public Pair<COMPILABLE, TestResult> runTestViaShellScript(String commitID) throws Exception {
+	public Pair<Compilable, TestResult> runTestViaShellScript(String commitID) throws Exception {
 		if (!ensureNoHaltOnFailure()) {
 			throw new Exception(ENSURE_EXCEPTION_MESSAGE);
 		}
 		
-		Pair<COMPILABLE, TestResult> result = super.runTestViaShellScript(commitID);
+		Pair<Compilable, TestResult> result = super.runTestViaShellScript(commitID);
 		
 		if (!restoreBuildFile()) {
 			throw new Exception(RESTORE_EXCEPTION_MESSAGE);

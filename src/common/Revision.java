@@ -26,14 +26,14 @@ public class Revision implements Serializable {
      */
     private static final long serialVersionUID = -4044614975764741642L;
 
-    public enum COMPILABLE {
+    public enum Compilable {
         YES, NO, UNKNOWN, NO_BUILD_FILE
     }
 
     private final Repository repository;
     private final String commitID;
     private final Map<Revision, List<DiffFile>> parentToDiffFiles;
-    private COMPILABLE compilable;
+    private Compilable compilable;
     private /*@Nullable*/ TestResult testResult;
 
     /**
@@ -48,7 +48,7 @@ public class Revision implements Serializable {
     	this.commitID = commitID;
     	this.parentToDiffFiles = parentToDiffFiles;
     	
-    	compilable = COMPILABLE.UNKNOWN;
+    	compilable = Compilable.UNKNOWN;
         testResult = null;
         
         boolean checkoutCommitSuccessful = repository.checkoutCommit(commitID);
@@ -65,7 +65,7 @@ public class Revision implements Serializable {
      * COMPILABLE state and TestResult are given.
      */
     public Revision(Repository repository, String commitID, Map<Revision, List<DiffFile>> parentToDiffFiles, 
-    		COMPILABLE compilable, TestResult testResult) {
+    		Compilable compilable, TestResult testResult) {
     	this.repository = repository;
     	this.commitID = commitID;
     	this.compilable = compilable;
@@ -115,7 +115,7 @@ public class Revision implements Serializable {
      * 
      * @return a COMPILABLE state of this Revision
      */
-    public COMPILABLE isCompilable() {
+    public Compilable isCompilable() {
         return compilable;
     }
 
@@ -137,7 +137,7 @@ public class Revision implements Serializable {
     private void populateTestResult() throws Exception {
     	BuildStrategy buildStrategy = repository.getBuildStrategy();
     	
-    	Pair<COMPILABLE, TestResult> result = buildStrategy.runTestViaShellScript(commitID);
+    	Pair<Compilable, TestResult> result = buildStrategy.runTestViaShellScript(commitID);
     	compilable = result.getFirst();
 		testResult = result.getSecond();
     }
@@ -175,12 +175,12 @@ public class Revision implements Serializable {
     public String toString() {
         String result = "commit : " + commitID + "\n";
         result += "compilable : ";
-        if (compilable == COMPILABLE.YES) {
+        if (compilable == Compilable.YES) {
             result += "yes\n";
             result += testResult.toString();
-        } else if (compilable == COMPILABLE.NO) {
+        } else if (compilable == Compilable.NO) {
             result += "no\n";
-        } else if (compilable == COMPILABLE.UNKNOWN) {
+        } else if (compilable == Compilable.UNKNOWN) {
             result += "unknown\n";
         } else {
             result += "no build file\n";
