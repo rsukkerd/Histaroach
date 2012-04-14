@@ -180,8 +180,8 @@ public class Util {
      * @return a HistoryGraph containing all revisions corresponding 
      *         to serialized revision files in serializedRevisionsDir
      */
-    public static HistoryGraph reconstructHistoryGraph(File serializedRevisionsDir, Repository repository) {
-    	HistoryGraph hGraph = new HistoryGraph(repository);
+    public static HistoryGraph reconstructHistoryGraph(File serializedRevisionsDir) {
+    	HistoryGraph hGraph = new HistoryGraph();
     	
     	FileFilter filter = new RevisionFileFilter();
     	File[] revisionFiles = serializedRevisionsDir.listFiles(filter);

@@ -110,7 +110,7 @@ public class GitRepository implements Repository, Serializable {
 	@Override
 	public HistoryGraph buildHistoryGraph(String startCommitID,
 			String endCommitID) throws Exception {
-		HistoryGraph hGraph = new HistoryGraph(this);
+		HistoryGraph hGraph = new HistoryGraph();
 		
 		boolean checkoutCommitSuccessful = checkoutCommit(startCommitID);
 		

@@ -106,9 +106,9 @@ public class TestIsolationDataReader {
 	    
 	    File serializedRevisionsDir = new File(serializedRevisionsDirName);
 	    
-	    HistoryGraph historyGraph = Util.reconstructHistoryGraph(serializedRevisionsDir, repository);
+	    HistoryGraph historyGraph = Util.reconstructHistoryGraph(serializedRevisionsDir);
 	    	    
-	    MixingTool mixing = new MixingTool(historyGraph, clonedRepository);
+	    MixingTool mixing = new MixingTool(historyGraph, repository, clonedRepository);
 	    mixing.run();
 	}
 }

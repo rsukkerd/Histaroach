@@ -11,12 +11,9 @@ import java.util.Queue;
 import java.util.Set;
 
 /**
- * HistoryGraph represents a graph of revision history 
- * of a particular Repository. 
+ * HistoryGraph represents a graph of Revision history. 
  * 
- * HistoryGraph has access to its associated Repository. 
- * It contains the following public methods: 
- *  - getRepository(): returns a Repository 
+ * HistoryGraph contains the following public methods: 
  *  - addRevision(revision): adds a Revision 
  *  - getAllFlips(): returns a set of all Flips occurred. 
  *    
@@ -25,30 +22,19 @@ import java.util.Set;
  */
 public class HistoryGraph implements Iterable<Revision> {
 	
-    private final Repository repository;
 	private final Set<Revision> revisions;
 	// for consistency of Revisions' order in toString() and iterator()
 	private final List<Revision> orderedRevisions;
 	
 	/**
-	 * Create an empty HistoryGraph associated with a Repository.
+	 * Create an empty HistoryGraph.
 	 */
-    public HistoryGraph(Repository repository) {
-    	this.repository = repository;
+    public HistoryGraph() {
         revisions = new HashSet<Revision>();
         orderedRevisions = new ArrayList<Revision>();
     }
 
     /**
-     * Get a Repository.
-     * 
-	 * @return a Repository associated with this HistoryGraph
-	 */
-	public Repository getRepository() {
-		return repository;
-	}
-
-	/**
      * Add a Revision.
      */
     public void addRevision(Revision revision) {
@@ -249,18 +235,17 @@ public class HistoryGraph implements Iterable<Revision> {
 
         HistoryGraph hGraph = (HistoryGraph) other;
 
-        return repository.equals(hGraph.repository) 
-        		&& revisions.equals(hGraph.revisions);
+        return revisions.equals(hGraph.revisions);
     }
 
     @Override
     public int hashCode() {
-        return 11 * repository.hashCode() + 13 * revisions.hashCode();
+        return revisions.hashCode();
     }
 
     @Override
     public String toString() {
-        String str = repository.toString() + "\n";
+    	String str = "";
         for (Revision revision : orderedRevisions) {
             str += revision.toString() + "\n";
         }

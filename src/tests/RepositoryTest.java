@@ -347,14 +347,14 @@ public class RepositoryTest {
 	private static final String[] END_COMMIT_IDS = {COMMIT_1_1, COMMIT_1_2, COMMIT_1_3, COMMIT_1_4, COMMIT_1_5};
 	private static final String[] END_COMMIT_IDS_PARTIAL = {COMMIT_1_1, COMMIT_1_2, COMMIT_2_3, COMMIT_2_4, COMMIT_4_5};
 	
-	private static final HistoryGraph HGRAPH_1 = new HistoryGraph(REPOSITORY_1);
-	private static final HistoryGraph HGRAPH_2 = new HistoryGraph(REPOSITORY_2);
-	private static final HistoryGraph HGRAPH_3 = new HistoryGraph(REPOSITORY_3);
-	private static final HistoryGraph HGRAPH_3_PARTIAL = new HistoryGraph(REPOSITORY_3);
-	private static final HistoryGraph HGRAPH_4 = new HistoryGraph(REPOSITORY_4);
-	private static final HistoryGraph HGRAPH_4_PARTIAL = new HistoryGraph(REPOSITORY_4);
-	private static final HistoryGraph HGRAPH_5 = new HistoryGraph(REPOSITORY_5);
-	private static final HistoryGraph HGRAPH_5_PARTIAL = new HistoryGraph(REPOSITORY_5);
+	private static final HistoryGraph HGRAPH_1 = new HistoryGraph();
+	private static final HistoryGraph HGRAPH_2 = new HistoryGraph();
+	private static final HistoryGraph HGRAPH_3 = new HistoryGraph();
+	private static final HistoryGraph HGRAPH_3_PARTIAL = new HistoryGraph();
+	private static final HistoryGraph HGRAPH_4 = new HistoryGraph();
+	private static final HistoryGraph HGRAPH_4_PARTIAL = new HistoryGraph();
+	private static final HistoryGraph HGRAPH_5 = new HistoryGraph();
+	private static final HistoryGraph HGRAPH_5_PARTIAL = new HistoryGraph();
 	static {
 		buildHistoryGraph(HGRAPH_1, REVISIONS_1);
 		buildHistoryGraph(HGRAPH_2, REVISIONS_2);
@@ -490,7 +490,7 @@ public class RepositoryTest {
 			COMPILABLE.YES, TEST_RESULT_4);
 	
 	/** hGraph of proj **/
-	private static final HistoryGraph EXPECTED_HGRAPH_PROJ = new HistoryGraph(REPOSITORY_PROJ);
+	private static final HistoryGraph EXPECTED_HGRAPH_PROJ = new HistoryGraph();
 	static {
 		EXPECTED_HGRAPH_PROJ.addRevision(REVISION_1);
 		EXPECTED_HGRAPH_PROJ.addRevision(REVISION_2);

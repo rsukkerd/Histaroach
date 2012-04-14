@@ -17,8 +17,8 @@ public class MixingTool {
 	private final Repository clonedRepository;
 	private final List<Flip> sortedToFailFlips;
 	
-	public MixingTool(HistoryGraph historyGraph, Repository clonedRepository) {
-		repository = historyGraph.getRepository();
+	public MixingTool(HistoryGraph historyGraph, Repository repository, Repository clonedRepository) {
+		this.repository = repository;
 		this.clonedRepository = clonedRepository;
 		
 		Set<Flip> flips = historyGraph.getAllFlips();
