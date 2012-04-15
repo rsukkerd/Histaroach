@@ -457,8 +457,8 @@ public class RepositoryTest {
 		FAILED_TESTS_4.add("proj.tests.Main3Test");
 	}
 	
-	private static final TestResult TEST_RESULT_3 = new TestResult(COMMIT_3, ALL_TESTS, FAILED_TESTS_3);
-	private static final TestResult TEST_RESULT_4 = new TestResult(COMMIT_4, ALL_TESTS, FAILED_TESTS_4);
+	private static final TestResult TEST_RESULT_3 = new TestResult(ALL_TESTS, FAILED_TESTS_3);
+	private static final TestResult TEST_RESULT_4 = new TestResult(ALL_TESTS, FAILED_TESTS_4);
 	
 	/** revision 1 in proj **/
 	private static final Map<Revision, List<DiffFile>> PARENT_DIFF_FILES_1 = new HashMap<Revision, List<DiffFile>>();

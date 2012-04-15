@@ -177,14 +177,10 @@ public class MixedRevisionTest {
 		TESTS.add("proj.tests.FTest");
 	}
 	
-	private static final TestResult PRJ_TEST_RESULT_1 = new TestResult(PRJ_COMMIT_1, 
-			TESTS, new HashSet<String>());
-	private static final TestResult PRJ_TEST_RESULT_2 = new TestResult(PRJ_COMMIT_2, 
-			TESTS, TESTS);
-	private static final TestResult COMBINATION_2_TEST_RESULT = new TestResult(PRJ_COMMIT_2, 
-			TESTS, TESTS);
-	private static final TestResult COMBINATION_3_TEST_RESULT = new TestResult(PRJ_COMMIT_2, 
-			TESTS, new HashSet<String>());
+	private static final TestResult PRJ_TEST_RESULT_1 = new TestResult(TESTS, new HashSet<String>());
+	private static final TestResult PRJ_TEST_RESULT_2 = new TestResult(TESTS, TESTS);
+	private static final TestResult COMBINATION_2_TEST_RESULT = new TestResult(TESTS, TESTS);
+	private static final TestResult COMBINATION_3_TEST_RESULT = new TestResult(TESTS, new HashSet<String>());
 	
 	private static final Map<Revision, List<DiffFile>> PRJ_PARENT_TO_DIFF_FILES_1 
 		= new HashMap<Revision, List<DiffFile>>();

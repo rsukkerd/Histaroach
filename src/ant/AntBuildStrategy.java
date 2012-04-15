@@ -22,8 +22,9 @@ import common.Revision.Compilable;
  * 
  * AntBuildStrategy is an abstract class; it contains the following 
  * abstract method: 
- *  - getTestResult(commitID, outputStreamContent, errorStreamContent): 
- *    parses test results and returns a TestResult of a commit. 
+ *  - getTestResult(outputStreamContent, errorStreamContent): 
+ *    parses test results from output and error streams 
+ *    and returns a TestResult. 
  * 
  * AntBuildStrategy is immutable.
  */
@@ -51,7 +52,7 @@ public abstract class AntBuildStrategy implements BuildStrategy, Serializable {
 	private final String[] antTestCmdArr;
 	
 	/**
-	 * Create an AntBuildStrategy.
+	 * Creates an AntBuildStrategy.
 	 */
 	protected AntBuildStrategy(File directory, String antCommand, String testCommand) {
 		this.directory = directory;
@@ -60,7 +61,7 @@ public abstract class AntBuildStrategy implements BuildStrategy, Serializable {
 	}
 	
 	@Override
-	public Pair<Compilable, TestResult> runTest(String commitID) throws Exception {
+	public Pair<Compilable, TestResult> runTest() throws Exception {
 		Process process = Util.runProcess(antTestCmdArr, directory);
 
         BufferedReader stdOutputReader = new BufferedReader(
@@ -76,14 +77,14 @@ public abstract class AntBuildStrategy implements BuildStrategy, Serializable {
         TestResult testResult = null;
         
         if (compilable == Compilable.YES) {
-            testResult = getTestResult(commitID, outputStreamContent, errorStreamContent);
+            testResult = getTestResult(outputStreamContent, errorStreamContent);
         }
 
         return new Pair<Compilable, TestResult>(compilable, testResult);
 	}
 
 	@Override
-	public Pair<Compilable, TestResult> runTestViaShellScript(String commitID) throws Exception {
+	public Pair<Compilable, TestResult> runTestViaShellScript() throws Exception {
 		String workingDir = System.getProperty("user.dir");
     	File dir = new File(workingDir);
     	
@@ -108,23 +109,24 @@ public abstract class AntBuildStrategy implements BuildStrategy, Serializable {
         TestResult testResult = null;
         
         if (compilable == Compilable.YES) {
-            testResult = getTestResult(commitID, outputStreamContent, errorStreamContent);
+            testResult = getTestResult(outputStreamContent, errorStreamContent);
         }
         
         return new Pair<Compilable, TestResult>(compilable, testResult);
 	}
 	
 	/**
-	 * Parse test results and return a TestResult of a commit.
+	 * Parses test results from output and error streams 
+	 * and returns a TestResult.
 	 * 
-	 * @return a TestResult of a commit
+	 * @return a TestResult.
 	 */
-	protected abstract TestResult getTestResult(String commitID, 
-			List<String> outputStreamContent, List<String> errorStreamContent);
+	protected abstract TestResult getTestResult(List<String> outputStreamContent, 
+			List<String> errorStreamContent);
 
 	/**
      * @return YES if build successful, NO if build failed, 
-     *         and NO_BUILD_FILE if there is no build file
+     *         and NO_BUILD_FILE if there is no build file.
      */
 	private Compilable buildSuccessful(List<String> outputStreamContent,
 			List<String> errorStreamContent) {

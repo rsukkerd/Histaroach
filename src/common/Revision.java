@@ -37,7 +37,7 @@ public class Revision implements Serializable {
     private /*@Nullable*/ TestResult testResult;
 
     /**
-     * Create a Revision. 
+     * Creates a Revision. 
      * Compilable state and TestResult are populated in this constructor.
      * 
      * @throws Exception 
@@ -61,7 +61,7 @@ public class Revision implements Serializable {
     }
     
     /**
-     * Create a Revision. 
+     * Creates a Revision. 
      * Compilable state and TestResult are given.
      */
     public Revision(Repository repository, String commitID, Map<Revision, List<DiffFile>> parentToDiffFiles, 
@@ -74,62 +74,63 @@ public class Revision implements Serializable {
     }
 
     /**
-     * Get a Repository.
+     * Returns a Repository.
      * 
-     * @return a Repository of this Revision
+     * @return a Repository of this Revision.
      */
     public Repository getRepository() {
         return repository;
     }
 
     /**
-     * Get a commit ID.
+     * Returns a commit ID.
      * 
-     * @return a commit ID of this Revision
+     * @return a commit ID of this Revision.
      */
     public String getCommitID() {
         return commitID;
     }
 
     /**
-     * Get a set of parents.
+     * Returns a set of parents.
      * 
-     * @return a set of parents of this Revision
+     * @return a set of parents of this Revision.
      */
     public Set<Revision> getParents() {
         return parentToDiffFiles.keySet();
     }
 
     /**
-     * Get a list of DiffFiles corresponding to a parent.
+     * Returns a list of DiffFiles corresponding to a parent.
      * 
      * @return a list of DiffFiles corresponding to the parent, 
-     *         null if the parent is not a parent of this Revision
+     *         null if the parent is not a parent of this Revision.
      */
     public List<DiffFile> getDiffFiles(Revision parent) {
         return parentToDiffFiles.get(parent);
     }
 
     /**
-     * Get a Compilable state.
+     * Returns a Compilable state.
      * 
-     * @return a Compilable state of this Revision
+     * @return a Compilable state of this Revision.
      */
     public Compilable isCompilable() {
         return compilable;
     }
 
     /**
-     * Get a TestResult.
+     * Returns a TestResult.
      * 
-     * @return a TestResult of this Revision
+     * @return a TestResult of this Revision.
      */
     public TestResult getTestResult() {
         return testResult;
     }
 
     /**
-     * Compile, run tests, and parse the test results.
+     * Compiles the project, runs tests, and 
+     * parses the test results.
      * 
      * @modifies this
      * @throws Exception 
@@ -137,7 +138,7 @@ public class Revision implements Serializable {
     private void populateTestResult() throws Exception {
     	BuildStrategy buildStrategy = repository.getBuildStrategy();
     	
-    	Pair<Compilable, TestResult> result = buildStrategy.runTestViaShellScript(commitID);
+    	Pair<Compilable, TestResult> result = buildStrategy.runTestViaShellScript();
     	compilable = result.getFirst();
 		testResult = result.getSecond();
     }

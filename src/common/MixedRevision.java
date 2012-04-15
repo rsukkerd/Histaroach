@@ -99,7 +99,7 @@ public class MixedRevision {
     	} else {
     		Set<String> allTests = testResult.getAllTests();
     		Set<String> failedTests = testResult.getFailedTests();
-    		copy.testResult = new TestResult(baseRevision.getCommitID(), allTests, failedTests);
+    		copy.testResult = new TestResult(allTests, failedTests);
     	}
     	
     	copy.revertedFiles = new HashMap<DiffFile, Revision>();
@@ -190,8 +190,8 @@ public class MixedRevision {
      */
     public void runTest() throws Exception {
     	BuildStrategy buildStrategy = repository.getBuildStrategy();
-    	// Pair<COMPILABLE, TestResult> pair = buildStrategy.runTest(baseRevision.getCommitID());
-    	Pair<Compilable, TestResult> pair = buildStrategy.runTestViaShellScript(baseRevision.getCommitID());
+    	// Pair<COMPILABLE, TestResult> pair = buildStrategy.runTest();
+    	Pair<Compilable, TestResult> pair = buildStrategy.runTestViaShellScript();
         compilable = pair.getFirst();
         testResult = pair.getSecond();
     }

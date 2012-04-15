@@ -7,31 +7,31 @@ import common.Revision.Compilable;
  * run tests, and parse the test results. 
  * 
  * BuildStrateggy contains the following public methods: 
- *  - runTest(commitID): compiles, runs tests, and 
- *    parses the test results of a commit 
- *  - runTestViaShellScript(commitID): an alternative 
- *    method of runTest.
+ *  - runTest(): compiles the project, runs tests, and 
+ *    parses the test results 
+ *  - runTestViaShellScript(): an alternative method 
+ *    of runTest.
  */
 public interface BuildStrategy {
 	
 	/**
-     * Compile, run tests, and parse the test results of a commit.
+     * Compiles the project, runs tests, and 
+     * parses the test results.
      * 
-     * @return a pair of COMPILABLE state and TestResult of the commit
+     * @return a pair of Compilable state and TestResult.
      * @throws Exception
      */
-	public Pair<Compilable, TestResult> runTest(String commitID) 
-			throws Exception;
+	public Pair<Compilable, TestResult> runTest() throws Exception;
 	
 	/**
-     * Compile, run tests, and parse the test results of a commit.
+     * Compiles the project, runs tests, and 
+     * parses the test results. 
      * 
-     * Alternative of runTest.
+     * This method is an alternative of runTest().
      * 
-     * @return a pair of COMPILABLE state and TestResult of the commit
+     * @return a pair of Compilable state and TestResult.
      * @throws Exception
      */
-	public Pair<Compilable, TestResult> runTestViaShellScript(String commitID) 
-			throws Exception;
+	public Pair<Compilable, TestResult> runTestViaShellScript() throws Exception;
 
 }

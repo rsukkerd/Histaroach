@@ -5,15 +5,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * TestResult represents test results of a particular Revision. 
+ * TestResult represents test results of a Revision. 
  * 
  * TestResult contains the following public methods: 
- *  - getCommitID(): returns a commit ID of its Revision 
  *  - getAllTests(): returns a set of all tests 
  *  - getFailedTests(): returns a set of failed tests 
  *  - getPassedTests(): returns a set of passed tests 
- *  - pass(test): returns whether its Revision passes a test 
- *  - fail(test): returns whether its Revision fails a test. 
+ *  - pass(test): returns whether a test passes
+ *  - fail(test): returns whether a test fails.
  * 
  * TestResult is immutable.
  */
@@ -23,19 +22,17 @@ public class TestResult implements Serializable {
 	 */
 	private static final long serialVersionUID = 2210640650733708242L;
 	
-	private final String commitID;
     private final /*@Non-Null*/ Set<String> allTests;
     private final /*@Non-Null*/ Set<String> failedTests;
     private final /*@Non-Null*/ Set<String> passedTests;
 
     /**
-     * Create a TestResult.
+     * Creates a TestResult.
      * 
      * @precondition allTests and failedTests are Non-Null
      */
-    public TestResult(String commitID, /*@Non-Null*/ Set<String> allTests, 
+    public TestResult(/*@Non-Null*/ Set<String> allTests, 
     		/*@Non-Null*/ Set<String> failedTests) {
-        this.commitID = commitID;
         this.allTests = allTests;
         this.failedTests = failedTests;
         
@@ -48,54 +45,45 @@ public class TestResult implements Serializable {
     }
     
     /**
-     * Get a commit ID of its Revision.
+     * Returns a set of all tests.
      * 
-     * @return a commit ID of this TestResult's Revision
-     */
-    public String getCommitID() {
-        return commitID;
-    }
-    
-    /**
-     * Get a set of all tests.
-     * 
-     * @return a set of all tests
+     * @return a set of all tests.
      */
     public Set<String> getAllTests() {
         return allTests;
     }
 
     /**
-     * Get a set of failed tests.
+     * Returns a set of failed tests.
      * 
-     * @return a set of failed tests
+     * @return a set of failed tests.
      */
     public Set<String> getFailedTests() {
         return failedTests;
     }
     
     /**
-     * Get a set of passed tests.
+     * Returns a set of passed tests.
      * 
-     * @return a set of passed tests
+     * @return a set of passed tests.
      */
     public Set<String> getPassedTests() {
         return passedTests;
     }
 
     /**
-     * Does its Revision pass a test?
+     * Returns true if a test passes.
      * 
-     * @return true if and only if this TestResult's Revision passes the test
+     * @return true if the test passes.
      */
     public boolean pass(String test) {
         return passedTests.contains(test);
     }
 
     /**
-     * Does its Revision fail a test?
+     * Returns true if a test fails.
      * 
-     * @return true if and only if this TestResult's Revision fails the test
+     * @return true if the test fails.
      */
     public boolean fail(String test) {
         return failedTests.contains(test);
@@ -109,14 +97,12 @@ public class TestResult implements Serializable {
 
         TestResult result = (TestResult) other;
 
-        return commitID.equals(result.commitID) 
-        	&& allTests.equals(result.allTests) && failedTests.equals(result.failedTests);
+        return allTests.equals(result.allTests) && failedTests.equals(result.failedTests);
     }
 
     @Override
     public int hashCode() {
-        int code = 11 * commitID.hashCode() + 13 * allTests.hashCode() 
-        		+ 17 * failedTests.hashCode();
+        int code = 13 * allTests.hashCode() + 17 * failedTests.hashCode();
         return code;
     }
 

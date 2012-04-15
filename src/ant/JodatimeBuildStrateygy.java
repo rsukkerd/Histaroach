@@ -33,7 +33,10 @@ public class JodatimeBuildStrateygy extends AntBuildStrategy {
 	
 	private final File directory;
 	private final Repository repository;
-
+	
+	/**
+	 * Creates a JodatimeBuildStrategy.
+	 */
 	public JodatimeBuildStrateygy(File directory, String antCommand) {
 		super(directory, antCommand, TEST_COMMAND);
 		this.directory = directory;
@@ -41,12 +44,12 @@ public class JodatimeBuildStrateygy extends AntBuildStrategy {
 	}
 	
 	@Override
-	public Pair<Compilable, TestResult> runTest(String commitID) throws Exception {
+	public Pair<Compilable, TestResult> runTest() throws Exception {
 		if (!ensureNoHaltOnFailure()) {
 			throw new Exception(ENSURE_EXCEPTION_MESSAGE);
 		}
 		
-		Pair<Compilable, TestResult> result = super.runTest(commitID);
+		Pair<Compilable, TestResult> result = super.runTest();
 		
 		if (!restoreBuildFile()) {
 			throw new Exception(RESTORE_EXCEPTION_MESSAGE);
@@ -56,12 +59,12 @@ public class JodatimeBuildStrateygy extends AntBuildStrategy {
 	}
 	
 	@Override
-	public Pair<Compilable, TestResult> runTestViaShellScript(String commitID) throws Exception {
+	public Pair<Compilable, TestResult> runTestViaShellScript() throws Exception {
 		if (!ensureNoHaltOnFailure()) {
 			throw new Exception(ENSURE_EXCEPTION_MESSAGE);
 		}
 		
-		Pair<Compilable, TestResult> result = super.runTestViaShellScript(commitID);
+		Pair<Compilable, TestResult> result = super.runTestViaShellScript();
 		
 		if (!restoreBuildFile()) {
 			throw new Exception(RESTORE_EXCEPTION_MESSAGE);
@@ -71,17 +74,17 @@ public class JodatimeBuildStrateygy extends AntBuildStrategy {
 	}
 	
 	@Override
-	protected TestResult getTestResult(String commitID,
-			List<String> outputStreamContent, List<String> errorStreamContent) {
+	protected TestResult getTestResult(List<String> outputStreamContent, 
+			List<String> errorStreamContent) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	/**
-	 * Ensure haltonfailure="no" in build.xml.
+	 * Ensures haltonfailure="no" in build.xml.
 	 * 
-	 * @return true if and only if the method successfully 
-	 *         ensured haltonfailure="no" in build.xml
+	 * @return true if the method successfully ensured 
+	 *         haltonfailure="no" in build.xml.
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
@@ -93,10 +96,10 @@ public class JodatimeBuildStrateygy extends AntBuildStrategy {
 	}
 	
 	/**
-	 * Restore build.xml after ensureNoHaltOnFailure().
+	 * Restores build.xml after ensureNoHaltOnFailure().
 	 * 
-	 * @return true if and only if the method successfully 
-	 *         restored build.xml
+	 * @return true if the method successfully restored 
+	 *         build.xml.
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
