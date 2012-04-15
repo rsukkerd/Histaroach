@@ -70,17 +70,6 @@ public class DiffFile implements Serializable {
 	
 	@Override
 	public String toString() {
-		String str;
-		if (type == DiffType.ADDED) {
-			str = "A";
-		} else if (type == DiffType.MODIFIED) {
-			str = "M";
-		} else {
-			str = "D";
-		}
-		
-		str += "\t" + fileName;
-		
-		return str;
+		return type.toString().charAt(0) + "\t" + fileName;
 	}
 }

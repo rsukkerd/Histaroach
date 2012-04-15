@@ -15,7 +15,7 @@ import java.util.Set;
  *  - getParents(): returns a set of parents 
  *  - getDiffFiles(parent): returns a list of DiffFiles 
  *    corresponding to a parent 
- *  - isCompilable(): returns a COMPIABLE state 
+ *  - isCompilable(): returns a Compilable state 
  *  - getTestResult(): returns a TestResult.
  * 
  * Revision is immutable.
@@ -38,7 +38,7 @@ public class Revision implements Serializable {
 
     /**
      * Create a Revision. 
-     * COMPILABLE state and TestResult are populated in this constructor.
+     * Compilable state and TestResult are populated in this constructor.
      * 
      * @throws Exception 
      */
@@ -62,7 +62,7 @@ public class Revision implements Serializable {
     
     /**
      * Create a Revision. 
-     * COMPILABLE state and TestResult are given.
+     * Compilable state and TestResult are given.
      */
     public Revision(Repository repository, String commitID, Map<Revision, List<DiffFile>> parentToDiffFiles, 
     		Compilable compilable, TestResult testResult) {
@@ -111,9 +111,9 @@ public class Revision implements Serializable {
     }
 
     /**
-     * Get a COMPILABLE state.
+     * Get a Compilable state.
      * 
-     * @return a COMPILABLE state of this Revision
+     * @return a Compilable state of this Revision
      */
     public Compilable isCompilable() {
         return compilable;
@@ -173,22 +173,16 @@ public class Revision implements Serializable {
 
     @Override
     public String toString() {
-        String result = "commit : " + commitID + "\n";
-        result += "compilable : ";
+        String result = "Commit: " + commitID + "\n";
+        result += "Compilable: " + compilable + "\n";
+        
         if (compilable == Compilable.YES) {
-            result += "yes\n";
             result += testResult.toString();
-        } else if (compilable == Compilable.NO) {
-            result += "no\n";
-        } else if (compilable == Compilable.UNKNOWN) {
-            result += "unknown\n";
-        } else {
-            result += "no build file\n";
         }
                 
         for (Revision parent : parentToDiffFiles.keySet()) {
-        	result += "parent : " + parent.commitID + "\n";
-        	result += "diff files :\n";
+        	result += "Parent: " + parent.commitID + "\n";
+        	result += "Diff Files:\n";
         	
         	List<DiffFile> diffFiles = parentToDiffFiles.get(parent);
         	for (DiffFile diffFile : diffFiles) {
