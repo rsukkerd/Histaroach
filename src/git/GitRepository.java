@@ -41,6 +41,9 @@ public class GitRepository implements Repository, Serializable {
 	private final File directory;
 	private final BuildStrategy buildStrategy;
 	
+	/**
+	 * Creates a GitRepository.
+	 */
 	public GitRepository(File directory, BuildStrategy buildStrategy) {
 		this.directory = directory;
 		this.buildStrategy = buildStrategy;
@@ -203,7 +206,7 @@ public class GitRepository implements Repository, Serializable {
 	        			parent = revisions.get(parentID);
 	        		} else {
 	        			// dummy revision of parent
-	        			parent = new Revision(this, parentID, new HashMap<Revision, List<DiffFile>>(), 
+	        			parent = new Revision(parentID, new HashMap<Revision, List<DiffFile>>(), 
 	        					Compilable.UNKNOWN, null);
 	        		}
 	        		

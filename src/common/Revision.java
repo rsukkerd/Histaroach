@@ -8,9 +8,7 @@ import java.util.Set;
 /**
  * Revision represents a state of a particular commit. 
  * 
- * Revision has access to its Repository. 
- * It contains the following public methods: 
- *  - getRepository(): returns a Repository 
+ * Revision contains the following public methods: 
  *  - getCommitID(): returns a commit ID 
  *  - getParents(): returns a set of parents 
  *  - getDiffFiles(parent): returns a list of DiffFiles 
@@ -30,7 +28,6 @@ public class Revision implements Serializable {
         YES, NO, UNKNOWN, NO_BUILD_FILE
     }
 
-    private final Repository repository;
     private final String commitID;
     private final Map<Revision, List<DiffFile>> parentToDiffFiles;
     private Compilable compilable;
@@ -44,17 +41,17 @@ public class Revision implements Serializable {
      */
     public Revision(Repository repository, String commitID, Map<Revision, List<DiffFile>> parentToDiffFiles) 
     		throws Exception {
-    	this.repository = repository;
     	this.commitID = commitID;
     	this.parentToDiffFiles = parentToDiffFiles;
-    	
-    	compilable = Compilable.UNKNOWN;
-        testResult = null;
         
         boolean checkoutCommitSuccessful = repository.checkoutCommit(commitID);
         
         if (checkoutCommitSuccessful) {
-        	populateTestResult();
+        	BuildStrategy buildStrategy = repository.getBuildStrategy();
+        	
+        	Pair<Compilable, TestResult> result = buildStrategy.runTestViaShellScript();
+        	compilable = result.getFirst();
+    		testResult = result.getSecond();
         } else {
     		throw new Exception("git checkout commit " + commitID + " unsuccessful");
     	}
@@ -64,22 +61,12 @@ public class Revision implements Serializable {
      * Creates a Revision. 
      * Compilable state and TestResult are given.
      */
-    public Revision(Repository repository, String commitID, Map<Revision, List<DiffFile>> parentToDiffFiles, 
+    public Revision(String commitID, Map<Revision, List<DiffFile>> parentToDiffFiles, 
     		Compilable compilable, TestResult testResult) {
-    	this.repository = repository;
     	this.commitID = commitID;
     	this.compilable = compilable;
     	this.testResult = testResult;
     	this.parentToDiffFiles = parentToDiffFiles;
-    }
-
-    /**
-     * Returns a Repository.
-     * 
-     * @return a Repository of this Revision.
-     */
-    public Repository getRepository() {
-        return repository;
     }
 
     /**
@@ -128,21 +115,6 @@ public class Revision implements Serializable {
         return testResult;
     }
 
-    /**
-     * Compiles the project, runs tests, and 
-     * parses the test results.
-     * 
-     * @modifies this
-     * @throws Exception 
-     */
-    private void populateTestResult() throws Exception {
-    	BuildStrategy buildStrategy = repository.getBuildStrategy();
-    	
-    	Pair<Compilable, TestResult> result = buildStrategy.runTestViaShellScript();
-    	compilable = result.getFirst();
-		testResult = result.getSecond();
-    }
-
     @Override
     public boolean equals(Object other) {
         if (other == null || !other.getClass().equals(this.getClass())) {
@@ -151,20 +123,19 @@ public class Revision implements Serializable {
 
         Revision revision = (Revision) other;
         
-        boolean boolRepo = repository.equals(revision.repository);
         boolean boolCommitID = commitID.equals(revision.commitID);
         boolean boolParentToDiffFiles = parentToDiffFiles.equals(revision.parentToDiffFiles);
         boolean boolCompilable = compilable == revision.compilable;
         boolean boolTestResult = (testResult == null && revision.testResult == null) 
         						|| (testResult != null && testResult.equals(revision.testResult));
         
-        return boolRepo && boolCommitID && boolParentToDiffFiles && boolCompilable && boolTestResult;
+        return boolCommitID && boolParentToDiffFiles && boolCompilable && boolTestResult;
     }
 
     @Override
     public int hashCode() {
-        int code = 11 * repository.hashCode() + 13 * commitID.hashCode() 
-        			+ 17 * parentToDiffFiles.hashCode() + 19 * compilable.hashCode();
+        int code = 13 * commitID.hashCode() + 17 * parentToDiffFiles.hashCode() 
+        	+ 19 * compilable.hashCode();
         if (testResult != null) {
             code += 23 * testResult.hashCode();
         }

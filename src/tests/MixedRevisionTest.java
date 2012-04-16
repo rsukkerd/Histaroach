@@ -85,7 +85,7 @@ public class MixedRevisionTest {
 		= new HashMap<Revision, List<DiffFile>>();
 	
 	private static final Revision REVISION_1 
-		= new Revision(REPOSITORY, COMMIT_1, PARENT_TO_DIFF_FILES_1, Compilable.UNKNOWN, null);
+		= new Revision(COMMIT_1, PARENT_TO_DIFF_FILES_1, Compilable.UNKNOWN, null);
 	
 	private static final Map<Revision, List<DiffFile>> PARENT_TO_DIFF_FILES_2 
 		= new HashMap<Revision, List<DiffFile>>();
@@ -94,7 +94,7 @@ public class MixedRevisionTest {
 	}
 	
 	private static final Revision REVISION_2 
-		= new Revision(REPOSITORY, COMMIT_2, PARENT_TO_DIFF_FILES_2, Compilable.UNKNOWN, null);
+		= new Revision(COMMIT_2, PARENT_TO_DIFF_FILES_2, Compilable.UNKNOWN, null);
 	
 	private static final String FILE_1_REVISION_1 = "f1r1";
 	private static final String FILE_1_REVISION_2 = "f1r2";
@@ -186,7 +186,7 @@ public class MixedRevisionTest {
 		= new HashMap<Revision, List<DiffFile>>();
 
 	private static final Revision PRJ_REVISION_1 
-		= new Revision(PRJ_REPOSITORY, PRJ_COMMIT_1, PRJ_PARENT_TO_DIFF_FILES_1, 
+		= new Revision(PRJ_COMMIT_1, PRJ_PARENT_TO_DIFF_FILES_1, 
 				Compilable.YES, PRJ_TEST_RESULT_1);
 	
 	private static final Map<Revision, List<DiffFile>> PRJ_PARENT_TO_DIFF_FILES_2 
@@ -196,7 +196,7 @@ public class MixedRevisionTest {
 	}
 	
 	private static final Revision PRJ_REVISION_2 
-		= new Revision(PRJ_REPOSITORY, PRJ_COMMIT_2, PRJ_PARENT_TO_DIFF_FILES_2, 
+		= new Revision(PRJ_COMMIT_2, PRJ_PARENT_TO_DIFF_FILES_2, 
 				Compilable.YES, PRJ_TEST_RESULT_2);
 	
 	// not compilable

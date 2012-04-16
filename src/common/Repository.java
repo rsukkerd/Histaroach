@@ -21,43 +21,42 @@ import java.util.List;
 public interface Repository {
 
 	/**
-	 * Get a directory.
+	 * Returns a directory.
 	 * 
-     * @return a directory of this Repository
+     * @return a directory of this Repository.
      */
 	public File getDirectory();
 	
 	/**
-	 * Get a BuildStrategy.
+	 * Returns a BuildStrategy.
 	 * 
-	 * @return a BuildStrategy of this Repository
+	 * @return a BuildStrategy associated with this Repository.
 	 */
 	public BuildStrategy getBuildStrategy();
 	
 	/**
-     * Check out a commit into the working directory.
+     * Checks out a commit into the working directory.
      * 
-     * @return true if and only if the method successfully 
-     *         checked out the commit
+     * @return true if the method successfully checked out the commit.
      * @throws InterruptedException 
      * @throws IOException 
      */
 	public boolean checkoutCommit(String commitID) throws IOException, InterruptedException;
 	
 	/**
-	 * Discard any change made in a file.
+	 * Discards any change made in a file.
 	 * 
-	 * @return true if and only if the method successfully 
-	 *         restored the file if there was any change
+	 * @return true if the method successfully restored the file 
+	 *         if there was any change.
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
 	public boolean discardFileChange(String filename) throws IOException, InterruptedException;
 	
 	/**
-	 * Get a list of DiffFiles between any 2 commits.
+	 * Returns a list of DiffFiles between any 2 commits.
 	 * 
-     * @return a list of DiffFiles between baseCommit and otherCommit
+     * @return a list of DiffFiles between baseCommit and otherCommit.
      * @throws InterruptedException 
      * @throws IOException 
      */
@@ -65,11 +64,11 @@ public interface Repository {
             String otherCommitID) throws IOException, InterruptedException;
 
 	/**
-	 * Build a HistoryGraph containing Revisions from startCommit 
+	 * Builds a HistoryGraph containing Revisions from startCommit 
 	 * to endCommit.
 	 * 
 	 * @return a HistoryGraph containing Revisions from startCommit 
-	 *         to endCommit
+	 *         to endCommit.
 	 * @throws Exception
 	 */
 	public HistoryGraph buildHistoryGraph(String startCommitID, String endCommitID) 
