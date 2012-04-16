@@ -2,32 +2,34 @@ import git.GitRepository;
 
 import java.io.File;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
 import ant.JodatimeBuildStrateygy;
 import ant.VoldemortBuildStrategy;
 
 import common.BuildStrategy;
 import common.HistoryGraph;
 import common.Repository;
-import common.Revision;
-import common.Util;
 
 import plume.Option;
 import plume.OptionGroup;
 import plume.Options;
+import util.HistoryGraphXMLWriter;
 
 /**
  * TestIsolationDataGenerator builds a HistoryGraph from voldemort repository
  * and writes each Revision in the graph to a serialized file.
  */
 public class TestIsolationDataGenerator {
+	
+	public static final String OUTPUT_PATH = "output";
+	
     // Prefix of files to which HistoryGraph instances are written.
     public static final String HGRAPH_FILE_PREFIX = "historyGraph";
-
-    // Extension of serialized files.
-    public static final String SERIALIZED_EXTENSION = ".ser";
-
-    // Extension of human-readable files.
-    public static final String HUMAN_READ_EXTENSION = ".log";
+    
+    // Extension of xml files.
+    public static final String XML_EXTENSION = ".xml";
     
     public static final String VOLDEMORT = "voldemort";
     public static final String JODA_TIME = "joda-time";
@@ -74,14 +76,6 @@ public class TestIsolationDataGenerator {
             aliases = { "-endCommitID" })
     public static String endCommitID = null;
 
-    /**
-     * Full path to the output directory. 
-     * Must NOT contain '/' at the end of the path.
-     */
-    @Option(value = "-o Full path to the output directory (Required)",
-            aliases = { "-outputPath" })
-    public static String outputPath = null;
-    
     /** One line synopsis of usage */
     public static final String usage_string = "TestIsolationDataGenerator [options]";
 
@@ -106,8 +100,7 @@ public class TestIsolationDataGenerator {
         }
 
         if (projName == null || repoPath == null 
-        		|| startCommitID == null || endCommitID == null 
-        		|| outputPath == null) {
+        		|| startCommitID == null || endCommitID == null) {
             plumeOptions.print_usage();
             return;
         }
@@ -126,23 +119,25 @@ public class TestIsolationDataGenerator {
         
         Repository repository = new GitRepository(repoDir, buildStrategy);
         
-        HistoryGraph historyGraph = repository.buildHistoryGraph(startCommitID, endCommitID);
+        HistoryGraph hGraph = repository.buildHistoryGraph(startCommitID, endCommitID);
         
-        exportTestResults(historyGraph);
-
-        String fileName = "_" + startCommitID + "_" + endCommitID;
-        
-        Util.writeToHumanReadableFile(outputPath + File.separatorChar + HGRAPH_FILE_PREFIX + fileName
-                + HUMAN_READ_EXTENSION, historyGraph);
+        saveHistoryGraph(hGraph);
     }
 
     /**
-     * Write each Revision in the HistoryGraph to a serialized file.
+     * Write a HistoryGraph to an xml file.
+     * 
+     * @throws ParserConfigurationException 
+     * @throws TransformerException 
      */
-    public static void exportTestResults(HistoryGraph historyGraph) {
-    	for (Revision revision : historyGraph) {
-    		String filename = outputPath + File.separatorChar + revision.getCommitID() + SERIALIZED_EXTENSION;
-    		Util.writeToSerializedFile(filename, revision);
-    	}
+    public static void saveHistoryGraph(HistoryGraph hGraph) throws ParserConfigurationException, 
+    		TransformerException {
+    	
+    	String fileName = HGRAPH_FILE_PREFIX + "_" + startCommitID + "_" + endCommitID 
+    			+ XML_EXTENSION;
+    	File hGraphXML = new File(OUTPUT_PATH + File.separatorChar + fileName);
+    	
+    	HistoryGraphXMLWriter writer = new HistoryGraphXMLWriter(hGraph, hGraphXML);
+    	writer.write();
     }
 }
