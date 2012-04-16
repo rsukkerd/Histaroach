@@ -29,7 +29,7 @@ public class TestResult implements Serializable {
     /**
      * Creates a TestResult.
      * 
-     * @precondition allTests and failedTests are Non-Null
+     * @precondition allTests and failedTests are Non-Null.
      */
     public TestResult(/*@Non-Null*/ Set<String> allTests, 
     		/*@Non-Null*/ Set<String> failedTests) {

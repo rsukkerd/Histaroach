@@ -39,9 +39,9 @@ public class Flip implements Comparable<Flip> {
 	private final /*@Non-Null*/ Set<String> toFailTests;
 	
 	/**
-	 * Create a Flip.
+	 * Creates a Flip.
 	 * 
-	 * @precondition toPassTests and toFailTests are Non-Null
+	 * @precondition toPassTests and toFailTests are Non-Null.
 	 */
 	public Flip(Revision child, Revision parent, /*@Non-Null*/ Set<String> toPassTests,
 			/*@Non-Null*/ Set<String> toFailTests) {
@@ -53,45 +53,45 @@ public class Flip implements Comparable<Flip> {
 	}
 	
 	/**
-	 * Get a child Revision.
+	 * Returns a child Revision.
 	 * 
-	 * @return a child Revision of this Flip
+	 * @return a child Revision of this Flip.
 	 */
 	public Revision getChildRevision() {
 		return child;
 	}
 	
 	/**
-	 * Get a parent Revision.
+	 * Returns a parent Revision.
 	 * 
-	 * @return a parent Revision of this Flip
+	 * @return a parent Revision of this Flip.
 	 */
 	public Revision getParentRevision() {
 		return parent;
 	}
 	
 	/**
-	 * Get a list of DiffFiles between child and parent.
+	 * Returns a list of DiffFiles between child and parent.
 	 * 
-	 * @return a list of DiffFiles between child and parent of this Flip
+	 * @return a list of DiffFiles between child and parent of this Flip.
 	 */
 	public List<DiffFile> getDiffFiles() {
 		return diffFiles;
 	}
 	
 	/**
-	 * Get a set of tests that fail in parent but pass in child.
+	 * Returns a set of tests that fail in parent but pass in child.
 	 * 
-	 * @return a set of tests that fail in parent but pass in child
+	 * @return a set of tests that fail in parent but pass in child.
 	 */
 	public Set<String> getToPassTests() {
 		return toPassTests;
 	}
 	
 	/**
-	 * Get a set of tests that pass in parent but fail in child.
+	 * Returns a set of tests that pass in parent but fail in child.
 	 * 
-	 * @return a set of tests that pass in parent but fail in child
+	 * @return a set of tests that pass in parent but fail in child.
 	 */
 	public Set<String> getToFailTests() {
 		return toFailTests;

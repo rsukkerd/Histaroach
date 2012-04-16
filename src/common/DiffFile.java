@@ -27,7 +27,7 @@ public class DiffFile implements Serializable {
 	private final String fileName;
 	
 	/**
-	 * Create a DiffFile.
+	 * Creates a DiffFile.
 	 */
 	public DiffFile(DiffType type, String fileName) {
 		this.type = type;
@@ -35,7 +35,7 @@ public class DiffFile implements Serializable {
 	}
 	
 	/**
-	 * Get a file name.
+	 * Returns a file name.
 	 * 
 	 * @return a file name.
 	 */
@@ -44,9 +44,9 @@ public class DiffFile implements Serializable {
 	}
 	
 	/**
-	 * Get a DiffType.
+	 * Returns a DiffType.
 	 * 
-	 * @return a DiffType (ADDED, MODIFIED, or DELETED)
+	 * @return a DiffType (ADDED, MODIFIED, or DELETED).
 	 */
 	public DiffType getDiffType() {
 		return type;

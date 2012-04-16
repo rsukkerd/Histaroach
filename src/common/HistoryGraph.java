@@ -23,11 +23,11 @@ import java.util.Set;
 public class HistoryGraph implements Iterable<Revision> {
 	
 	private final Set<Revision> revisions;
-	// for consistency of Revisions' order in toString() and iterator()
+	// for Revisions' topological ordering in iterator() and toString()
 	private final List<Revision> orderedRevisions;
 	
 	/**
-	 * Create an empty HistoryGraph.
+	 * Creates an empty HistoryGraph.
 	 */
     public HistoryGraph() {
         revisions = new HashSet<Revision>();
@@ -35,7 +35,9 @@ public class HistoryGraph implements Iterable<Revision> {
     }
 
     /**
-     * Add a Revision.
+     * Adds a Revision to this HistoryGraph.
+     * 
+     * @modifies this
      */
     public void addRevision(Revision revision) {
         revisions.add(revision);
@@ -43,9 +45,9 @@ public class HistoryGraph implements Iterable<Revision> {
     }
     
     /**
-     * Get a set of all Flips occurred.
+     * Returns a set of all Flips occurred.
      * 
-	 * @return a set of all Flips in this HistoryGraph
+	 * @return a set of all Flips in this HistoryGraph.
 	 */
 	public Set<Flip> getAllFlips() {
 	    Set<Flip> flips = new HashSet<Flip>();
