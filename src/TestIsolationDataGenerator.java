@@ -19,7 +19,7 @@ import util.HistoryGraphXMLWriter;
 
 /**
  * TestIsolationDataGenerator builds a HistoryGraph from voldemort repository
- * and writes each Revision in the graph to a serialized file.
+ * and writes the HistoryGraph output to an xml file.
  */
 public class TestIsolationDataGenerator {
 	

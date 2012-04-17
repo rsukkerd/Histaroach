@@ -44,8 +44,8 @@ public abstract class AntBuildStrategy implements BuildStrategy, Serializable {
 	private static final String BUILD_FAILED_PATTERN = "BUILD FAILED";
 	
 	private static final String RUN_SCRIPT_COMMAND = "./run_test.sh";
-	private static final String TEST_OUTPUT = "output/run_test_stdoutput";
-	private static final String TEST_ERROR = "output/run_test_stderror";
+	private static final String TEST_OUTPUT = "output/run_test_stdout";
+	private static final String TEST_ERROR = "output/run_test_stderr";
 	
 	private final File directory;
 	private final String antTestCmdStr;
