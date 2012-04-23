@@ -170,7 +170,14 @@ public class HistoryGraphXMLReader {
 		String parentCommitID = getString(commitIDElement);
 		List<DiffFile> diffFiles = parseDiffFilesElement(diffFilesElement);
 		
-		Revision parent = revisions.get(parentCommitID);
+		Revision parent;
+		if (revisions.containsKey(parentCommitID)) {
+			parent = revisions.get(parentCommitID);
+		} else {
+			// dummy revision of parent
+			parent = new Revision(parentCommitID, new HashMap<Revision, List<DiffFile>>(), 
+					Compilable.UNKNOWN, null);
+		}
 		
 		Pair<Revision, List<DiffFile>> pair = new Pair<Revision, List<DiffFile>>(parent, diffFiles);
 		
