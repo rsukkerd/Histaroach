@@ -9,6 +9,8 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 
+import util.Pair;
+
 import common.DiffFile.DiffType;
 import common.Revision.Compilable;
 

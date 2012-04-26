@@ -20,6 +20,8 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
+import util.Util;
+
 import ant.VoldemortBuildStrategy;
 
 import common.BuildStrategy;
@@ -28,7 +30,6 @@ import common.DiffFile.DiffType;
 import common.MixedRevision;
 import common.Repository;
 import common.Revision;
-import common.Util;
 import common.Revision.Compilable;
 import common.TestResult;
 

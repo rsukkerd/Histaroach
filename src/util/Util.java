@@ -1,4 +1,4 @@
-package common;
+package util;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -21,13 +21,18 @@ import java.util.regex.Pattern;
 import org.xeustechnologies.jtar.TarEntry;
 import org.xeustechnologies.jtar.TarInputStream;
 
+import common.HistoryGraph;
+import common.MixedRevisionTemplate;
+import common.MixedRevisionTemplatesGenerator;
+import common.Revision;
+
 public class Util {
 	
 	/**
 	 * Single space character
 	 */
 	public static final String SINGLE_SPACE_CHAR = " ";
-
+	
 	/**
 	 * Create a process that executes the given command 
 	 * in the given directory.
@@ -113,6 +118,26 @@ public class Util {
     	try {
 			input = new ObjectInputStream(new FileInputStream(fileName));
 			object = (T) input.readObject();
+			input.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		return object;
+    }
+    
+    public static List<MixedRevisionTemplate> readMixedRevisionTemplates() {
+    	List<MixedRevisionTemplate> object = null;
+    	ObjectInputStream input;
+    	
+    	try {
+			input = new ObjectInputStream(new FileInputStream(
+					MixedRevisionTemplatesGenerator.MIXED_REVISION_TEMPLATES_FILE));
+			object = (List<MixedRevisionTemplate>) input.readObject();
 			input.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

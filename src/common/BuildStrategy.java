@@ -1,5 +1,6 @@
 package common;
 
+import util.Pair;
 import common.Revision.Compilable;
 
 /**

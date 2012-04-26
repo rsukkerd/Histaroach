@@ -24,7 +24,6 @@ import org.xml.sax.SAXException;
 import common.DiffFile;
 import common.DiffFile.DiffType;
 import common.HistoryGraph;
-import common.Pair;
 import common.Revision;
 import common.Revision.Compilable;
 import common.TestResult;

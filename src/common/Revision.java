@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import util.Pair;
+
 /**
  * Revision represents a state of a particular commit. 
  * 

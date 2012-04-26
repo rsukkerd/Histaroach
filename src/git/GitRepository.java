@@ -13,12 +13,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import util.Util;
+
 import common.BuildStrategy;
 import common.DiffFile;
 import common.HistoryGraph;
 import common.Repository;
 import common.Revision;
-import common.Util;
 import common.DiffFile.DiffType;
 import common.Revision.Compilable;
 

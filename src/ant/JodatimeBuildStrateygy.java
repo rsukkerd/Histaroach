@@ -4,13 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import util.Pair;
+import util.Util;
+
 import git.GitRepository;
 
-import common.Pair;
 import common.Repository;
 import common.TestResult;
 import common.Revision.Compilable;
-import common.Util;
 
 /**
  * JodatimeBuildStrateygy is a concrete subclass of AntBuildStrategy. 

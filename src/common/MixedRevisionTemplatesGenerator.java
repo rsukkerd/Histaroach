@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import util.CombinationGenerator;
+import util.Util;
 
 /**
  * MixedRevisionTemplatesGenerator gets all Flips occurred in 
@@ -19,8 +20,9 @@ import util.CombinationGenerator;
  */
 public class MixedRevisionTemplatesGenerator {
 	
+	public static final String MIXED_REVISION_TEMPLATES_FILE = "output/mixed_revision_templates.ser";
+	
 	private static final int MAX_NUM_DIFF_FILES = 7;
-	private static final String MIXED_REVISION_TEMPLATES = "output/mixed_revision_templates.ser";
 	
 	private final List<Flip> sortedFlips;
 	private final List<MixedRevisionTemplate> mixedRevisionTemplates;
@@ -48,7 +50,7 @@ public class MixedRevisionTemplatesGenerator {
 	}
 	
 	public void writeOutMixedRevisionTemplates() {
-		Util.writeToSerializedFile(MIXED_REVISION_TEMPLATES, mixedRevisionTemplates);
+		Util.writeToSerializedFile(MIXED_REVISION_TEMPLATES_FILE, mixedRevisionTemplates);
 	}
 	
 	private List<MixedRevisionTemplate> getMixedRevisionTemplates(Flip flip) {		

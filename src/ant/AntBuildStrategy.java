@@ -9,10 +9,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import util.Pair;
+import util.Util;
+
 import common.BuildStrategy;
-import common.Pair;
 import common.TestResult;
-import common.Util;
 import common.Revision.Compilable;
 
 /**

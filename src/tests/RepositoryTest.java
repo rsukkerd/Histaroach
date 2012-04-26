@@ -16,6 +16,8 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
+import util.Util;
+
 import ant.AntBuildStrategy;
 import ant.VoldemortBuildStrategy;
 
@@ -27,7 +29,6 @@ import common.Repository;
 import common.Revision;
 import common.Revision.Compilable;
 import common.TestResult;
-import common.Util;
 
 public class RepositoryTest {
 	private static final String ANT_COMMAND = "ant";
