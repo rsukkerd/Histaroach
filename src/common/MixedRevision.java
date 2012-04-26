@@ -14,12 +14,25 @@ import common.Revision.Compilable;
 
 /**
  * MixedRevision represents a hypothetical Revision. 
+ * It contains a baseRevision, a set of reverted 
+ * files and Revisions they are reverted to. 
  * 
- * MixedRevision maintains a base revision. It has methods to revert 
- * a subset of files in the base revision to their former states in 
- * other revision, compile and run all unit tests on the partially-
- * reverted base revision. These methods determine the COMPILABLE state 
- * and TestResult of this MixedRevision.
+ * MixedRevision contains the following public methods: 
+ *  - revertFiles(diffFiles, otherRevision): reverts 
+ *    diffFiles in baseRevision to their former states 
+ *    in otherRevision 
+ *  - runTest(): compiles this MixedRevision, runs tests, 
+ *    and parses the test results 
+ *  - export(): exports this MixedRevision 
+ *  - restoreBaseRevision(diffFile): restores a diffFile 
+ *    in baseRevision to its original state 
+ *  - restoreBaseRevision(): restores all diffFiles 
+ *    in baseRevision to their original states 
+ *  - getBaseRevision(): returns baseRevision 
+ *  - isCompilable(): returns a Compilable state 
+ *  - getTestResult(): returns a TestResult 
+ *  - getRevertedFiles(): returns all reverted files 
+ *    and Revisions they are reverted to.
  */
 public class MixedRevision {
     private final Revision baseRevision;
@@ -35,6 +48,7 @@ public class MixedRevision {
     /**
      * Create a MixedRevision.
      * 
+     * @requires baseRevision is compilable.
      * @throws Exception 
      */
     public MixedRevision(Revision baseRevision, Repository repository, Repository clonedRepository) 
@@ -57,10 +71,11 @@ public class MixedRevision {
     }
     
     /**
-     * Revert files in the base revision to their former states 
-     * in other revision.
+     * Reverts diffFiles in baseRevision to their former states 
+     * in otherRevision.
      * 
-     * @modifies this, files in the base revision
+     * @requires otherRevision is compilable.
+     * @modifies this, file system
      * @throws Exception 
      */
     public void revertFiles(Set<DiffFile> diffFiles, Revision otherRevision) throws Exception {
@@ -85,9 +100,24 @@ public class MixedRevision {
     }
 
     /**
-     * Export this MixedRevision.
+	 * Compiles this MixedRevision, runs tests, and 
+	 * parses the test results.
+	 * 
+	 * @modifies this
+	 * @throws Exception
+	 */
+	public void runTest() throws Exception {
+		BuildStrategy buildStrategy = repository.getBuildStrategy();
+		// Pair<COMPILABLE, TestResult> pair = buildStrategy.runTest();
+		Pair<Compilable, TestResult> pair = buildStrategy.runTestViaShellScript();
+	    compilable = pair.getFirst();
+	    testResult = pair.getSecond();
+	}
+
+	/**
+     * Exports this MixedRevision.
      * 
-     * @return a deep copy of the current state of this MixedRevision
+     * @return a deep copy of the current states of this MixedRevision.
      * @throws Exception 
      */
     public MixedRevision export() throws Exception {
@@ -112,7 +142,7 @@ public class MixedRevision {
     }
     
     /**
-     * Restore a file in the base revision to its original state.
+     * Restores a diffFile in baseRevision to its original state.
      * 
      * @modifies this, file system
      * @throws Exception 
@@ -137,7 +167,7 @@ public class MixedRevision {
     }
     
     /**
-     * Restore all files in the base revision to their original states.
+     * Restores all diffFiles in baseRevision to their original states.
      * 
      * @modifies this, file system
      * @throws Exception 
@@ -155,54 +185,48 @@ public class MixedRevision {
     }
     
     /**
-     * @return base revision of this MixedRevision
+     * Returns baseRevision.
+     * 
+     * @return baseRevision of this MixedRevision
      */
     public Revision getBaseRevision() {
     	return baseRevision;
     }
 
     /**
-     * @return a current COMPILABLE state of this MixedRevision
+     * Returns a Compilable state.
+     * 
+     * @return a current Compilable state of this MixedRevision.
      */
     public Compilable isCompilable() {
         return compilable;
     }
 
     /**
-     * @return a current TestResult of this MixedRevision
+     * Returns a TestResult.
+     * 
+     * @return a current TestResult of this MixedRevision.
      */
     public TestResult getTestResult() {
         return testResult;
     }
     
     /**
-     * @return all reverted files and their source Revisions
+     * Returns all reverted files and Revisions they are reverted to.
+     * 
+     * @return all reverted files and Revisions they are reverted to.
      */
     public Map<DiffFile, Revision> getRevertedFiles() {
     	return revertedFiles;
     }
 
     /**
-     * Compile and run all unit tests on this MixedRevision.
-     * 
-     * @modifies this
-     * @throws Exception
-     */
-    public void runTest() throws Exception {
-    	BuildStrategy buildStrategy = repository.getBuildStrategy();
-    	// Pair<COMPILABLE, TestResult> pair = buildStrategy.runTest();
-    	Pair<Compilable, TestResult> pair = buildStrategy.runTestViaShellScript();
-        compilable = pair.getFirst();
-        testResult = pair.getSecond();
-    }
-
-    /**
-     * Copy a file from source directory to destination directory.
+     * Copies a file from source directory to destination directory.
      * 
      * @modifies file system
      * @throws IOException
      */
-    public void copyFile(String filename, File srcDir, File destDir) throws IOException {
+    private void copyFile(String filename, File srcDir, File destDir) throws IOException {
         File srcFile = new File(srcDir.getAbsolutePath() + File.separatorChar 
                 + filename);
         File destFile = new File(destDir.getAbsolutePath() + File.separatorChar 
@@ -211,12 +235,12 @@ public class MixedRevision {
     }
 
     /**
-     * Delete a file from directory.
+     * Deletes a file from directory.
      * 
      * @modifies file system
      * @throws IOException 
      */
-    public void deleteFile(String filename, File dir) throws IOException {
+    private void deleteFile(String filename, File dir) throws IOException {
         File file = new File(dir.getAbsolutePath() + File.separatorChar
                 + filename);
 		FileUtils.forceDelete(file);
@@ -249,29 +273,22 @@ public class MixedRevision {
 	
 	@Override
     public String toString() {
-        String str = "base : " + baseRevision.getCommitID() + "\n";
+        String str = "Base: " + baseRevision.getCommitID() + "\n";
         if (!revertedFiles.isEmpty()) {
-	        str += "reverted files :\n";
+	        str += "Reverted Files:\n";
 	        
 	    	for (DiffFile diffFile : revertedFiles.keySet()) {
 	    		str += diffFile.toString() + "\n";
 	    		
 	    		Revision otherRevision = revertedFiles.get(diffFile);
-	    		str += "reference revision : " + otherRevision.getCommitID() + "\n";
+	    		str += "To: " + otherRevision.getCommitID() + "\n";
 	    	}
         }
         
-        str += "compilable : ";
+        str += "Compilable: " + compilable + "\n";
+        
         if (compilable == Compilable.YES) {
-        	assert testResult != null;
-            str += "yes\n";
             str += testResult.toString();
-        } else if (compilable == Compilable.NO) {
-            str += "no\n";
-        } else if (compilable == Compilable.UNKNOWN) {
-            str += "unknown\n";
-        } else {
-            str += "no build file\n";
         }
         
         return str;
