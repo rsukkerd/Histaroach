@@ -50,9 +50,9 @@ public class TestIsolationDataReader {
     public static int startIndex = 0;
     
     /**
-     * Number of MixedRevisions to analysis.
+     * Number of MixedRevisions to analyze.
      */
-    @Option(value = "-n Number of MixedRevisions to analysis", 
+    @Option(value = "-n Number of MixedRevisions to analyze", 
     		aliases = { "-numMixedRevisions" })
     public static int numMixedRevisions = 0;
     
