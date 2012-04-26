@@ -1,6 +1,7 @@
 package common;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,6 +33,9 @@ public class Revision implements Serializable {
     private final Map<Revision, List<DiffFile>> parentToDiffFiles;
     private Compilable compilable;
     private /*@Nullable*/ TestResult testResult;
+    
+    /* used in equals(other) and hashCode() methods only */
+    private final Map<String, List<DiffFile>> parentIDToDiffFiles;
 
     /**
      * Creates a Revision. 
@@ -43,6 +47,15 @@ public class Revision implements Serializable {
     		throws Exception {
     	this.commitID = commitID;
     	this.parentToDiffFiles = parentToDiffFiles;
+    	
+    	parentIDToDiffFiles = new HashMap<String, List<DiffFile>>();
+    	
+    	for (Revision parent : parentToDiffFiles.keySet()) {
+    		String parentID = parent.getCommitID();
+    		List<DiffFile> diffFiles = parentToDiffFiles.get(parent);
+    		
+    		parentIDToDiffFiles.put(parentID, diffFiles);
+    	}
         
         boolean checkoutCommitSuccessful = repository.checkoutCommit(commitID);
         
@@ -67,6 +80,15 @@ public class Revision implements Serializable {
     	this.compilable = compilable;
     	this.testResult = testResult;
     	this.parentToDiffFiles = parentToDiffFiles;
+    	
+    	parentIDToDiffFiles = new HashMap<String, List<DiffFile>>();
+    	
+    	for (Revision parent : parentToDiffFiles.keySet()) {
+    		String parentID = parent.getCommitID();
+    		List<DiffFile> diffFiles = parentToDiffFiles.get(parent);
+    		
+    		parentIDToDiffFiles.put(parentID, diffFiles);
+    	}
     }
 
     /**
@@ -124,17 +146,17 @@ public class Revision implements Serializable {
         Revision revision = (Revision) other;
         
         boolean boolCommitID = commitID.equals(revision.commitID);
-        boolean boolParentToDiffFiles = parentToDiffFiles.equals(revision.parentToDiffFiles);
+        boolean boolParentIDToDiffFiles = parentIDToDiffFiles.equals(revision.parentIDToDiffFiles);
         boolean boolCompilable = compilable == revision.compilable;
         boolean boolTestResult = (testResult == null && revision.testResult == null) 
         						|| (testResult != null && testResult.equals(revision.testResult));
         
-        return boolCommitID && boolParentToDiffFiles && boolCompilable && boolTestResult;
+        return boolCommitID && boolParentIDToDiffFiles && boolCompilable && boolTestResult;
     }
 
     @Override
     public int hashCode() {
-        int code = 13 * commitID.hashCode() + 17 * parentToDiffFiles.hashCode() 
+        int code = 13 * commitID.hashCode() + 17 * parentIDToDiffFiles.hashCode() 
         	+ 19 * compilable.hashCode();
         if (testResult != null) {
             code += 23 * testResult.hashCode();
