@@ -14,7 +14,7 @@ import common.Revision.Compilable;
 public class MixedRevisionsGenerator {
 	
 	private static final String MIXED_REVISION_ANALYSIS = "output/mixed_revision_analysis.txt";
-	private static final String HEADER = "Child Parent Mixed Test Compilable ParentResult ChildResult MixedResult\n";
+	private static final String HEADER = "Child Parent Mixed Compilable Test ParentResult ChildResult MixedResult\n";
 	private static final String COLUMN_SEPARATOR_CHAR = " ";
 	private static final String FILE_SEPARATOR_CHAR = ",";
 	private static final String ADDED_CHAR = "+";
