@@ -26,7 +26,7 @@ import java.util.Set;
  * 
  * GitRepository is immutable.
  */
-public class GitRepository implements Repository, Serializable {
+public class GitRepository implements IRepository, Serializable {
 	
 	/**
 	 * serial version ID

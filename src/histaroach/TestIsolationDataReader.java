@@ -8,7 +8,7 @@ import histaroach.model.HistoryGraph;
 import histaroach.model.MixedRevisionTemplate;
 import histaroach.model.MixedRevisionTemplatesGenerator;
 import histaroach.model.MixedRevisionsGenerator;
-import histaroach.model.Repository;
+import histaroach.model.IRepository;
 import histaroach.util.HistoryGraphXMLReader;
 import histaroach.util.Util;
 
@@ -122,8 +122,8 @@ public class TestIsolationDataReader {
 	        
 	        assert buildStrategy != null && clonedBuildStrategy != null;
 	        
-	        Repository repository = new GitRepository(repoDir, buildStrategy);
-	        Repository clonedRepository = new GitRepository(clonedRepoDir, clonedBuildStrategy);
+	        IRepository repository = new GitRepository(repoDir, buildStrategy);
+	        IRepository clonedRepository = new GitRepository(clonedRepoDir, clonedBuildStrategy);
 		    
 	    	List<MixedRevisionTemplate> mixedRevisionTemplates = Util.readMixedRevisionTemplates();
 	    	

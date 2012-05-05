@@ -5,7 +5,7 @@ import histaroach.buildstrategy.JodatimeBuildStrateygy;
 import histaroach.buildstrategy.VoldemortBuildStrategy;
 import histaroach.model.GitRepository;
 import histaroach.model.HistoryGraph;
-import histaroach.model.Repository;
+import histaroach.model.IRepository;
 import histaroach.util.HistoryGraphXMLWriter;
 
 import java.io.File;
@@ -118,7 +118,7 @@ public class TestIsolationDataGenerator {
         
         assert buildStrategy != null;
         
-        Repository repository = new GitRepository(repoDir, buildStrategy);
+        IRepository repository = new GitRepository(repoDir, buildStrategy);
         
         HistoryGraph hGraph = repository.buildHistoryGraph(startCommitID, endCommitID);
         

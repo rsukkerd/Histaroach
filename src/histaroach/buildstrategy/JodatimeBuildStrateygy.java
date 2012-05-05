@@ -1,7 +1,7 @@
 package histaroach.buildstrategy;
 
 import histaroach.model.GitRepository;
-import histaroach.model.Repository;
+import histaroach.model.IRepository;
 import histaroach.model.TestResult;
 import histaroach.model.Revision.Compilable;
 import histaroach.util.Pair;
@@ -32,7 +32,7 @@ public class JodatimeBuildStrateygy extends AntBuildStrategy {
 	private static final String TEST_COMMAND = "test";
 	
 	private final File directory;
-	private final Repository repository;
+	private final IRepository repository;
 	
 	/**
 	 * Creates a JodatimeBuildStrategy.

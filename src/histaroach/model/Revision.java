@@ -47,7 +47,7 @@ public class Revision implements Serializable {
      * 
      * @throws Exception 
      */
-    public Revision(Repository repository, String commitID, Map<Revision, List<DiffFile>> parentToDiffFiles) 
+    public Revision(IRepository repository, String commitID, Map<Revision, List<DiffFile>> parentToDiffFiles) 
     		throws Exception {
     	this.commitID = commitID;
     	this.parentToDiffFiles = parentToDiffFiles;

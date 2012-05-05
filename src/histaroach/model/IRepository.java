@@ -21,7 +21,7 @@ import java.util.List;
  *  - buildHistoryGraph(startCommitID, endCommitID): builds a HistoryGraph 
  *    containing Revisions from startCommit to endCommit.
  */
-public interface Repository {
+public interface IRepository {
 
 	/**
 	 * Returns a directory.

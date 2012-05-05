@@ -39,8 +39,8 @@ import org.apache.commons.io.FileUtils;
  */
 public class MixedRevision {
     private final Revision baseRevision;
-    private final Repository repository;
-    private final Repository clonedRepository;
+    private final IRepository repository;
+    private final IRepository clonedRepository;
     private final File repoDir;
     private final File clonedRepoDir;
     
@@ -54,7 +54,7 @@ public class MixedRevision {
      * @requires baseRevision is compilable.
      * @throws Exception 
      */
-    public MixedRevision(Revision baseRevision, Repository repository, Repository clonedRepository) 
+    public MixedRevision(Revision baseRevision, IRepository repository, IRepository clonedRepository) 
     		throws Exception {
         this.baseRevision = baseRevision;
         this.repository = repository;

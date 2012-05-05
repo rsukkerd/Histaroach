@@ -27,13 +27,13 @@ public class MixedRevisionsGenerator {
 	
 	private List<MixedRevisionTemplate> mixedRevisionTemplates;
 	
-	private Repository repository;
-	private Repository clonedRepository;
+	private IRepository repository;
+	private IRepository clonedRepository;
 	
 	private BufferedWriter out;
 	
 	public MixedRevisionsGenerator(List<MixedRevisionTemplate> mixedRevisionTemplates, 
-			Repository repository, Repository clonedRepository) throws IOException{
+			IRepository repository, IRepository clonedRepository) throws IOException{
 		this.mixedRevisionTemplates = mixedRevisionTemplates;
 		this.repository = repository;
 		this.clonedRepository = clonedRepository;
