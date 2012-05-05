@@ -20,8 +20,7 @@ import java.util.Set;
  *    parent but fail in child 
  * 
  * Flip is comparable. A Flip that has fewer DiffFiles is less 
- * than a Flip that has more DiffFiles; tie is broken by the 
- * number of all tests in a child Revision.
+ * than a Flip that has more DiffFiles.
  * 
  * Flip is immutable.
  */
@@ -33,7 +32,6 @@ public class Flip implements Comparable<Flip> {
 
 	private final Revision child;
 	private final Revision parent;
-	private final List<DiffFile> diffFiles;
 	// set of tests that flip from fail to pass
 	private final /*@Non-Null*/ Set<String> toPassTests;
 	// set of tests that flip from pass to fail
@@ -48,7 +46,6 @@ public class Flip implements Comparable<Flip> {
 			/*@Non-Null*/ Set<String> toFailTests) {
 		this.child = child;
 		this.parent = parent;
-		diffFiles = child.getDiffFiles(parent);
 		this.toPassTests = toPassTests;
 		this.toFailTests = toFailTests;
 	}
@@ -77,7 +74,7 @@ public class Flip implements Comparable<Flip> {
 	 * @return a list of DiffFiles between child and parent of this Flip.
 	 */
 	public List<DiffFile> getDiffFiles() {
-		return diffFiles;
+		return child.getDiffFiles(parent);
 	}
 	
 	/**
@@ -122,6 +119,7 @@ public class Flip implements Comparable<Flip> {
 				+ "parent commit: " + parent.getCommitID() + "\n";
 		
 		str += "diff files: \n";
+		List<DiffFile> diffFiles = getDiffFiles();
 		for (DiffFile diffFile : diffFiles) {
 			str += diffFile.toString() + "\n";
 		}
@@ -145,12 +143,9 @@ public class Flip implements Comparable<Flip> {
 
 	@Override
 	public int compareTo(Flip other) {
-		if (diffFiles.size() > other.diffFiles.size()) {
-			return 1;
-		} else if (diffFiles.size() < other.diffFiles.size()) {
-			return -1;
-		} else {
-			return child.getTestResult().getAllTests().size() - other.child.getTestResult().getAllTests().size();
-		}
+		List<DiffFile> diffFiles = getDiffFiles();
+		List<DiffFile> otherDiffFiles = other.getDiffFiles();
+		
+		return diffFiles.size() - otherDiffFiles.size();
 	}
 }
