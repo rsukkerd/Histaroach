@@ -40,6 +40,7 @@
         <echo message="${ant.project.name}: ${ant.file}"/>
         <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
             <src path="src"/>
+        	<src path="test"/>
             <classpath refid="Histaroach.classpath"/>
         </javac>
     </target>
@@ -60,7 +61,7 @@
 
 	  <batchtest fork="no" todir="${junit.output.dir}">
 	    <fileset dir="bin/">
-	      <include name="tests/*Test.class"/>
+	      <include name="**/*Test.class"/>
 	    </fileset>
 	  </batchtest>
 
