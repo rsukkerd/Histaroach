@@ -1,18 +1,15 @@
-package model;
+package histaroach.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
-
-
 
 import histaroach.buildstrategy.IBuildStrategy;
 import histaroach.buildstrategy.VoldemortBuildStrategy;
 import histaroach.model.DiffFile;
 import histaroach.model.GitRepository;
 import histaroach.model.MixedRevision;
-import histaroach.model.Repository;
+import histaroach.model.IRepository;
 import histaroach.model.Revision;
 import histaroach.model.TestResult;
 import histaroach.model.DiffFile.DiffType;
@@ -30,14 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
-
-
-
-
-
 
 
 public class MixedRevisionTest {
@@ -47,11 +38,11 @@ public class MixedRevisionTest {
 	/********************/
 	/** in delta_files **/
 	/********************/
-	private static final String TAR_FILE = "test/delta_files.tar";
-	private static final String TAR_FILE_CLONE = "test/delta_files_clone.tar";
+	private static final String TAR_FILE = "test-data/delta_files.tar";
+	private static final String TAR_FILE_CLONE = "test-data/delta_files_clone.tar";
 	
-	private static final String PATHNAME = "test/delta_files";
-	private static final String PATHNAME_CLONE = "test/delta_files_clone";
+	private static final String PATHNAME = "test-data/delta_files";
+	private static final String PATHNAME_CLONE = "test-data/delta_files_clone";
 	
 	private static final File DIR = new File(PATHNAME);
 	private static final File DIR_CLONE = new File(PATHNAME_CLONE);
@@ -59,8 +50,8 @@ public class MixedRevisionTest {
 	private static final IBuildStrategy BUILD_STRATEGY = new VoldemortBuildStrategy(DIR, ANT_COMMAND);
 	private static final IBuildStrategy BUILD_STRATEGY_CLONE = new VoldemortBuildStrategy(DIR_CLONE, ANT_COMMAND);
 	
-	private static final Repository REPOSITORY = new GitRepository(DIR, BUILD_STRATEGY);
-	private static final Repository REPOSITORY_CLONE = new GitRepository(DIR_CLONE, BUILD_STRATEGY_CLONE);
+	private static final IRepository REPOSITORY = new GitRepository(DIR, BUILD_STRATEGY);
+	private static final IRepository REPOSITORY_CLONE = new GitRepository(DIR_CLONE, BUILD_STRATEGY_CLONE);
 	
 	private static final String FILENAME_1 = "f1";
 	private static final String FILENAME_2 = "f2";
@@ -146,13 +137,13 @@ public class MixedRevisionTest {
 	/**********************/
 	/** in delta_project **/
 	/**********************/
-	private static final String DEST_PATH = "test";
+	private static final String DEST_PATH = "test-data";
 	
-	private static final String PRJ_TAR_FILE = "test/delta_project.tar";
-	private static final String PRJ_TAR_FILE_CLONE = "test/delta_project_clone.tar";
+	private static final String PRJ_TAR_FILE = "test-data/delta_project.tar";
+	private static final String PRJ_TAR_FILE_CLONE = "test-data/delta_project_clone.tar";
 	
-	private static final String PRJ_PATHNAME = "test/delta_project";
-	private static final String PRJ_PATHNAME_CLONE = "test/delta_project_clone";
+	private static final String PRJ_PATHNAME = "test-data/delta_project";
+	private static final String PRJ_PATHNAME_CLONE = "test-data/delta_project_clone";
 	
 	private static final File PRJ = new File(PRJ_PATHNAME);
 	private static final File PRJ_CLONE = new File(PRJ_PATHNAME_CLONE);
@@ -162,8 +153,8 @@ public class MixedRevisionTest {
 	private static final IBuildStrategy PRJ_BUILD_STRATEGY_CLONE = new VoldemortBuildStrategy(
 			PRJ_CLONE, ANT_COMMAND);
 	
-	private static final Repository PRJ_REPOSITORY = new GitRepository(PRJ, PRJ_BUILD_STRATEGY);
-	private static final Repository PRJ_REPOSITORY_CLONE = new GitRepository(PRJ_CLONE, 
+	private static final IRepository PRJ_REPOSITORY = new GitRepository(PRJ, PRJ_BUILD_STRATEGY);
+	private static final IRepository PRJ_REPOSITORY_CLONE = new GitRepository(PRJ_CLONE, 
 			PRJ_BUILD_STRATEGY_CLONE);
 	
 	private static final DiffFile PRJ_DIFF_FILE_1 = new DiffFile(DiffType.MODIFIED, "src/proj/F1.java");

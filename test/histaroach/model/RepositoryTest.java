@@ -1,10 +1,7 @@
-package model;
+package histaroach.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
-
-
 
 import histaroach.buildstrategy.AntBuildStrategy;
 import histaroach.buildstrategy.IBuildStrategy;
@@ -12,7 +9,7 @@ import histaroach.buildstrategy.VoldemortBuildStrategy;
 import histaroach.model.DiffFile;
 import histaroach.model.GitRepository;
 import histaroach.model.HistoryGraph;
-import histaroach.model.Repository;
+import histaroach.model.IRepository;
 import histaroach.model.Revision;
 import histaroach.model.TestResult;
 import histaroach.model.DiffFile.DiffType;
@@ -27,31 +24,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 
-
-
-
-
-
 public class RepositoryTest {
 	private static final String ANT_COMMAND = "ant";
-	private static final String DEST_PATH = "test";
+	private static final String DEST_PATH = "test-data";
 	
 	/****************************/
 	/** in sample_repositories **/
 	/****************************/
-	private static final String SAMPLE_REPOSITORIES = "test/sample_repositories";
-	private static final String SAMPLE_REPOSITORIES_TAR_FILE = "test/sample_repositories.tar";
+	private static final String SAMPLE_REPOSITORIES = "test-data/sample_repositories";
+	private static final String SAMPLE_REPOSITORIES_TAR_FILE = "test-data/sample_repositories.tar";
 	
-	private static final String[] PATHS = { "test/sample_repositories/repo1", 
-		"test/sample_repositories/repo2", 
-		"test/sample_repositories/repo3", 
-		"test/sample_repositories/repo4", 
-		"test/sample_repositories/repo5"};
+	private static final String[] PATHS = { "test-data/sample_repositories/repo1", 
+		"test-data/sample_repositories/repo2", 
+		"test-data/sample_repositories/repo3", 
+		"test-data/sample_repositories/repo4", 
+		"test-data/sample_repositories/repo5"};
 	
 	private static final File[] DIRECTORIES = new File[5];
 	static {
@@ -383,7 +374,7 @@ public class RepositoryTest {
 		Util.untar(SAMPLE_REPOSITORIES_TAR_FILE, DEST_PATH);
 		
 		for (int i = 0; i < DIRECTORIES.length; i++) {
-			Repository repo = new GitRepository(DIRECTORIES[i], BUILD_STRATEGIES[i]);
+			IRepository repo = new GitRepository(DIRECTORIES[i], BUILD_STRATEGIES[i]);
 	
 			HistoryGraph actualHGraph = null;
 			actualHGraph = repo.buildHistoryGraph(START_COMMIT_IDS[i], END_COMMIT_IDS[i]);
@@ -400,7 +391,7 @@ public class RepositoryTest {
 		Util.untar(SAMPLE_REPOSITORIES_TAR_FILE, DEST_PATH);
 		
 		for (int i = 2; i < DIRECTORIES.length; i++) {
-			Repository repo = new GitRepository(DIRECTORIES[i], BUILD_STRATEGIES[i]);
+			IRepository repo = new GitRepository(DIRECTORIES[i], BUILD_STRATEGIES[i]);
 	
 			HistoryGraph actualHGraph = null;
 			actualHGraph = repo.buildHistoryGraph(START_COMMIT_IDS[i], END_COMMIT_IDS_PARTIAL[i]);
@@ -415,15 +406,15 @@ public class RepositoryTest {
 	/****************/
 	/** in project **/
 	/****************/
-	private static final String PROJ = "test/project";
-	private static final String PROJ_TAR_FILE = "test/project.tar";
+	private static final String PROJ = "test-data/project";
+	private static final String PROJ_TAR_FILE = "test-data/project.tar";
 	
 	private static final File PROJ_DIR = new File(PROJ);
 	
 	private static final IBuildStrategy PROJ_BUILD_STARTEGY = new VoldemortBuildStrategy(PROJ_DIR, 
 			ANT_COMMAND);
 	
-	private static final Repository REPOSITORY_PROJ = new GitRepository(PROJ_DIR, PROJ_BUILD_STARTEGY);
+	private static final IRepository REPOSITORY_PROJ = new GitRepository(PROJ_DIR, PROJ_BUILD_STARTEGY);
 	
 	private static final String COMMIT_1 = "8a75644";
 	private static final String COMMIT_2 = "57451b4";
