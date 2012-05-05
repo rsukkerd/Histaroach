@@ -29,20 +29,21 @@ import org.junit.Test;
 
 
 public class RepositoryTest {
+	
+	private static final String DEST_PATH = "test-data/";
 	private static final String ANT_COMMAND = "ant";
-	private static final String DEST_PATH = "test-data";
 	
 	/****************************/
 	/** in sample_repositories **/
 	/****************************/
-	private static final String SAMPLE_REPOSITORIES = "test-data/sample_repositories";
-	private static final String SAMPLE_REPOSITORIES_TAR_FILE = "test-data/sample_repositories.tar";
+	private static final String SAMPLE_REPOSITORIES = DEST_PATH + "sample_repositories";
+	private static final String SAMPLE_REPOSITORIES_TAR_FILE = DEST_PATH + "sample_repositories.tar";
 	
-	private static final String[] PATHS = { "test-data/sample_repositories/repo1", 
-		"test-data/sample_repositories/repo2", 
-		"test-data/sample_repositories/repo3", 
-		"test-data/sample_repositories/repo4", 
-		"test-data/sample_repositories/repo5"};
+	private static final String[] PATHS = { DEST_PATH + "sample_repositories/repo1", 
+		DEST_PATH + "sample_repositories/repo2", 
+		DEST_PATH + "sample_repositories/repo3", 
+		DEST_PATH + "sample_repositories/repo4", 
+		DEST_PATH + "sample_repositories/repo5"};
 	
 	private static final File[] DIRECTORIES = new File[5];
 	static {
@@ -406,8 +407,8 @@ public class RepositoryTest {
 	/****************/
 	/** in project **/
 	/****************/
-	private static final String PROJ = "test-data/project";
-	private static final String PROJ_TAR_FILE = "test-data/project.tar";
+	private static final String PROJ = DEST_PATH + "project";
+	private static final String PROJ_TAR_FILE = DEST_PATH + "project.tar";
 	
 	private static final File PROJ_DIR = new File(PROJ);
 	

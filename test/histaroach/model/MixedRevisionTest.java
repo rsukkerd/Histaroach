@@ -33,16 +33,17 @@ import org.junit.Test;
 
 public class MixedRevisionTest {
 	
+	private static final String DEST_PATH = "test-data/";
 	private static final String ANT_COMMAND = "ant";
 	
 	/********************/
 	/** in delta_files **/
 	/********************/
-	private static final String TAR_FILE = "test-data/delta_files.tar";
-	private static final String TAR_FILE_CLONE = "test-data/delta_files_clone.tar";
+	private static final String TAR_FILE = DEST_PATH + "delta_files.tar";
+	private static final String TAR_FILE_CLONE = DEST_PATH + "delta_files_clone.tar";
 	
-	private static final String PATHNAME = "test-data/delta_files";
-	private static final String PATHNAME_CLONE = "test-data/delta_files_clone";
+	private static final String PATHNAME = DEST_PATH + "delta_files";
+	private static final String PATHNAME_CLONE = DEST_PATH + "delta_files_clone";
 	
 	private static final File DIR = new File(PATHNAME);
 	private static final File DIR_CLONE = new File(PATHNAME_CLONE);
@@ -137,13 +138,12 @@ public class MixedRevisionTest {
 	/**********************/
 	/** in delta_project **/
 	/**********************/
-	private static final String DEST_PATH = "test-data";
 	
-	private static final String PRJ_TAR_FILE = "test-data/delta_project.tar";
-	private static final String PRJ_TAR_FILE_CLONE = "test-data/delta_project_clone.tar";
+	private static final String PRJ_TAR_FILE = DEST_PATH + "delta_project.tar";
+	private static final String PRJ_TAR_FILE_CLONE = DEST_PATH + "delta_project_clone.tar";
 	
-	private static final String PRJ_PATHNAME = "test-data/delta_project";
-	private static final String PRJ_PATHNAME_CLONE = "test-data/delta_project_clone";
+	private static final String PRJ_PATHNAME = DEST_PATH + "delta_project";
+	private static final String PRJ_PATHNAME_CLONE = DEST_PATH + "delta_project_clone";
 	
 	private static final File PRJ = new File(PRJ_PATHNAME);
 	private static final File PRJ_CLONE = new File(PRJ_PATHNAME_CLONE);
