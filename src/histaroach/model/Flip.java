@@ -146,6 +146,6 @@ public class Flip implements Comparable<Flip> {
 		List<DiffFile> diffFiles = getDiffFiles();
 		List<DiffFile> otherDiffFiles = other.getDiffFiles();
 		
-		return diffFiles.size() - otherDiffFiles.size();
+		return ((Integer) diffFiles.size()).compareTo(otherDiffFiles.size());
 	}
 }
