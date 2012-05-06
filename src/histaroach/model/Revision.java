@@ -11,15 +11,17 @@ import java.util.Set;
 
 
 /**
- * Revision represents a state of a particular commit. 
+ * Revision represents a particular commit in some Repository. 
  * 
- * Revision contains the following public methods: 
- *  - getCommitID(): returns a commit ID 
- *  - getParents(): returns a set of parents 
- *  - getDiffFiles(parent): returns a list of DiffFiles 
- *    corresponding to a parent 
- *  - isCompilable(): returns a Compilable state 
- *  - getTestResult(): returns a TestResult.
+ * Revision can be responsible for populating its Compilable 
+ * state and TestResult at construction time. 
+ * In this case, the caller to Revision's constructor must 
+ * pass in a Repository. This Repository will be called from 
+ * the constructor to compile the project, run tests and 
+ * parse the test results. 
+ * 
+ * Otherwise, Revision's Compilable state and TestResult must 
+ * be given by the caller at construction time. 
  * 
  * Revision is immutable.
  */
@@ -53,25 +55,19 @@ public class Revision implements Serializable {
     	this.parentToDiffFiles = parentToDiffFiles;
     	
     	parentIDToDiffFiles = new HashMap<String, List<DiffFile>>();
-    	
-    	for (Revision parent : parentToDiffFiles.keySet()) {
-    		String parentID = parent.getCommitID();
-    		List<DiffFile> diffFiles = parentToDiffFiles.get(parent);
-    		
-    		parentIDToDiffFiles.put(parentID, diffFiles);
-    	}
+    	deriveParentIDToDiffFiles();
         
         boolean checkoutCommitSuccessful = repository.checkoutCommit(commitID);
         
-        if (checkoutCommitSuccessful) {
-        	IBuildStrategy buildStrategy = repository.getBuildStrategy();
-        	
-        	Pair<Compilable, TestResult> result = buildStrategy.runTestViaShellScript();
-        	compilable = result.getFirst();
-    		testResult = result.getSecond();
-        } else {
-    		throw new Exception("git checkout commit " + commitID + " unsuccessful");
-    	}
+        if (!checkoutCommitSuccessful) {
+        	throw new Exception("git checkout commit " + commitID + " unsuccessful");
+        }
+        
+    	IBuildStrategy buildStrategy = repository.getBuildStrategy();
+    	
+    	Pair<Compilable, TestResult> result = buildStrategy.runTestViaShellScript();
+    	compilable = result.getFirst();
+		testResult = result.getSecond();
     }
     
     /**
@@ -86,6 +82,13 @@ public class Revision implements Serializable {
     	this.parentToDiffFiles = parentToDiffFiles;
     	
     	parentIDToDiffFiles = new HashMap<String, List<DiffFile>>();
+    	deriveParentIDToDiffFiles();
+    }
+    
+    /**
+     * Derives parentIDToDiffFiles from parentToDiffFiles.
+     */
+    private void deriveParentIDToDiffFiles() {
     	
     	for (Revision parent : parentToDiffFiles.keySet()) {
     		String parentID = parent.getCommitID();
@@ -94,21 +97,11 @@ public class Revision implements Serializable {
     		parentIDToDiffFiles.put(parentID, diffFiles);
     	}
     }
-
-    /**
-     * Returns a commit ID.
-     * 
-     * @return a commit ID of this Revision.
-     */
+    
     public String getCommitID() {
         return commitID;
     }
-
-    /**
-     * Returns a set of parents.
-     * 
-     * @return a set of parents of this Revision.
-     */
+    
     public Set<Revision> getParents() {
         return parentToDiffFiles.keySet();
     }
@@ -122,20 +115,13 @@ public class Revision implements Serializable {
     public List<DiffFile> getDiffFiles(Revision parent) {
         return parentToDiffFiles.get(parent);
     }
-
-    /**
-     * Returns a Compilable state.
-     * 
-     * @return a Compilable state of this Revision.
-     */
+    
     public Compilable isCompilable() {
         return compilable;
     }
 
     /**
-     * Returns a TestResult.
-     * 
-     * @return a TestResult of this Revision.
+     * @return a TestResult; null if this Revision is not compilable.
      */
     public TestResult getTestResult() {
         return testResult;
