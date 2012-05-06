@@ -13,6 +13,9 @@ import java.util.Set;
  * HistoryGraph represents a (partial or full) Revision history 
  * of some Repository. 
  * 
+ * The order of Revisions added to a HistoryGraph must be 
+ * a topological order from ancestor to descendant. 
+ * 
  * HistoryGraph is iterable. The order of Revisions returned by 
  * its iterator is from ancestor to descendant.
  */
