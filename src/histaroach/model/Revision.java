@@ -4,7 +4,6 @@ import histaroach.buildstrategy.IBuildStrategy;
 import histaroach.util.Pair;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,9 +38,6 @@ public class Revision implements Serializable {
     private final Map<Revision, List<DiffFile>> parentToDiffFiles;
     private Compilable compilable;
     private /*@Nullable*/ TestResult testResult;
-    
-    /* used in equals(other) and hashCode() methods only */
-    private final Map<String, List<DiffFile>> parentIDToDiffFiles;
 
     /**
      * Creates a Revision. 
@@ -53,10 +49,7 @@ public class Revision implements Serializable {
     		throws Exception {
     	this.commitID = commitID;
     	this.parentToDiffFiles = parentToDiffFiles;
-    	
-    	parentIDToDiffFiles = new HashMap<String, List<DiffFile>>();
-    	deriveParentIDToDiffFiles();
-        
+    	        
         boolean checkoutCommitSuccessful = repository.checkoutCommit(commitID);
         
         if (!checkoutCommitSuccessful) {
@@ -80,22 +73,6 @@ public class Revision implements Serializable {
     	this.compilable = compilable;
     	this.testResult = testResult;
     	this.parentToDiffFiles = parentToDiffFiles;
-    	
-    	parentIDToDiffFiles = new HashMap<String, List<DiffFile>>();
-    	deriveParentIDToDiffFiles();
-    }
-    
-    /**
-     * Derives parentIDToDiffFiles from parentToDiffFiles.
-     */
-    private void deriveParentIDToDiffFiles() {
-    	
-    	for (Revision parent : parentToDiffFiles.keySet()) {
-    		String parentID = parent.getCommitID();
-    		List<DiffFile> diffFiles = parentToDiffFiles.get(parent);
-    		
-    		parentIDToDiffFiles.put(parentID, diffFiles);
-    	}
     }
     
     public String getCommitID() {
@@ -128,28 +105,59 @@ public class Revision implements Serializable {
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (other == null || !other.getClass().equals(this.getClass())) {
+    public boolean equals(Object object) {
+        if (object == null || !object.getClass().equals(this.getClass())) {
             return false;
         }
 
-        Revision revision = (Revision) other;
+        Revision other = (Revision) object;
         
-        boolean boolCommitID = commitID.equals(revision.commitID);
-        boolean boolParentIDToDiffFiles = parentIDToDiffFiles.equals(revision.parentIDToDiffFiles);
-        boolean boolCompilable = compilable == revision.compilable;
-        boolean boolTestResult = (testResult == null && revision.testResult == null) 
-        						|| (testResult != null && testResult.equals(revision.testResult));
+        boolean boolCommitID = commitID.equals(other.commitID);
+        boolean boolCompilable = compilable == other.compilable;
+        boolean boolTestResult = (testResult == null && other.testResult == null) 
+        						|| (testResult != null && testResult.equals(other.testResult));
         
-        return boolCommitID && boolParentIDToDiffFiles && boolCompilable && boolTestResult;
+        // check equality of parents' IDs and DiffFiles
+        Set<Revision> parents = parentToDiffFiles.keySet();
+        Set<Revision> otherParents = other.parentToDiffFiles.keySet();
+                
+        for (Revision parent : parents) {
+        	String parentID = parent.commitID;
+        	List<DiffFile> diffFiles = parentToDiffFiles.get(parent);
+        	
+        	boolean foundMatch = false;
+        	
+        	for (Revision otherParent : otherParents) {
+        		String otherParentID = otherParent.commitID;
+        		List<DiffFile> otherDiffFiles = other.parentToDiffFiles.get(otherParent);
+        		
+        		if (parentID.equals(otherParentID) && diffFiles.equals(otherDiffFiles)) {
+        			foundMatch = true;
+        			break;
+        		}
+        	}
+        	
+        	if (!foundMatch) {
+        		return false;
+        	}
+        }
+        
+        return boolCommitID && boolCompilable && boolTestResult;
     }
 
     @Override
     public int hashCode() {
-        int code = 13 * commitID.hashCode() + 17 * parentIDToDiffFiles.hashCode() 
-        	+ 19 * compilable.hashCode();
+        int code = 11 * commitID.hashCode() + 13 * compilable.hashCode();
+        
         if (testResult != null) {
-            code += 23 * testResult.hashCode();
+            code += 17 * testResult.hashCode();
+        }
+        
+        for (Revision parent : parentToDiffFiles.keySet()) {
+        	String parentID = parent.commitID;
+        	List<DiffFile> diffFiles = parentToDiffFiles.get(parent);
+        	
+        	code += 19 * parentID.hashCode() + 23 * diffFiles.hashCode();
         }
 
         return code;
