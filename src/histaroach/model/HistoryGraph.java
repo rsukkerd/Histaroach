@@ -1,5 +1,7 @@
 package histaroach.model;
 
+import histaroach.model.Revision.Compilable;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -8,14 +10,14 @@ import java.util.Set;
 
 
 /**
- * HistoryGraph represents a graph of Revision history. 
+ * HistoryGraph represents a (partial or full) Revision history 
+ * of some Repository. 
  * 
- * HistoryGraph contains the following public methods: 
- *  - addRevision(revision): adds a Revision 
- *  - getAllFlips(): returns a set of all Flips occurred. 
- *    
+ * The order of Revisions added to a HistoryGraph must be 
+ * a topological order from ancestor to descendant. 
+ * 
  * HistoryGraph is iterable. The order of Revisions returned by 
- * an iterator is from ancestor to descendant.
+ * its iterator is from ancestor to descendant.
  */
 public class HistoryGraph implements Iterable<Revision> {
 	
@@ -42,7 +44,7 @@ public class HistoryGraph implements Iterable<Revision> {
     }
     
     /**
-     * Returns a set of all Flips occurred.
+     * Returns a set of all Flips in this HistoryGraph.
      * 
 	 * @return a set of all Flips in this HistoryGraph.
 	 */
@@ -50,43 +52,25 @@ public class HistoryGraph implements Iterable<Revision> {
 	    Set<Flip> flips = new HashSet<Flip>();
 	
 	    for (Revision revision : revisions) {
-	        TestResult childResult = revision.getTestResult();
-	        
-	        if (childResult == null) { continue; }
-	
-	        Set<String> allTests = childResult.getAllTests();
-	
+	    	
+	        if (revision.isCompilable() != Compilable.YES) {
+	        	continue;
+	        }
+	        	
 	        Set<Revision> parents = revision.getParents();
 	
-	        for (/*@NonNull*/Revision parent : parents) {            	
-	            TestResult parentResult = parent.getTestResult();
+	        for (Revision parent : parents) {
 	            
-	            if (parentResult == null) { continue; }
-	            
-	            Set<String> toPassTests = null;
-	            Set<String> toFailTests = null;
-	
-	            for (String test : allTests) {
-	                if (childResult.pass(test) && parentResult.fail(test)) {
-	                    if (toPassTests == null) {
-	                    	toPassTests = new HashSet<String>();
-	                    }
-	                    toPassTests.add(test);
-	                } else if (childResult.fail(test) && parentResult.pass(test)) {
-	                    if (toFailTests == null) {
-	                    	toFailTests = new HashSet<String>();
-	                    }
-	                    toFailTests.add(test);
-	                }
+	            if (parent.isCompilable() != Compilable.YES) {
+	            	continue;
 	            }
+	            
+	            Set<String> toPassTests = new HashSet<String>();
+	            Set<String> toFailTests = new HashSet<String>();
 	
-	            if (toPassTests != null || toFailTests != null) {
-	            	if (toPassTests == null) {
-	            		toPassTests = new HashSet<String>();
-	            	} else if (toFailTests == null) {
-	            		toFailTests = new HashSet<String>();
-	            	}
-	            	
+	            findFlippedTests(revision, parent, toPassTests, toFailTests);
+	            
+	            if (!toPassTests.isEmpty() || !toFailTests.isEmpty()) {
 	                Flip flip = new Flip(revision, parent, toPassTests, toFailTests);
 	                flips.add(flip);
 	            }
@@ -94,6 +78,27 @@ public class HistoryGraph implements Iterable<Revision> {
 	    }
 	
 	    return flips;
+	}
+	
+	/**
+	 * Find all flipped tests between child and parent Revisions.
+	 * 
+	 * @modifies toPassTests, toFailTests
+	 */
+	private void findFlippedTests(Revision child, Revision parent, 
+			Set<String> toPassTests, Set<String> toFailTests) {
+		TestResult childResult = child.getTestResult();
+		TestResult parentResult = parent.getTestResult();
+		
+		Set<String> allTests = childResult.getAllTests();
+		
+        for (String test : allTests) {
+            if (childResult.pass(test) && parentResult.fail(test)) {
+                toPassTests.add(test);
+            } else if (childResult.fail(test) && parentResult.pass(test)) {
+                toFailTests.add(test);
+            }
+        }
 	}
 
 	@Override
