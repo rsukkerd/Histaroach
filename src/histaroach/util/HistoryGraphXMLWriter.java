@@ -24,6 +24,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
 
+/**
+ * HistoryGraphXMLWriter writes information of a HistoryGraph 
+ * into an XML file.
+ */
 public class HistoryGraphXMLWriter {
 	
 	public static final String HISTORY_GRAPH = "HistoryGraph";
@@ -55,6 +59,12 @@ public class HistoryGraphXMLWriter {
 		doc = builder.newDocument();
 	}
 	
+	/**
+	 * Writes information of the HistoryGraph into the XML file.
+	 * 
+	 * @throws ParserConfigurationException
+	 * @throws TransformerException
+	 */
 	public void write() throws ParserConfigurationException, 
 			TransformerException {
 		Element rootElement = doc.createElement(HISTORY_GRAPH);
