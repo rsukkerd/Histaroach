@@ -4,10 +4,8 @@ import histaroach.buildstrategy.IBuildStrategy;
 import histaroach.model.DiffFile.DiffType;
 import histaroach.util.Util;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,9 +52,9 @@ public class GitRepository implements IRepository, Serializable {
 	@Override
 	public boolean checkoutCommit(String commitID) throws IOException,
 			InterruptedException {
-		Process p = Util.runProcess(
+		Process checkoutProcess = Util.runProcess(
                 new String[] { "git", "checkout", commitID }, directory);
-        return p.exitValue() == 0;
+        return checkoutProcess.exitValue() == 0;
 	}
 
 	@Override
@@ -64,9 +62,9 @@ public class GitRepository implements IRepository, Serializable {
 			InterruptedException {
 		File file = new File(directory.getPath() + File.separatorChar + filename);
 		
-		Process p = Util.runProcess(
+		Process checkoutProcess = Util.runProcess(
 	            new String[] { "git", "checkout", filename }, directory);
-	    return !file.exists() || p.exitValue() == 0;
+	    return !file.exists() || checkoutProcess.exitValue() == 0;
 	}
 
 	@Override
@@ -74,13 +72,10 @@ public class GitRepository implements IRepository, Serializable {
 			String otherCommitID) throws IOException, InterruptedException {
 		List<DiffFile> diffFiles = new ArrayList<DiffFile>();
 
-        Process p = Util.runProcess(new String[] { "git", "diff",
+        Process diffProcess = Util.runProcess(new String[] { "git", "diff",
                 "--name-status", otherCommitID, baseCommitID }, directory);
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(
-                p.getInputStream()));
-
-        List<String> lines = Util.getStreamContent(reader);
+        
+        List<String> lines = Util.getInputStreamContent(diffProcess.getInputStream());
 
         for (String line : lines) {
             String[] tokens = line.split("\\s");
@@ -114,11 +109,8 @@ public class GitRepository implements IRepository, Serializable {
 		}
 		
         Process logProcess = Util.runProcess(LOG_COMMAND, directory);
-
-        BufferedReader logReader = new BufferedReader(new InputStreamReader(
-                logProcess.getInputStream()));
-
-        List<String> lines = Util.getStreamContent(logReader);
+        
+        List<String> lines = Util.getInputStreamContent(logProcess.getInputStream());
         
         // revision's commit id -> list of its parents' ids
         Map<String, List<String>> commitIDToParentsIDs = getCommitIDToParentsIDs(lines, endCommitID);

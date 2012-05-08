@@ -1,27 +1,22 @@
 package histaroach.util;
 
-import histaroach.model.HistoryGraph;
 import histaroach.model.MixedRevisionTemplate;
 import histaroach.model.MixedRevisionTemplatesGenerator;
-import histaroach.model.Revision;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.xeustechnologies.jtar.TarEntry;
 import org.xeustechnologies.jtar.TarInputStream;
@@ -35,14 +30,14 @@ public class Util {
 	public static final String SINGLE_SPACE_CHAR = " ";
 	
 	/**
-	 * Create a process that executes the given command 
-	 * in the given directory.
+	 * Creates a process that executes command in processDir.
 	 * 
 	 * @return the process
 	 * @throws IOException 
 	 * @throws InterruptedException 
 	 */
-    public static Process runProcess(String[] command, File processDir) throws IOException, InterruptedException {
+    public static Process runProcess(String[] command, File processDir) 
+    		throws IOException, InterruptedException {
         ProcessBuilder pBuilder = new ProcessBuilder(command);
         pBuilder.directory(processDir);
         Process p = null;
@@ -54,29 +49,28 @@ public class Util {
     }
     
     /**
-     * Read and cache content from reader.
+     * Reads and caches content from inputStream.
      * 
-     * @return a list of lines obtained by reader.readline()
+     * @return a list of lines from inputStream.
      * @throws IOException
      */
-    public static List<String> getStreamContent(BufferedReader reader) {
-    	List<String> lines = new ArrayList<String>();
+    public static List<String> getInputStreamContent(InputStream inputStream) 
+    		throws IOException {
+    	BufferedReader bufferedReader = new BufferedReader(
+    			new InputStreamReader(inputStream));
     	
-    	String line = new String();
-    	try {
-			while ((line = reader.readLine()) != null) {
-				lines.add(line);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.exit(1);
+    	List<String> lines = new ArrayList<String>();
+    	String line;
+    	
+    	while ((line = bufferedReader.readLine()) != null) {
+			lines.add(line);
 		}
     	
     	return lines;
     }
     
     /**
-     * Write an object to a serialized output file.
+     * Writes an object to a serialized output file.
      */
     public static void writeToSerializedFile(String fileName, Object object) {
     	ObjectOutputStream output;
@@ -90,45 +84,6 @@ public class Util {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-    }
-    
-    /**
-     * Write an object in a human-readable form to an output file.
-     */
-    public static void writeToHumanReadableFile(String fileName, Object object) {
-        BufferedWriter outFileWriter;
-        
-		try {
-			outFileWriter = new BufferedWriter(new FileWriter(fileName));
-			outFileWriter.write(object.toString());
-	        outFileWriter.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-    }
-    
-    /**
-     * Read an object from a serialized input file.
-     * 
-     * @return an object of type T
-     */
-    public static <T> T readObject(Class<T> type, String fileName) {
-    	T object = null;
-    	ObjectInputStream input;
-    	
-    	try {
-			input = new ObjectInputStream(new FileInputStream(fileName));
-			object = (T) input.readObject();
-			input.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		
-		return object;
     }
     
     public static List<MixedRevisionTemplate> readMixedRevisionTemplates() {
@@ -152,17 +107,21 @@ public class Util {
     }
     
     /**
-     * Untar a repoTarFile and put its entries in repoDir.
+     * Untars a repoTarFile and put its entries in repoDir.
      * 
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public static void untar(String repoTarFile, String repoDir) throws FileNotFoundException, IOException {
+    public static void untar(String repoTarFile, String repoDir) 
+    		throws FileNotFoundException, IOException {
     	File dest = new File(repoDir);
     	dest.mkdir();
     	
-    	TarInputStream tis = new TarInputStream(new BufferedInputStream(new FileInputStream(repoTarFile)));
+    	TarInputStream tis = new TarInputStream(new BufferedInputStream(
+    			new FileInputStream(repoTarFile)));
+    	
 		TarEntry entry;
+		
 		while((entry = tis.getNextEntry()) != null) {
 			File destPath = new File(dest.toString() + File.separatorChar + entry.getName());
 			
@@ -186,37 +145,4 @@ public class Util {
 		
 		tis.close();
 	}
-    
-    public static class RevisionFileFilter implements FileFilter {
-    	private static final int LENGTH = 11;
-    	private static final Pattern REVISION_PATTERN = Pattern.compile("[a-f0-9]{7}.ser");
-    	
-		@Override
-		public boolean accept(File pathname) {
-			String fileName = pathname.getName();
-			Matcher revisionMatcher = REVISION_PATTERN.matcher(fileName);
-			
-			return fileName.length() == LENGTH && revisionMatcher.find();
-		}
-    }
-    
-    /**
-     * Reconstruct a HistoryGraph instance from serialized Revision files.
-     * 
-     * @return a HistoryGraph containing all revisions corresponding 
-     *         to serialized revision files in serializedRevisionsDir
-     */
-    public static HistoryGraph reconstructHistoryGraph(File serializedRevisionsDir) {
-    	HistoryGraph hGraph = new HistoryGraph();
-    	
-    	FileFilter filter = new RevisionFileFilter();
-    	File[] revisionFiles = serializedRevisionsDir.listFiles(filter);
-    	
-    	for (File revisionFile : revisionFiles) {
-    		Revision revision = readObject(Revision.class, revisionFile.getPath());
-    		hGraph.addRevision(revision);
-    	}
-    	
-    	return hGraph;
-    }
 }
