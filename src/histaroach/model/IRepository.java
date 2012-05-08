@@ -10,31 +10,13 @@ import java.util.List;
 /**
  * Repository represents a project repository. 
  * 
- * Repository has access to its associated directory and BuildStrategy. 
- * It contains the following public methods: 
- *  - getDirectory(): returns a directory 
- *  - getBuildStrategy(): returns a BuildStrategy 
- *  - checkoutCommit(commitID): checks out a commit into the working directory 
- *  - discardFileChange(filename): discards any change made in a file 
- *  - getDiffFiles(baseCommitID, otherCommitID): returns a list of DiffFiles 
- *    between any 2 commits 
- *  - buildHistoryGraph(startCommitID, endCommitID): builds a HistoryGraph 
- *    containing Revisions from startCommit to endCommit.
+ * Repository is associated with a particular directory 
+ * and a BuildStrategy.
  */
 public interface IRepository {
-
-	/**
-	 * Returns a directory.
-	 * 
-     * @return a directory of this Repository.
-     */
+	
 	public File getDirectory();
 	
-	/**
-	 * Returns a BuildStrategy.
-	 * 
-	 * @return a BuildStrategy associated with this Repository.
-	 */
 	public IBuildStrategy getBuildStrategy();
 	
 	/**
@@ -57,8 +39,6 @@ public interface IRepository {
 	public boolean discardFileChange(String filename) throws IOException, InterruptedException;
 	
 	/**
-	 * Returns a list of DiffFiles between any 2 commits.
-	 * 
      * @return a list of DiffFiles between baseCommit and otherCommit.
      * @throws InterruptedException 
      * @throws IOException 

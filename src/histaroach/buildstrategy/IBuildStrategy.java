@@ -7,13 +7,7 @@ import histaroach.util.Pair;
 
 /**
  * BuildStrategy represents a way to compile a project, 
- * run tests, and parse the test results. 
- * 
- * BuildStrateggy contains the following public methods: 
- *  - runTest(): compiles the project, runs tests, and 
- *    parses the test results 
- *  - runTestViaShellScript(): an alternative method 
- *    of runTest.
+ * run tests, and parse the test results.
  */
 public interface IBuildStrategy {
 	

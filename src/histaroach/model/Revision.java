@@ -4,22 +4,23 @@ import histaroach.buildstrategy.IBuildStrategy;
 import histaroach.util.Pair;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 
 /**
- * Revision represents a state of a particular commit. 
+ * Revision represents a particular commit in some Repository. 
  * 
- * Revision contains the following public methods: 
- *  - getCommitID(): returns a commit ID 
- *  - getParents(): returns a set of parents 
- *  - getDiffFiles(parent): returns a list of DiffFiles 
- *    corresponding to a parent 
- *  - isCompilable(): returns a Compilable state 
- *  - getTestResult(): returns a TestResult.
+ * Revision can be responsible for populating its Compilable 
+ * state and TestResult at construction time. 
+ * In this case, the caller to Revision's constructor must 
+ * pass in a Repository. This Repository will be called from 
+ * the constructor to compile the project, run tests and 
+ * parse the test results. 
+ * 
+ * Otherwise, Revision's Compilable state and TestResult must 
+ * be given by the caller at construction time. 
  * 
  * Revision is immutable.
  */
@@ -37,9 +38,6 @@ public class Revision implements Serializable {
     private final Map<Revision, List<DiffFile>> parentToDiffFiles;
     private Compilable compilable;
     private /*@Nullable*/ TestResult testResult;
-    
-    /* used in equals(other) and hashCode() methods only */
-    private final Map<String, List<DiffFile>> parentIDToDiffFiles;
 
     /**
      * Creates a Revision. 
@@ -51,27 +49,18 @@ public class Revision implements Serializable {
     		throws Exception {
     	this.commitID = commitID;
     	this.parentToDiffFiles = parentToDiffFiles;
-    	
-    	parentIDToDiffFiles = new HashMap<String, List<DiffFile>>();
-    	
-    	for (Revision parent : parentToDiffFiles.keySet()) {
-    		String parentID = parent.getCommitID();
-    		List<DiffFile> diffFiles = parentToDiffFiles.get(parent);
-    		
-    		parentIDToDiffFiles.put(parentID, diffFiles);
-    	}
-        
+    	        
         boolean checkoutCommitSuccessful = repository.checkoutCommit(commitID);
         
-        if (checkoutCommitSuccessful) {
-        	IBuildStrategy buildStrategy = repository.getBuildStrategy();
-        	
-        	Pair<Compilable, TestResult> result = buildStrategy.runTestViaShellScript();
-        	compilable = result.getFirst();
-    		testResult = result.getSecond();
-        } else {
-    		throw new Exception("git checkout commit " + commitID + " unsuccessful");
-    	}
+        if (!checkoutCommitSuccessful) {
+        	throw new Exception("git checkout commit " + commitID + " unsuccessful");
+        }
+        
+    	IBuildStrategy buildStrategy = repository.getBuildStrategy();
+    	
+    	Pair<Compilable, TestResult> result = buildStrategy.runTestViaShellScript();
+    	compilable = result.getFirst();
+		testResult = result.getSecond();
     }
     
     /**
@@ -84,86 +73,89 @@ public class Revision implements Serializable {
     	this.compilable = compilable;
     	this.testResult = testResult;
     	this.parentToDiffFiles = parentToDiffFiles;
-    	
-    	parentIDToDiffFiles = new HashMap<String, List<DiffFile>>();
-    	
-    	for (Revision parent : parentToDiffFiles.keySet()) {
-    		String parentID = parent.getCommitID();
-    		List<DiffFile> diffFiles = parentToDiffFiles.get(parent);
-    		
-    		parentIDToDiffFiles.put(parentID, diffFiles);
-    	}
     }
-
-    /**
-     * Returns a commit ID.
-     * 
-     * @return a commit ID of this Revision.
-     */
+    
     public String getCommitID() {
         return commitID;
     }
-
-    /**
-     * Returns a set of parents.
-     * 
-     * @return a set of parents of this Revision.
-     */
+    
     public Set<Revision> getParents() {
         return parentToDiffFiles.keySet();
     }
 
     /**
-     * Returns a list of DiffFiles corresponding to a parent.
-     * 
      * @return a list of DiffFiles corresponding to the parent, 
      *         null if the parent is not a parent of this Revision.
      */
     public List<DiffFile> getDiffFiles(Revision parent) {
         return parentToDiffFiles.get(parent);
     }
-
-    /**
-     * Returns a Compilable state.
-     * 
-     * @return a Compilable state of this Revision.
-     */
+    
     public Compilable isCompilable() {
         return compilable;
     }
 
     /**
-     * Returns a TestResult.
-     * 
-     * @return a TestResult of this Revision.
+     * @return a TestResult; null if this Revision is not compilable.
      */
     public TestResult getTestResult() {
         return testResult;
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (other == null || !other.getClass().equals(this.getClass())) {
+    public boolean equals(Object object) {
+        if (object == null || !object.getClass().equals(this.getClass())) {
             return false;
         }
 
-        Revision revision = (Revision) other;
+        Revision other = (Revision) object;
         
-        boolean boolCommitID = commitID.equals(revision.commitID);
-        boolean boolParentIDToDiffFiles = parentIDToDiffFiles.equals(revision.parentIDToDiffFiles);
-        boolean boolCompilable = compilable == revision.compilable;
-        boolean boolTestResult = (testResult == null && revision.testResult == null) 
-        						|| (testResult != null && testResult.equals(revision.testResult));
+        boolean boolCommitID = commitID.equals(other.commitID);
+        boolean boolCompilable = compilable == other.compilable;
+        boolean boolTestResult = (testResult == null && other.testResult == null) 
+        						|| (testResult != null && testResult.equals(other.testResult));
         
-        return boolCommitID && boolParentIDToDiffFiles && boolCompilable && boolTestResult;
+        // check equality of parents' IDs and DiffFiles
+        Set<Revision> parents = parentToDiffFiles.keySet();
+        Set<Revision> otherParents = other.parentToDiffFiles.keySet();
+                
+        for (Revision parent : parents) {
+        	String parentID = parent.commitID;
+        	List<DiffFile> diffFiles = parentToDiffFiles.get(parent);
+        	
+        	boolean foundMatch = false;
+        	
+        	for (Revision otherParent : otherParents) {
+        		String otherParentID = otherParent.commitID;
+        		List<DiffFile> otherDiffFiles = other.parentToDiffFiles.get(otherParent);
+        		
+        		if (parentID.equals(otherParentID) && diffFiles.equals(otherDiffFiles)) {
+        			foundMatch = true;
+        			break;
+        		}
+        	}
+        	
+        	if (!foundMatch) {
+        		return false;
+        	}
+        }
+        
+        return boolCommitID && boolCompilable && boolTestResult;
     }
 
     @Override
     public int hashCode() {
-        int code = 13 * commitID.hashCode() + 17 * parentIDToDiffFiles.hashCode() 
-        	+ 19 * compilable.hashCode();
+        int code = 11 * commitID.hashCode() + 13 * compilable.hashCode();
+        
         if (testResult != null) {
-            code += 23 * testResult.hashCode();
+            code += 17 * testResult.hashCode();
+        }
+        
+        for (Revision parent : parentToDiffFiles.keySet()) {
+        	String parentID = parent.commitID;
+        	List<DiffFile> diffFiles = parentToDiffFiles.get(parent);
+        	
+        	code += 19 * parentID.hashCode() + 23 * diffFiles.hashCode();
         }
 
         return code;

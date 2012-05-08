@@ -29,6 +29,10 @@ import org.w3c.dom.Text;
 import org.xml.sax.SAXException;
 
 
+/**
+ * HistoryGraphXMLReader reads an XML file representing a HistoryGraph 
+ * and reconstructs the HistoryGraph instance.
+ */
 public class HistoryGraphXMLReader {
 	
 	private final File hGraphXML;
@@ -39,6 +43,14 @@ public class HistoryGraphXMLReader {
 		revisions = new HashMap<String, Revision>();
 	}
 	
+	/**
+	 * Reconstructs the HistoryGraph instance from the XML file.
+	 * 
+	 * @return the HistoryGraph instance represented by the XML file.
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 */
 	public HistoryGraph reconstructHistoryGraph() throws ParserConfigurationException, 
 			SAXException, IOException {
 		HistoryGraph hGraph = new HistoryGraph();
@@ -50,26 +62,20 @@ public class HistoryGraphXMLReader {
 		
 		Element root = doc.getDocumentElement(); // <HistoryGraph>
 		
-		NodeList nodes = root.getChildNodes();
+		List<Element> revisionElements = traverseContainedElements(root);
 		
-		for (int i = 0; i < nodes.getLength(); i++) {
-			Node node = nodes.item(i);
+		for (Element revisionElement : revisionElements) { // <Revision>
+			Revision revision = parseRevisionElement(revisionElement);
+			hGraph.addRevision(revision);
 			
-			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				Element revisionElement = (Element) node; // <Revision>
-				
-				Revision revision = parseRevisionElement(revisionElement);
-				hGraph.addRevision(revision);
-				
-				revisions.put(revision.getCommitID(), revision);
-			}
+			revisions.put(revision.getCommitID(), revision);
 		}
 		
 		return hGraph;
 	}
 	
 	private Revision parseRevisionElement(Element revisionElement) {
-		Iterator<Element> iter = getSubElementIterator(revisionElement);
+		Iterator<Element> iter = traverseContainedElements(revisionElement).iterator();
 		
 		Element commitIDElement = iter.next();		// <commitID>
 		Element compilableElement = iter.next();	// <Compilable>
@@ -106,7 +112,7 @@ public class HistoryGraphXMLReader {
 	}
 	
 	private TestResult parseTestResultElement(Element testResultElement) {
-		Iterator<Element> iter = getSubElementIterator(testResultElement);
+		Iterator<Element> iter = traverseContainedElements(testResultElement).iterator();
 		
 		Element allTestsElement = iter.next();		// <Tests>
 		Element failedTestsElement = iter.next();	// <FailedTests>
@@ -122,18 +128,11 @@ public class HistoryGraphXMLReader {
 	private Set<String> parseTestsElement(Element testsElement) {
 		Set<String> tests = new HashSet<String>();
 		
-		NodeList nodes = testsElement.getChildNodes();
+		List<Element> testNameElements = traverseContainedElements(testsElement);
 		
-		for (int i = 0; i < nodes.getLength(); i++) {
-			Node node = nodes.item(i);
-			
-			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				Element testNameElement = (Element) node;	// <testName>
-				
-				String testName = getString(testNameElement);
-				
-				tests.add(testName);
-			}
+		for (Element testNameElement : testNameElements) { // <testName>
+			String testName = getString(testNameElement);
+			tests.add(testName);
 		}
 		
 		return tests;
@@ -142,27 +141,21 @@ public class HistoryGraphXMLReader {
 	private Map<Revision, List<DiffFile>> parseParentsElement(Element parentsElement) {
 		Map<Revision, List<DiffFile>> parentToDiffFiles = new HashMap<Revision, List<DiffFile>>();
 		
-		NodeList nodes = parentsElement.getChildNodes();
+		List<Element> parentElements = traverseContainedElements(parentsElement);
 		
-		for (int i = 0; i < nodes.getLength(); i++) {
-			Node node = nodes.item(i);
+		for (Element parentElement : parentElements) { // <Parent>
+			Pair<Revision, List<DiffFile>> pair = parseParentElement(parentElement);
+			Revision parent = pair.getFirst();
+			List<DiffFile> diffFiles = pair.getSecond();
 			
-			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				Element parentElement = (Element) node; // <Parent>
-				
-				Pair<Revision, List<DiffFile>> pair = parseParentElement(parentElement);
-				Revision parent = pair.getFirst();
-				List<DiffFile> diffFiles = pair.getSecond();
-				
-				parentToDiffFiles.put(parent, diffFiles);
-			}
+			parentToDiffFiles.put(parent, diffFiles);
 		}
 		
 		return parentToDiffFiles;
 	}
 	
 	private Pair<Revision, List<DiffFile>> parseParentElement(Element parentElement) {
-		Iterator<Element> iter = getSubElementIterator(parentElement);
+		Iterator<Element> iter = traverseContainedElements(parentElement).iterator();
 		
 		Element commitIDElement = iter.next();	// <commitID>
 		Element diffFilesElement = iter.next();	// <DiffFiles>
@@ -170,14 +163,10 @@ public class HistoryGraphXMLReader {
 		String parentCommitID = getString(commitIDElement);
 		List<DiffFile> diffFiles = parseDiffFilesElement(diffFilesElement);
 		
-		Revision parent;
-		if (revisions.containsKey(parentCommitID)) {
-			parent = revisions.get(parentCommitID);
-		} else {
-			// dummy revision of parent
-			parent = new Revision(parentCommitID, new HashMap<Revision, List<DiffFile>>(), 
-					Compilable.UNKNOWN, null);
-		}
+		// because of topological ordering of Revisions in HistoryGraph
+		assert revisions.containsKey(parentCommitID);
+		
+		Revision parent = revisions.get(parentCommitID);
 		
 		Pair<Revision, List<DiffFile>> pair = new Pair<Revision, List<DiffFile>>(parent, diffFiles);
 		
@@ -187,25 +176,18 @@ public class HistoryGraphXMLReader {
 	private List<DiffFile> parseDiffFilesElement(Element diffFilesElement) {
 		List<DiffFile> diffFiles = new ArrayList<DiffFile>();
 		
-		NodeList nodes = diffFilesElement.getChildNodes();
+		List<Element> diffFileElements = traverseContainedElements(diffFilesElement);
 		
-		for (int i = 0; i < nodes.getLength(); i++) {
-			Node node = nodes.item(i);
-			
-			if (node.getNodeType() == Node.ELEMENT_NODE) {
-				Element diffFileElement = (Element) node;
-				
-				DiffFile diffFile = parseDiffFileElement(diffFileElement);
-				
-				diffFiles.add(diffFile);
-			}
+		for (Element diffFileElement : diffFileElements) { // <DiffFile>
+			DiffFile diffFile = parseDiffFileElement(diffFileElement);
+			diffFiles.add(diffFile);
 		}
 		
 		return diffFiles;
 	}
 	
 	private DiffFile parseDiffFileElement(Element diffFileElement) {
-		Iterator<Element> iter = getSubElementIterator(diffFileElement);
+		Iterator<Element> iter = traverseContainedElements(diffFileElement).iterator();
 		
 		Element fileNameElement = iter.next();	// <fileName>
 		Element diffTypeElement = iter.next();	// <DiffType>
@@ -230,23 +212,24 @@ public class HistoryGraphXMLReader {
 		return DiffType.DELETED;
 	}
 	
-	private Iterator<Element> getSubElementIterator(Element element) {
-		NodeList subNodes = element.getChildNodes();
-		List<Element> subElements = new ArrayList<Element>();
+	/**
+	 * @return a list of elements contained in the containerElement.
+	 */
+	private List<Element> traverseContainedElements(Element containerElement) {
+		List<Element> containedElements = new ArrayList<Element>();
 		
-		for (int i = 0; i < subNodes.getLength(); i++) {
-			Node subNode = subNodes.item(i);
+		NodeList nodes = containerElement.getChildNodes();
+		
+		for (int i = 0; i < nodes.getLength(); i++) {
+			Node node = nodes.item(i);
 			
-			if (subNode.getNodeType() == Node.ELEMENT_NODE) {
-				Element subElement = (Element) subNode;
-				
-				subElements.add(subElement);
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				Element element = (Element) node;
+				containedElements.add(element);
 			}
 		}
 		
-		Iterator<Element> iter = subElements.iterator();
-		
-		return iter;
+		return containedElements;
 	}
 	
 	private String getString(Element element) {

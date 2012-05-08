@@ -4,11 +4,7 @@ import java.io.Serializable;
 
 
 /**
- * DiffFile represents a file that is different between any 2 Revisions. 
- * 
- * DiffFile contains the following public methods: 
- *  - getFileName(): returns a file name 
- *  - getDiffType(): returns a DiffType (ADDED, MODIFIED, or DELETED). 
+ * DiffFile represents a file that is different between 2 Revisions. 
  * 
  * DiffFile is immutable.
  */
@@ -35,20 +31,10 @@ public class DiffFile implements Serializable {
 		this.fileName = fileName;
 	}
 	
-	/**
-	 * Returns a file name.
-	 * 
-	 * @return a file name.
-	 */
 	public String getFileName() {
 		return fileName;
 	}
 	
-	/**
-	 * Returns a DiffType.
-	 * 
-	 * @return a DiffType (ADDED, MODIFIED, or DELETED).
-	 */
 	public DiffType getDiffType() {
 		return type;
 	}
