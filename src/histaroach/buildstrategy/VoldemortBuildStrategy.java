@@ -11,9 +11,7 @@ import java.util.regex.Pattern;
 
 
 /**
- * VoldemortBuildStrategy is a concrete subclass of AntBuildStrategy. 
- * 
- * For voldemort project.
+ * VoldemortBuildStrategy is for voldemort project.
  */
 public class VoldemortBuildStrategy extends AntBuildStrategy {
 

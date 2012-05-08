@@ -14,15 +14,7 @@ import java.util.regex.Pattern;
 
 
 /**
- * AntBuildStrategy is an implementation of BuildStrategy Interface. 
- * 
- * For ant build tool. 
- * 
- * AntBuildStrategy is an abstract class; it contains the following 
- * abstract method: 
- *  - getTestResult(outputStreamContent, errorStreamContent): 
- *    parses test results from output and error streams 
- *    and returns a TestResult. 
+ * AntBuildStrategy is for ant build tool. 
  * 
  * AntBuildStrategy is immutable.
  */
