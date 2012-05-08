@@ -84,8 +84,6 @@ public class Revision implements Serializable {
     }
 
     /**
-     * Returns a list of DiffFiles corresponding to a parent.
-     * 
      * @return a list of DiffFiles corresponding to the parent, 
      *         null if the parent is not a parent of this Revision.
      */

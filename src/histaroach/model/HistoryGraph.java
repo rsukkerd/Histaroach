@@ -44,8 +44,6 @@ public class HistoryGraph implements Iterable<Revision> {
     }
     
     /**
-     * Returns a set of all Flips in this HistoryGraph.
-     * 
 	 * @return a set of all Flips in this HistoryGraph.
 	 */
 	public Set<Flip> getAllFlips() {
@@ -87,6 +85,7 @@ public class HistoryGraph implements Iterable<Revision> {
 	 */
 	private void findFlippedTests(Revision child, Revision parent, 
 			Set<String> toPassTests, Set<String> toFailTests) {
+		
 		TestResult childResult = child.getTestResult();
 		TestResult parentResult = parent.getTestResult();
 		
