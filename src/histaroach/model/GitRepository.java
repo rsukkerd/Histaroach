@@ -2,7 +2,6 @@ package histaroach.model;
 
 import histaroach.buildstrategy.IBuildStrategy;
 import histaroach.model.DiffFile.DiffType;
-import histaroach.model.Revision.Compilable;
 import histaroach.util.Util;
 
 import java.io.BufferedReader;
@@ -12,17 +11,13 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 
 /**
- * GitRepository is an implementation of Repository Interface. 
- * 
- * For git version control. 
+ * GitRepository is for git version control. 
  * 
  * GitRepository is immutable.
  */
@@ -114,128 +109,152 @@ public class GitRepository implements IRepository, Serializable {
 		
 		boolean checkoutCommitSuccessful = checkoutCommit(startCommitID);
 		
-		if (checkoutCommitSuccessful) {
-	        Process logProcess = Util.runProcess(LOG_COMMAND, directory);
-	
-	        BufferedReader reader = new BufferedReader(new InputStreamReader(
-	                logProcess.getInputStream()));
-	
-	        List<String> lines = Util.getStreamContent(reader);
-	        
-	        // parent id -> a list of its children's ids
-	        Map<String, List<String>> parentIDToChildrenIDs = new HashMap<String, List<String>>();
-	        // child id -> a list of its parents' ids
-	        Map<String, List<String>> childIDToParentsIDs = new HashMap<String, List<String>>();
-	        
-	        // special case : the start revision has no children
-	        if (!lines.isEmpty()) {
-	        	String line = lines.get(0);
-	        	String[] hashes = line.split(" ");
-	        	
-	        	String topID = hashes[0];
-	        	parentIDToChildrenIDs.put(topID, new ArrayList<String>());
-	        }
-	        
-	        for (String line : lines) {
-	        	String[] hashes = line.split(" ");
-	
-	            String childID = hashes[0];
-	            List<String> parentsIDs = new ArrayList<String>();
-	            
-	            for (int i = 1; i < hashes.length; i++) {
-	            	String parentID = hashes[i];
-	            	parentsIDs.add(parentID);
-	            	
-	            	if (parentIDToChildrenIDs.containsKey(parentID)) {
-	            		parentIDToChildrenIDs.get(parentID).add(childID);
-	            	} else {
-	            		List<String> childrenIDs = new ArrayList<String>();
-	            		childrenIDs.add(childID);
-	            		parentIDToChildrenIDs.put(parentID, childrenIDs);
-	            	}
-	            }
-	            
-	            childIDToParentsIDs.put(childID, parentsIDs);
-	            
-	            if (childID.equals(endCommitID)) {
-	            	break;
-	            }
-	        }
-	        
-	        // commit id -> number of its parents
-	        Map<String, Integer> incomingEdgeCounter = new HashMap<String, Integer>();
-	        
-	        for (String childID : childIDToParentsIDs.keySet()) {
-	        	int incomingEdges = 0;
-	        	List<String> parentsIDs = childIDToParentsIDs.get(childID);
-	        	for (String parentID : parentsIDs) {
-	        		if (childIDToParentsIDs.containsKey(parentID)) {
-	        			incomingEdges++;
-	        		}
-	        	}
-	        	
-	        	incomingEdgeCounter.put(childID, incomingEdges);
-	        }
-	        
-	        Set<String> noIncomingEdge = new HashSet<String>();
-	        
-	        for (String commitID : incomingEdgeCounter.keySet()) {
-	        	int count = incomingEdgeCounter.get(commitID);
-	        	if (count == 0) {
-	        		noIncomingEdge.add(commitID);
-	        	}
-	        }
-	        
-	        // commit id -> its revision object
-	        Map<String, Revision> revisions = new HashMap<String, Revision>();
-	        
-	        while (!noIncomingEdge.isEmpty()) {
-	        	Iterator<String> itr = noIncomingEdge.iterator();
-	        	String commitID = itr.next();
-	        	noIncomingEdge.remove(commitID);
-	        	
-	        	Map<Revision, List<DiffFile>> parentToDiffFiles = new HashMap<Revision, List<DiffFile>>();
-	        	
-	        	List<String> parentsIDs = childIDToParentsIDs.get(commitID);
-	        	for (String parentID : parentsIDs) {
-	        		Revision parent;
-	        		if (revisions.containsKey(parentID)) {
-	        			parent = revisions.get(parentID);
-	        		} else {
-	        			// dummy revision of parent
-	        			parent = new Revision(parentID, new HashMap<Revision, List<DiffFile>>(), 
-	        					Compilable.UNKNOWN, null);
-	        		}
-	        		
-	        		List<DiffFile> diffFiles = getDiffFiles(commitID, parentID);
-	        		
-	        		parentToDiffFiles.put(parent, diffFiles);
-	        	}
-	        	
-	        	Revision revision = new Revision(this, commitID, parentToDiffFiles);
-	        	hGraph.addRevision(revision);
-	        	
-	        	/* print progress to standard out */
-	        	System.out.println(revision);
-	        	
-	        	revisions.put(commitID, revision);
-	        	
-	        	List<String> childrenIDs = parentIDToChildrenIDs.get(commitID);
-	        	
-	        	for (String childID : childrenIDs) {
-	        		int edges = incomingEdgeCounter.get(childID);
-	        		incomingEdgeCounter.put(childID, edges - 1);
-	        		
-	        		if (edges - 1 == 0) {
-	        			noIncomingEdge.add(childID);
-	        		}
-	        	}
-	        }
-		} else {
+		if (!checkoutCommitSuccessful) {
 			throw new Exception("git checkout commit " + startCommitID + " unsuccessful");
 		}
 		
+        Process logProcess = Util.runProcess(LOG_COMMAND, directory);
+
+        BufferedReader logReader = new BufferedReader(new InputStreamReader(
+                logProcess.getInputStream()));
+
+        List<String> lines = Util.getStreamContent(logReader);
+        
+        // revision's commit id -> list of its parents' ids
+        Map<String, List<String>> commitIDToParentsIDs = getCommitIDToParentsIDs(lines, endCommitID);
+        
+        // revision's commit id -> count of its parent edges
+        Map<String, Integer> parentEdgeCounter = getParentEdgeCounter(commitIDToParentsIDs);
+        
+        // revision's commit id -> revision object
+        Map<String, Revision> revisions = new HashMap<String, Revision>();
+        
+        while (!parentEdgeCounter.isEmpty()) {
+        	// find a commit id node that has no parent edge
+        	String commitID = "";
+        	
+        	for (Map.Entry<String, Integer> entry : parentEdgeCounter.entrySet()) {
+        		if (entry.getValue() == 0) {
+        			commitID = entry.getKey();
+        			break;
+        		}
+        	}
+        	
+        	assert !commitID.isEmpty();
+        	
+        	parentEdgeCounter.remove(commitID);
+        	
+        	// create a revision
+        	Map<Revision, List<DiffFile>> parentToDiffFiles = new HashMap<Revision, List<DiffFile>>();
+        	List<String> parentsIDs = commitIDToParentsIDs.get(commitID);
+        	
+        	for (String parentID : parentsIDs) {
+        		
+        		if (!revisions.containsKey(parentID)) {
+        			// parentID is not in the range [startCommitID, endCommitID]
+        			// ignore this parentID
+        			continue;
+        		}
+        		
+        		Revision parent = revisions.get(parentID);
+        		List<DiffFile> diffFiles = getDiffFiles(commitID, parentID);
+        		
+        		parentToDiffFiles.put(parent, diffFiles);
+        	}
+        	
+        	Revision revision = new Revision(this, commitID, parentToDiffFiles);
+        	hGraph.addRevision(revision);
+        	
+        	// print progress to stdout
+        	System.out.println(revision);
+        	
+        	revisions.put(commitID, revision);
+        	
+        	// update parentEdgeCounter
+        	decrementParentEdgeCounts(commitIDToParentsIDs, commitID, parentEdgeCounter);
+        }
+		
 		return hGraph;
+	}
+	
+	/**
+	 * Returns a graph where each node is a commit ID and each edge 
+	 * goes from child commit ID to parent commit ID.
+	 * 
+	 * @return a map from commit ID to the list of its parents' IDs.
+	 */
+	private Map<String, List<String>> getCommitIDToParentsIDs(List<String> lines, 
+			String endCommitID) {
+        Map<String, List<String>> commitIDToParentsIDs = new HashMap<String, List<String>>();
+        
+        for (String line : lines) {
+        	String[] hashes = line.split(" ");
+
+            String commitID = hashes[0];
+            List<String> parentsIDs = new ArrayList<String>();
+            
+            for (int i = 1; i < hashes.length; i++) {
+            	String parentID = hashes[i];
+            	parentsIDs.add(parentID);
+            }
+            
+            commitIDToParentsIDs.put(commitID, parentsIDs);
+            
+            if (commitID.equals(endCommitID)) {
+            	break;
+            }
+        }
+        
+        return commitIDToParentsIDs;
+	}
+	
+	/**
+	 * Returns a parent edge counter.
+	 * 
+	 * @return a map from commit ID to the number of its parent edges.
+	 */
+	private Map<String, Integer> getParentEdgeCounter(Map<String, List<String>> commitIDToParentsIDs) {
+		Map<String, Integer> parentEdgeCounter = new HashMap<String, Integer>();
+		
+		// commit ids in the range [startCommitID, endCommitID]
+		Set<String> commitIDs = commitIDToParentsIDs.keySet();
+		
+		for (String commitID : commitIDs) {
+			List<String> parentsIDs = commitIDToParentsIDs.get(commitID);
+			int extraParentEdges = 0;
+			
+			// eliminate parent edges that are not in the range [startCommitID, endCommitID]
+			for (String parentID : parentsIDs) {
+				if (!commitIDs.contains(parentID)) {
+					extraParentEdges++;
+				}
+			}
+			
+			int parentEdges = parentsIDs.size() - extraParentEdges;
+			parentEdgeCounter.put(commitID, parentEdges);
+		}
+		
+		return parentEdgeCounter;
+	}
+	
+	/**
+	 * Decrements parent edge counts of commit ID nodes whose parent 
+	 * has just been added to HistoryGraph.
+	 * 
+	 * @modifies parentEdgeCounter
+	 */
+	private void decrementParentEdgeCounts(Map<String, List<String>> commitIDToParentsIDs, 
+			String removedParentEdge, 
+			Map<String, Integer> parentEdgeCounter) {
+		
+		for (String commitID : commitIDToParentsIDs.keySet()) {
+			List<String> parentsIDs = commitIDToParentsIDs.get(commitID);
+			
+			if (parentsIDs.contains(removedParentEdge)) {
+				int parentEdgeCount = parentEdgeCounter.get(commitID);
+				parentEdgeCounter.put(commitID, parentEdgeCount - 1);
+			}
+		}
 	}
 
 	@Override
