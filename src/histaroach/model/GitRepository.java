@@ -98,27 +98,68 @@ public class GitRepository implements IRepository, Serializable {
 	}
 
 	@Override
-	public HistoryGraph buildHistoryGraph(String startCommitID,
-			String endCommitID) throws Exception {
+	public HistoryGraph buildHistoryGraph(String startCommitID, String endCommitID) 
+			throws Exception {
 		HistoryGraph hGraph = new HistoryGraph();
 		
+		// check out startCommit, which will be the new HEAD
 		boolean checkoutCommitSuccessful = checkoutCommit(startCommitID);
 		
 		if (!checkoutCommitSuccessful) {
 			throw new Exception("git checkout commit " + startCommitID + " unsuccessful");
 		}
 		
+		// "git log" shows HEAD's history
         Process logProcess = Util.runProcess(LOG_COMMAND, directory);
         
+        /*
+         * each line is formatted as either: 
+         * {commit id} {parent1's commit id} ... {parentN's commit id} 
+         * or 
+         * {commit id} if a commit has no parent.
+         */
         List<String> lines = Util.getInputStreamContent(logProcess.getInputStream());
         
-        // revision's commit id -> list of its parents' ids
+        /*
+         * The commitIDToParentsIDs map maps a revision's commit id to a list of 
+         * its parents' commit ids. 
+         * 
+         * The commitIDToParentsIDs map is a graph representation of HEAD's revision history. 
+         * Each node in this graph is a commit id string. Each edge in this graph goes 
+         * from a child to a parent. 
+         * 
+         * This graph will not be modified.
+         */
         Map<String, List<String>> commitIDToParentsIDs = getCommitIDToParentsIDs(lines, endCommitID);
         
-        // revision's commit id -> count of its parent edges
+        /*
+         * The parentEdgeCounter map maps a revision's commit id to a count 
+         * of its parent edges. 
+         * 
+         * To construct a Revision object, all of its parents must already exist. 
+         * 
+         * The parentEdgeCounter map is a counter of the remaining parent edges 
+         * of each node in the commitIDToParentsIDs graph. A parent edge represents 
+         * a parent that has not been constructed. If a node has one or more parent- 
+         * edges, a Revision corresponding to that node cannot be constructed yet. 
+         * 
+         * This counter will be modified at each while-loop iteration in this method. 
+         * At each iteration, an entry in the counter that has 0 count will be removed, 
+         * and a Revision corresponding to the node in that entry will be constructed. 
+         * 
+         * Once a Revision is constructed, the decrementParentEdgeCounts function 
+         * searches over all remaining entries in the counter and decrements a count 
+         * of each node whose parent has just been constructed.
+         */
         Map<String, Integer> parentEdgeCounter = getParentEdgeCounter(commitIDToParentsIDs);
         
-        // revision's commit id -> revision object
+        /*
+         * The revisions map maps a revision's commit id to a corresponding 
+         * Revision object. 
+         * 
+         * This map is used, when constructing a Revision object, for getting 
+         * a parent Revision from a parent commit id string.
+         */
         Map<String, Revision> revisions = new HashMap<String, Revision>();
         
         while (!parentEdgeCounter.isEmpty()) {
@@ -136,7 +177,7 @@ public class GitRepository implements IRepository, Serializable {
         	
         	parentEdgeCounter.remove(commitID);
         	
-        	// create a revision
+        	// create a Revision object
         	Map<Revision, List<DiffFile>> parentToDiffFiles = new HashMap<Revision, List<DiffFile>>();
         	List<String> parentsIDs = commitIDToParentsIDs.get(commitID);
         	
