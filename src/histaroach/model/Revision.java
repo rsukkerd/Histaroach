@@ -40,8 +40,11 @@ public class Revision implements Serializable {
     private /*@Nullable*/ TestResult testResult;
 
     /**
-     * Creates a Revision. 
-     * Compilable state and TestResult are populated in this constructor.
+     * Creates a Revision, whose Compilable state and 
+     * TestResult are populated in this constructor. 
+     * 
+     * The caller to this constructor must pass in 
+     * a Repository.
      * 
      * @throws Exception 
      */
@@ -64,8 +67,8 @@ public class Revision implements Serializable {
     }
     
     /**
-     * Creates a Revision. 
-     * Compilable state and TestResult are given.
+     * Creates a Revision, whose Compilable state and 
+     * TestResult are given.
      */
     public Revision(String commitID, Map<Revision, List<DiffFile>> parentToDiffFiles, 
     		Compilable compilable, TestResult testResult) {
