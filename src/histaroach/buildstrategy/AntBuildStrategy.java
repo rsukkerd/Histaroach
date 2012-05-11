@@ -1,14 +1,12 @@
 package histaroach.buildstrategy;
 
-import histaroach.model.TestResult;
 import histaroach.model.Revision.Compilable;
+import histaroach.model.TestResult;
 import histaroach.util.Pair;
 import histaroach.util.Util;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.InputStreamReader;
+import java.io.FileInputStream;
 import java.io.Serializable;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -16,15 +14,7 @@ import java.util.regex.Pattern;
 
 
 /**
- * AntBuildStrategy is an implementation of BuildStrategy Interface. 
- * 
- * For ant build tool. 
- * 
- * AntBuildStrategy is an abstract class; it contains the following 
- * abstract method: 
- *  - getTestResult(outputStreamContent, errorStreamContent): 
- *    parses test results from output and error streams 
- *    and returns a TestResult. 
+ * AntBuildStrategy is for ant build tool. 
  * 
  * AntBuildStrategy is immutable.
  */
@@ -43,9 +33,9 @@ public abstract class AntBuildStrategy implements IBuildStrategy, Serializable {
 	private static final String BUILD_SUCCESSFUL_PATTERN = "BUILD SUCCESSFUL";
 	private static final String BUILD_FAILED_PATTERN = "BUILD FAILED";
 	
-	private static final String RUN_SCRIPT_COMMAND = "./run_test.sh";
-	private static final String TEST_OUTPUT = "output/run_test_stdout";
-	private static final String TEST_ERROR = "output/run_test_stderr";
+	private static final String RUN_TEST_SH_CMD = "./run_test.sh";
+	private static final String RUN_TEST_STDOUT = "output/run_test_stdout";
+	private static final String RUN_TEST_STDERR = "output/run_test_stderr";
 	
 	private final File directory;
 	private final String antTestCmdStr;
@@ -62,16 +52,12 @@ public abstract class AntBuildStrategy implements IBuildStrategy, Serializable {
 	
 	@Override
 	public Pair<Compilable, TestResult> runTest() throws Exception {
-		Process process = Util.runProcess(antTestCmdArr, directory);
-
-        BufferedReader stdOutputReader = new BufferedReader(
-                new InputStreamReader(process.getInputStream()));
-
-        BufferedReader stdErrorReader = new BufferedReader(
-                new InputStreamReader(process.getErrorStream()));
-
-        List<String> outputStreamContent = Util.getStreamContent(stdOutputReader);
-        List<String> errorStreamContent = Util.getStreamContent(stdErrorReader);
+		Process runTestProcess = Util.runProcess(antTestCmdArr, directory);
+        
+        List<String> outputStreamContent = Util.getInputStreamContent(
+        		runTestProcess.getInputStream());
+        List<String> errorStreamContent = Util.getInputStreamContent(
+        		runTestProcess.getErrorStream());
 
         Compilable compilable = buildSuccessful(outputStreamContent, errorStreamContent);
         TestResult testResult = null;
@@ -88,22 +74,19 @@ public abstract class AntBuildStrategy implements IBuildStrategy, Serializable {
 		String workingDir = System.getProperty("user.dir");
     	File dir = new File(workingDir);
     	
-    	String outputStream = workingDir + File.separatorChar + TEST_OUTPUT;
-    	String errorStream = workingDir + File.separatorChar + TEST_ERROR;
+    	String outputStream = workingDir + File.separatorChar + RUN_TEST_STDOUT;
+    	String errorStream = workingDir + File.separatorChar + RUN_TEST_STDERR;
     	
-    	String[] command = new String[] { RUN_SCRIPT_COMMAND, directory.getPath(), 
+    	String[] command = new String[] { RUN_TEST_SH_CMD, directory.getPath(), 
     			antTestCmdStr, outputStream, errorStream, };
     	    	
         Util.runProcess(command, dir);
         
-        BufferedReader stdOutputReader = new BufferedReader(
-                new FileReader(new File(TEST_OUTPUT)));
-
-        BufferedReader stdErrorReader = new BufferedReader(
-                new FileReader(new File(TEST_ERROR)));
-
-        List<String> outputStreamContent = Util.getStreamContent(stdOutputReader);
-        List<String> errorStreamContent = Util.getStreamContent(stdErrorReader);
+        FileInputStream stdOutStream = new FileInputStream(new File(RUN_TEST_STDOUT));
+        FileInputStream stdErrStream = new FileInputStream(new File(RUN_TEST_STDERR));
+        
+        List<String> outputStreamContent = Util.getInputStreamContent(stdOutStream);
+        List<String> errorStreamContent = Util.getInputStreamContent(stdErrStream);
         
         Compilable compilable = buildSuccessful(outputStreamContent, errorStreamContent);
         TestResult testResult = null;

@@ -13,9 +13,7 @@ import java.util.List;
 
 
 /**
- * JodatimeBuildStrateygy is a concrete subclass of AntBuildStrategy. 
- * 
- * For joda-time project.
+ * JodatimeBuildStrateygy is for joda-time project.
  */
 public class JodatimeBuildStrateygy extends AntBuildStrategy {
 
