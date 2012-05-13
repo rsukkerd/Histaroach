@@ -1,19 +1,20 @@
 package histaroach;
 
+import histaroach.algorithm.MixedRevisionAnalysis;
+import histaroach.algorithm.MixedRevisionGenerator;
 import histaroach.buildstrategy.IBuildStrategy;
 import histaroach.buildstrategy.JodatimeBuildStrateygy;
 import histaroach.buildstrategy.VoldemortBuildStrategy;
+import histaroach.model.Flip;
 import histaroach.model.GitRepository;
 import histaroach.model.HistoryGraph;
-import histaroach.model.MixedRevisionTemplate;
-import histaroach.model.MixedRevisionTemplatesGenerator;
-import histaroach.model.MixedRevisionsGenerator;
 import histaroach.model.IRepository;
+import histaroach.model.MixedRevision;
 import histaroach.util.HistoryGraphXMLReader;
-import histaroach.util.Util;
 
 import java.io.File;
 import java.util.List;
+import java.util.Set;
 
 import plume.Option;
 import plume.OptionGroup;
@@ -43,6 +44,13 @@ public class TestIsolationDataReader {
     @Option(value = "-x HistoryGraph xml file", 
     		aliases = { "-hGraphXML" })
     public static String hGraphXML = null;
+    
+    /**
+     * MixedRevision output file.
+     */
+    @Option(value = "-m MixedRevision output file", 
+    		aliases = { "-mixedRevisionOutput" })
+    public static String mixedRevisionOutput = null;
     
     /**
      * Start index of MixedRevision to begin analysis.
@@ -99,53 +107,39 @@ public class TestIsolationDataReader {
 	        return;
 	    }
 	    
-	    if (numMixedRevisions > 0) {
-	    	
-	    	if (projName == null || repoPath == null || clonedRepoPath == null) {
-		    	plumeOptions.print_usage();
-		    	return;
-		    }
-	    	
-	    	File repoDir = new File(repoPath);
-		    File clonedRepoDir = new File(clonedRepoPath);
-		    
-		    IBuildStrategy buildStrategy = null;
-	        IBuildStrategy clonedBuildStrategy = null;
-	        
-	        if (projName.equals(TestIsolationDataGenerator.VOLDEMORT)) {
-	        	buildStrategy = new VoldemortBuildStrategy(repoDir, buildCommand);
-	        	clonedBuildStrategy = new VoldemortBuildStrategy(clonedRepoDir, buildCommand);
-	        } else if (projName.equals(TestIsolationDataGenerator.JODA_TIME)) {
-	        	buildStrategy = new JodatimeBuildStrateygy(repoDir, buildCommand);
-	        	clonedBuildStrategy = new JodatimeBuildStrateygy(clonedRepoDir, buildCommand);
-	        }
-	        
-	        assert buildStrategy != null && clonedBuildStrategy != null;
-	        
-	        IRepository repository = new GitRepository(repoDir, buildStrategy);
-	        IRepository clonedRepository = new GitRepository(clonedRepoDir, clonedBuildStrategy);
-		    
-	    	List<MixedRevisionTemplate> mixedRevisionTemplates = Util.readMixedRevisionTemplates();
-	    	
-	    	MixedRevisionsGenerator generator = 
-	    		new MixedRevisionsGenerator(mixedRevisionTemplates, repository, clonedRepository);
-	    	
-	    	generator.constructSimpleMixedRevisions(startIndex, numMixedRevisions);
-	    } else {
-	    	
-	    	if (hGraphXML == null) {
-		    	plumeOptions.print_usage();
-		    	return;
-		    }
-	    	
-	    	HistoryGraphXMLReader reader = new HistoryGraphXMLReader(new File(hGraphXML));
-		    HistoryGraph historyGraph = reader.reconstructHistoryGraph();
-		    
-		    MixedRevisionTemplatesGenerator templatesGenerator = 
-		    	new MixedRevisionTemplatesGenerator(historyGraph);
-		    
-		    templatesGenerator.generateMixedRevisionTemplates();
-		    templatesGenerator.writeOutMixedRevisionTemplates();
+	    if (projName == null || repoPath == null || clonedRepoPath == null || 
+	    		hGraphXML == null) {
+	    	plumeOptions.print_usage();
+	    	return;
 	    }
+	    
+    	File repoDir = new File(repoPath);
+	    File clonedRepoDir = new File(clonedRepoPath);
+	    
+	    IBuildStrategy buildStrategy = null;
+        IBuildStrategy clonedBuildStrategy = null;
+        
+        if (projName.equals(TestIsolationDataGenerator.VOLDEMORT)) {
+        	buildStrategy = new VoldemortBuildStrategy(repoDir, buildCommand);
+        	clonedBuildStrategy = new VoldemortBuildStrategy(clonedRepoDir, buildCommand);
+        } else if (projName.equals(TestIsolationDataGenerator.JODA_TIME)) {
+        	buildStrategy = new JodatimeBuildStrateygy(repoDir, buildCommand);
+        	clonedBuildStrategy = new JodatimeBuildStrateygy(clonedRepoDir, buildCommand);
+        }
+        
+        assert buildStrategy != null && clonedBuildStrategy != null;
+        
+        IRepository repository = new GitRepository(repoDir, buildStrategy);
+        IRepository clonedRepository = new GitRepository(clonedRepoDir, clonedBuildStrategy);
+        
+        HistoryGraphXMLReader reader = new HistoryGraphXMLReader(new File(hGraphXML));
+	    HistoryGraph historyGraph = reader.reconstructHistoryGraph();
+    	Set<Flip> flips = historyGraph.getAllFlips();
+    	
+    	MixedRevisionGenerator generator = new MixedRevisionGenerator(repository, clonedRepository);
+    	List<MixedRevision> mixedRevisions = generator.generateMixedRevisionsFromFlips(flips);
+    	
+    	MixedRevisionAnalysis analysis = new MixedRevisionAnalysis(mixedRevisions);
+    	analysis.runTestOnMixedRevisions(startIndex, numMixedRevisions, mixedRevisionOutput);
 	}
 }
