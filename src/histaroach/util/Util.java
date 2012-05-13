@@ -1,8 +1,5 @@
 package histaroach.util;
 
-import histaroach.model.MixedRevisionTemplate;
-import histaroach.model.MixedRevisionTemplatesGenerator;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -13,11 +10,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.xeustechnologies.jtar.TarEntry;
 import org.xeustechnologies.jtar.TarInputStream;
 
@@ -70,43 +66,6 @@ public class Util {
     }
     
     /**
-     * Writes an object to a serialized output file.
-     */
-    public static void writeToSerializedFile(String fileName, Object object) {
-    	ObjectOutputStream output;
-    	
-    	try {
-			output = new ObjectOutputStream(new FileOutputStream(fileName));
-			output.writeObject(object);
-			output.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-    }
-    
-    public static List<MixedRevisionTemplate> readMixedRevisionTemplates() {
-    	List<MixedRevisionTemplate> object = null;
-    	ObjectInputStream input;
-    	
-    	try {
-			input = new ObjectInputStream(new FileInputStream(
-					MixedRevisionTemplatesGenerator.MIXED_REVISION_TEMPLATES_FILE));
-			object = (List<MixedRevisionTemplate>) input.readObject();
-			input.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		
-		return object;
-    }
-    
-    /**
      * Untars a repoTarFile and put its entries in repoDir.
      * 
      * @throws FileNotFoundException
@@ -144,5 +103,31 @@ public class Util {
 		}
 		
 		tis.close();
+	}
+
+	/**
+	 * Copies a file from source directory to destination directory.
+	 * 
+	 * @modifies file system
+	 * @throws IOException
+	 */
+	public static void copyFile(String filename, File srcDir, File destDir) throws IOException {
+	    File srcFile = new File(srcDir.getAbsolutePath() + File.separatorChar 
+	            + filename);
+	    File destFile = new File(destDir.getAbsolutePath() + File.separatorChar 
+	    		+ filename);
+	    FileUtils.copyFile(srcFile, destFile);
+	}
+
+	/**
+	 * Deletes a file from directory.
+	 * 
+	 * @modifies file system
+	 * @throws IOException 
+	 */
+	public static void deleteFile(String filename, File dir) throws IOException {
+	    File file = new File(dir.getAbsolutePath() + File.separatorChar
+	            + filename);
+		FileUtils.forceDelete(file);
 	}
 }

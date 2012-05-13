@@ -105,7 +105,9 @@ public class MixedRevisionTest {
 		Util.untar(TAR_FILE_CLONE, DEST_PATH);
 		
 		MixedRevision mr = new MixedRevision(REVISION_2, REPOSITORY, REPOSITORY_CLONE);
-		mr.revertFiles(COMBINATION, REVISION_1);
+		mr.setRevertedFiles(COMBINATION, REVISION_1);
+		mr.checkoutBaseRevision();
+		mr.revertFiles();
 		
 		checkFile(FILE_1, FILE_1_REVISION_1);
 		assertTrue(FILENAME_2 + " does not exist", FILE_2.exists());
@@ -122,11 +124,11 @@ public class MixedRevisionTest {
 	}
 
 	/**
-	 * Helper method 
-	 * Check if the file exists and contains the content
+	 * Checks if the file exists and contains the content.
+	 * 
 	 * @throws IOException 
 	 */
-	public void checkFile(File file, String content) throws IOException {
+	private void checkFile(File file, String content) throws IOException {
 		assertTrue(file.getName() + " does not exist", file.exists());
 		
 		BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -232,14 +234,21 @@ public class MixedRevisionTest {
 		checkTestResult(COMBINATION_3, Compilable.YES, COMBINATION_3_TEST_RESULT);
 	}
 	
-	public void checkTestResult(Set<DiffFile> combination, Compilable expectedCompilable, 
+	/**
+	 * Checks if the test result after reverting files is as expected.
+	 * 
+	 * @throws Exception
+	 */
+	private void checkTestResult(Set<DiffFile> combination, Compilable expectedCompilable, 
 			TestResult expectedTestResult) throws Exception {
 		Util.untar(PRJ_TAR_FILE, DEST_PATH);
 		Util.untar(PRJ_TAR_FILE_CLONE, DEST_PATH);
 		
 		MixedRevision mr = new MixedRevision(PRJ_REVISION_2, PRJ_REPOSITORY, PRJ_REPOSITORY_CLONE);
 		
-		mr.revertFiles(combination, PRJ_REVISION_1);
+		mr.setRevertedFiles(combination, PRJ_REVISION_1);
+		mr.checkoutBaseRevision();
+		mr.revertFiles();
 		mr.runTest();
 			
 		assertTrue(mr.isCompilable() == expectedCompilable);
