@@ -1,4 +1,4 @@
-package histaroach.util;
+package histaroach.algorithm;
 
 import java.math.BigInteger;
 
