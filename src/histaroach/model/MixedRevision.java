@@ -4,38 +4,33 @@ import histaroach.buildstrategy.IBuildStrategy;
 import histaroach.model.DiffFile.DiffType;
 import histaroach.model.Revision.Compilable;
 import histaroach.util.Pair;
+import histaroach.util.Util;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.io.FileUtils;
 
 
 /**
  * MixedRevision represents a hypothetical Revision. 
- * It contains a baseRevision, a set of reverted 
- * files and Revisions they are reverted to. 
+ * It is a Revision that has some of its files reverted 
+ * to their former states in some Revisions in the past. 
  * 
- * MixedRevision contains the following public methods: 
- *  - revertFiles(diffFiles, otherRevision): reverts 
- *    diffFiles in baseRevision to their former states 
- *    in otherRevision 
- *  - runTest(): compiles this MixedRevision, runs tests, 
- *    and parses the test results 
- *  - export(): exports this MixedRevision 
- *  - restoreBaseRevision(diffFile): restores a diffFile 
- *    in baseRevision to its original state 
- *  - restoreBaseRevision(): restores all diffFiles 
- *    in baseRevision to their original states 
- *  - getBaseRevision(): returns baseRevision 
- *  - isCompilable(): returns a Compilable state 
- *  - getTestResult(): returns a TestResult 
- *  - getRevertedFiles(): returns all reverted files 
- *    and Revisions they are reverted to.
+ * MixedRevision keeps track of what Revisions their 
+ * reverted files are reverted to. 
+ * 
+ * The public methods must be called in this order:  
+ *  1. setRevertedFiles(diffFiles, otherRevision) and 
+ *     checkoutBaseRevision() 
+ *     (Note: setRevertedFiles can be called multiple times) 
+ *  2. revertFiles() 
+ *  3. runTest() 
+ *  4. makeCopy() or other get methods 
+ *  5. restoreBaseRevision(). 
+ *  
+ * To run tests on a different file mixture of the same baseRevision, 
+ * repeat steps 1-5 without calling checkoutBaseRevision().
  */
 public class MixedRevision {
     private final Revision baseRevision;
@@ -46,16 +41,16 @@ public class MixedRevision {
     
     private Compilable compilable;
     private TestResult testResult;
-    private Map<DiffFile, Revision> revertedFiles;
-
+    // map: a set of reverted files -> a Revision they are reverted to
+    private Map<Set<DiffFile>, Revision> revertedFileRecords;
+    
     /**
-     * Create a MixedRevision.
+     * Create an empty MixedRevision.
      * 
      * @requires baseRevision is compilable.
-     * @throws Exception 
      */
-    public MixedRevision(Revision baseRevision, IRepository repository, IRepository clonedRepository) 
-    		throws Exception {
+    public MixedRevision(Revision baseRevision, IRepository repository, 
+    		IRepository clonedRepository) {
         this.baseRevision = baseRevision;
         this.repository = repository;
         this.clonedRepository = clonedRepository;
@@ -65,44 +60,68 @@ public class MixedRevision {
         
         compilable = Compilable.UNKNOWN;
         testResult = null;
-        revertedFiles = new HashMap<DiffFile, Revision>();
-        
-        boolean checkoutCommitSuccessful = repository.checkoutCommit(baseRevision.getCommitID());
-        if (!checkoutCommitSuccessful) {
-        	throw new Exception("check out base commit " + baseRevision.getCommitID() + " unsuccessful");
-        }
+        revertedFileRecords = new HashMap<Set<DiffFile>, Revision>();        
     }
     
     /**
-     * Reverts diffFiles in baseRevision to their former states 
-     * in otherRevision.
-     * 
-     * @requires otherRevision is compilable.
-     * @modifies this, file system
-     * @throws Exception 
+	 * Specifies diffFiles in baseRevision to be reverted 
+	 * to their former states in otherRevision.
+	 * 
+	 * @requires otherRevision is compilable.
+	 * @modifies this
      */
-    public void revertFiles(Set<DiffFile> diffFiles, Revision otherRevision) throws Exception {
-    	boolean checkoutCommitSuccessful = clonedRepository.checkoutCommit(otherRevision.getCommitID());
-    	
-    	if (checkoutCommitSuccessful) {
+    public void setRevertedFiles(Set<DiffFile> diffFiles, Revision otherRevision) {
+		revertedFileRecords.put(diffFiles, otherRevision);
+    }
+    
+    /**
+	 * Checks out the baseRevision into the working directory.
+	 * 
+	 * @throws Exception
+	 */
+	public void checkoutBaseRevision() throws Exception {
+		boolean checkoutCommitSuccessful = repository.checkoutCommit(baseRevision.getCommitID());
+		
+	    if (!checkoutCommitSuccessful) {
+	    	throw new Exception("check out base commit " + baseRevision.getCommitID() + " unsuccessful");
+	    }
+	}
+
+	/**
+	 * Reverts all diffFiles from all calls to 
+	 * setRevertedFiles(diffFiles, otherRevision).
+	 * 
+	 * @modifies file system
+	 * @throws Exception 
+	 */
+	public void revertFiles() throws Exception {
+		
+		for (Map.Entry<Set<DiffFile>, Revision> entry : revertedFileRecords.entrySet()) {
+			Set<DiffFile> diffFiles = entry.getKey();
+			Revision otherRevision = entry.getValue();
+			
+			boolean checkoutCommitSuccessful = clonedRepository.checkoutCommit(
+					otherRevision.getCommitID());
+	    	
+	    	if (!checkoutCommitSuccessful) {
+	    		throw new Exception("check out other commit " 
+	    				+ otherRevision.getCommitID() + " unsuccessful");
+	    	}
+	    	
 	    	for (DiffFile diffFile : diffFiles) {
 	    		String filename = diffFile.getFileName();
 	    		DiffType type = diffFile.getDiffType();
 	    		
 	    		if (type == DiffType.MODIFIED || type == DiffType.DELETED) {
-	    			copyFile(filename, clonedRepoDir, repoDir);
+	    			Util.copyFile(filename, clonedRepoDir, repoDir);
 	    		} else {
-	    			deleteFile(filename, repoDir);
-	    		}
-	    		
-	    		revertedFiles.put(diffFile, otherRevision);
+	    			Util.deleteFile(filename, repoDir);
+	    		}        		
 	    	}
-    	} else {
-    		throw new Exception("check out other commit " + otherRevision.getCommitID() + " unsuccessful");
-    	}
-    }
+		}
+	}
 
-    /**
+	/**
 	 * Compiles this MixedRevision, runs tests, and 
 	 * parses the test results.
 	 * 
@@ -118,12 +137,12 @@ public class MixedRevision {
 	}
 
 	/**
-     * Exports this MixedRevision.
+     * Makes a copy of this MixedRevision.
      * 
-     * @return a deep copy of the current states of this MixedRevision.
+     * @return a deep copy of this MixedRevision.
      * @throws Exception 
      */
-    public MixedRevision export() throws Exception {
+    public MixedRevision makeCopy() throws Exception {
     	MixedRevision copy = new MixedRevision(baseRevision, repository, clonedRepository);
     	copy.compilable = compilable;
     	
@@ -135,118 +154,62 @@ public class MixedRevision {
     		copy.testResult = new TestResult(allTests, failedTests);
     	}
     	
-    	copy.revertedFiles = new HashMap<DiffFile, Revision>();
-    	for (DiffFile diffFile : revertedFiles.keySet()) {
-    		Revision otherRevision = revertedFiles.get(diffFile);
-    		copy.revertedFiles.put(diffFile, otherRevision);
+    	copy.revertedFileRecords = new HashMap<Set<DiffFile>, Revision>();
+    	
+    	for (Map.Entry<Set<DiffFile>, Revision> entry : revertedFileRecords.entrySet()) {
+    		copy.revertedFileRecords.put(entry.getKey(), entry.getValue());
     	}
     	
     	return copy;
     }
     
     /**
-     * Restores a diffFile in baseRevision to its original state.
-     * 
-     * @modifies this, file system
-     * @throws Exception 
-     */
-    public void restoreBaseRevision(DiffFile diffFile) throws Exception {
-    	String filename = diffFile.getFileName();
-    	DiffType type = diffFile.getDiffType();
-    	
-    	if (type == DiffType.MODIFIED || type == DiffType.ADDED) {
-    		boolean restoreFileSuccessful = repository.discardFileChange(filename);
-    		
-    		if (!restoreFileSuccessful) {
-    			throw new Exception("restore file unsuccessful");
-    		}
-    	} else {
-    		deleteFile(filename, repoDir);
-    	}
-    	
-    	revertedFiles.remove(diffFile);
-    	compilable = Compilable.UNKNOWN;
-    	testResult = null;
-    }
-    
-    /**
-     * Restores all diffFiles in baseRevision to their original states.
+     * Restores all reverted diffFiles in baseRevision to 
+     * their original states. Clears Compilable and 
+     * TestResult data.
      * 
      * @modifies this, file system
      * @throws Exception 
      */
     public void restoreBaseRevision() throws Exception {
-    	Set<DiffFile> revertedDiffFiles = new HashSet<DiffFile>();
     	
-    	for (DiffFile diffFile : revertedFiles.keySet()) {
-    		revertedDiffFiles.add(diffFile);
+    	for (Set<DiffFile> revertedFiles : revertedFileRecords.keySet()) {
+    		
+    		for (DiffFile revertedFile : revertedFiles) {
+    			String filename = revertedFile.getFileName();
+    	    	DiffType type = revertedFile.getDiffType();
+    	    	
+    	    	if (type == DiffType.MODIFIED || type == DiffType.ADDED) {
+    	    		boolean restoreFileSuccessful = repository.discardFileChange(filename);
+    	    		
+    	    		if (!restoreFileSuccessful) {
+    	    			throw new Exception("restore file unsuccessful");
+    	    		}
+    	    	} else {
+    	    		Util.deleteFile(filename, repoDir);
+    	    	}
+    		}
     	}
     	
-    	for (DiffFile diffFile : revertedDiffFiles) {
-    		restoreBaseRevision(diffFile);
-    	}
+    	revertedFileRecords = new HashMap<Set<DiffFile>, Revision>();
+    	compilable = Compilable.UNKNOWN;
+    	testResult = null;
     }
     
-    /**
-     * Returns baseRevision.
-     * 
-     * @return baseRevision of this MixedRevision
-     */
     public Revision getBaseRevision() {
     	return baseRevision;
     }
-
-    /**
-     * Returns a Compilable state.
-     * 
-     * @return a current Compilable state of this MixedRevision.
-     */
+    
     public Compilable isCompilable() {
         return compilable;
     }
-
-    /**
-     * Returns a TestResult.
-     * 
-     * @return a current TestResult of this MixedRevision.
-     */
+    
     public TestResult getTestResult() {
         return testResult;
     }
     
-    /**
-     * Returns all reverted files and Revisions they are reverted to.
-     * 
-     * @return all reverted files and Revisions they are reverted to.
-     */
-    public Map<DiffFile, Revision> getRevertedFiles() {
-    	return revertedFiles;
-    }
-
-    /**
-     * Copies a file from source directory to destination directory.
-     * 
-     * @modifies file system
-     * @throws IOException
-     */
-    private void copyFile(String filename, File srcDir, File destDir) throws IOException {
-        File srcFile = new File(srcDir.getAbsolutePath() + File.separatorChar 
-                + filename);
-        File destFile = new File(destDir.getAbsolutePath() + File.separatorChar 
-        		+ filename);
-        FileUtils.copyFile(srcFile, destFile);
-    }
-
-    /**
-     * Deletes a file from directory.
-     * 
-     * @modifies file system
-     * @throws IOException 
-     */
-    private void deleteFile(String filename, File dir) throws IOException {
-        File file = new File(dir.getAbsolutePath() + File.separatorChar
-                + filename);
-		FileUtils.forceDelete(file);
+    public Map<Set<DiffFile>, Revision> getRevertedFileRecords() {
+    	return revertedFileRecords;
     }
     
     @Override
@@ -260,13 +223,14 @@ public class MixedRevision {
 		return baseRevision.equals(mr.baseRevision) && compilable == mr.compilable 
 				&& ((testResult == null && mr.testResult == null) || 
 						(testResult != null && testResult.equals(mr.testResult)))
-				&& revertedFiles.equals(mr.revertedFiles);
+				&& revertedFileRecords.equals(mr.revertedFileRecords);
 	}
 
 	@Override
 	public int hashCode() {
 		int hashCode = 11 * baseRevision.hashCode() + 13 * compilable.hashCode() 
-						+ 17 * revertedFiles.hashCode();
+						+ 17 * revertedFileRecords.hashCode();
+		
 		if (testResult != null) {
 			hashCode += 19 * testResult.hashCode();
 		}
@@ -277,15 +241,14 @@ public class MixedRevision {
 	@Override
     public String toString() {
         String str = "Base: " + baseRevision.getCommitID() + "\n";
-        if (!revertedFiles.isEmpty()) {
-	        str += "Reverted Files:\n";
-	        
-	    	for (DiffFile diffFile : revertedFiles.keySet()) {
-	    		str += diffFile.toString() + "\n";
-	    		
-	    		Revision otherRevision = revertedFiles.get(diffFile);
-	    		str += "To: " + otherRevision.getCommitID() + "\n";
-	    	}
+        
+        for (Set<DiffFile> diffFiles : revertedFileRecords.keySet()) {
+        	Revision otherRevision = revertedFileRecords.get(diffFiles);
+        	str += "Files reverted to " + otherRevision.getCommitID() + ":\n";
+        	
+        	for (DiffFile diffFile : diffFiles) {
+        		str += diffFile.toString() + "\n";
+        	}
         }
         
         str += "Compilable: " + compilable + "\n";
