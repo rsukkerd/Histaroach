@@ -26,7 +26,8 @@ public class GitRepository implements IRepository, Serializable {
 	 */
 	private static final long serialVersionUID = -3708734056581889395L;
 
-	private static final String[] LOG_COMMAND = { "git", "log", "--pretty=format:%h %p" };
+	private static final String[] LOG_COMMAND = 
+		{ "git", "log", "--pretty=format:%h %p", "--date-order" };
 
 	private final File directory;
 	private final IBuildStrategy buildStrategy;
