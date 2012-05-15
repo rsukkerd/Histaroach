@@ -34,9 +34,9 @@ public abstract class AntBuildStrategy implements IBuildStrategy, Serializable {
 	private static final String BUILD_SUCCESSFUL_PATTERN = "BUILD SUCCESSFUL";
 	private static final String BUILD_FAILED_PATTERN = "BUILD FAILED";
 	
-	private static final String RUN_TEST_SH_CMD = "./run_test.sh";
-	private static final String RUN_TEST_STDOUT = "output/run_test_stdout";
-	private static final String RUN_TEST_STDERR = "output/run_test_stderr";
+	private static final String RUN_COMMAND_SH = "./run_command.sh";
+	private static final String RUN_COMMAND_STDOUT = "output/run_command_stdout";
+	private static final String RUN_COMMAND_STDERR = "output/run_command_stderr";
 	
 	private final File directory;
 	private final String buildCommand;
@@ -44,6 +44,12 @@ public abstract class AntBuildStrategy implements IBuildStrategy, Serializable {
 	
 	/**
 	 * Creates an AntBuildStrategy.
+	 * 
+	 * @param antCommand - command to run ant.
+	 * @param buildTargetName - name of the target(s) to compile source files 
+	 *        and test files. If there are multiple targets, each target is 
+	 *        separated by a single space.
+	 * @param testTargetName - name of the target to run test.
 	 */
 	protected AntBuildStrategy(File directory, String antCommand, 
 			String buildTargetName, String testTargetName) {
@@ -98,16 +104,16 @@ public abstract class AntBuildStrategy implements IBuildStrategy, Serializable {
 			throws IOException, InterruptedException {
     	File workingDir = new File(System.getProperty("user.dir"));
     	    	
-    	String outputStream = workingDir.getPath() + File.separatorChar + RUN_TEST_STDOUT;
-    	String errorStream = workingDir.getPath() + File.separatorChar + RUN_TEST_STDERR;
+    	String outputStream = workingDir.getPath() + File.separatorChar + RUN_COMMAND_STDOUT;
+    	String errorStream = workingDir.getPath() + File.separatorChar + RUN_COMMAND_STDERR;
     	
-    	String[] runScriptCommand = new String[] { RUN_TEST_SH_CMD, directory.getPath(), 
+    	String[] runScriptCommand = new String[] { RUN_COMMAND_SH, directory.getPath(), 
     			command, outputStream, errorStream, };
     	    	
         Util.runProcess(runScriptCommand, workingDir);
         
-        FileInputStream stdOutStream = new FileInputStream(new File(RUN_TEST_STDOUT));
-        FileInputStream stdErrStream = new FileInputStream(new File(RUN_TEST_STDERR));
+        FileInputStream stdOutStream = new FileInputStream(new File(RUN_COMMAND_STDOUT));
+        FileInputStream stdErrStream = new FileInputStream(new File(RUN_COMMAND_STDERR));
         
         List<String> outputStreamContent = Util.getInputStreamContent(stdOutStream);
         List<String> errorStreamContent = Util.getInputStreamContent(stdErrStream);
