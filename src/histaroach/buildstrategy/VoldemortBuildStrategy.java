@@ -22,13 +22,15 @@ public class VoldemortBuildStrategy extends AntBuildStrategy {
 	
 	private static final String TEST_PATTERN = "\\s*\\[junit\\] Running (\\S+)";
 	private static final String FAILED_TEST_PATTERN = "\\s*\\[junit\\] Test (\\S+) FAILED";
-	private static final String TEST_COMMAND = "junit";
+	
+	private static final String BUILD_TARGET_NAME = "build buildtest";
+	private static final String TEST_TARGET_NAME = "junit";
 	
 	/**
 	 * Creates a VoldemortBuildStrategy.
 	 */
 	public VoldemortBuildStrategy(File directory, String antCommand) {
-		super(directory, antCommand, TEST_COMMAND);
+		super(directory, antCommand, BUILD_TARGET_NAME, TEST_TARGET_NAME);
 	}
 
 	@Override

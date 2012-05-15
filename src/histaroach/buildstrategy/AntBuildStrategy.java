@@ -7,6 +7,7 @@ import histaroach.util.Util;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -38,81 +39,25 @@ public abstract class AntBuildStrategy implements IBuildStrategy, Serializable {
 	private static final String RUN_TEST_STDERR = "output/run_test_stderr";
 	
 	private final File directory;
-	private final String antTestCmdStr;
-	private final String[] antTestCmdArr;
+	private final String buildCommand;
+	private final String testCommand;
 	
 	/**
 	 * Creates an AntBuildStrategy.
 	 */
-	protected AntBuildStrategy(File directory, String antCommand, String testCommand) {
+	protected AntBuildStrategy(File directory, String antCommand, 
+			String buildTargetName, String testTargetName) {
 		this.directory = directory;
-		antTestCmdStr = antCommand + Util.SINGLE_SPACE_CHAR + testCommand;
-		antTestCmdArr = antTestCmdStr.split(Util.SINGLE_SPACE_CHAR);
+		this.buildCommand = antCommand + Util.SINGLE_SPACE_CHAR + buildTargetName;
+		this.testCommand = antCommand + Util.SINGLE_SPACE_CHAR + testTargetName;
 	}
 	
 	@Override
-	public Pair<Compilable, TestResult> runTest() throws Exception {
-		Process runTestProcess = Util.runProcess(antTestCmdArr, directory);
-        
-        List<String> outputStreamContent = Util.getInputStreamContent(
-        		runTestProcess.getInputStream());
-        List<String> errorStreamContent = Util.getInputStreamContent(
-        		runTestProcess.getErrorStream());
-
-        Compilable compilable = buildSuccessful(outputStreamContent, errorStreamContent);
-        TestResult testResult = null;
-        
-        if (compilable == Compilable.YES) {
-            testResult = getTestResult(outputStreamContent, errorStreamContent);
-        }
-
-        return new Pair<Compilable, TestResult>(compilable, testResult);
-	}
-
-	@Override
-	public Pair<Compilable, TestResult> runTestViaShellScript() throws Exception {
-		String workingDir = System.getProperty("user.dir");
-    	File dir = new File(workingDir);
-    	
-    	String outputStream = workingDir + File.separatorChar + RUN_TEST_STDOUT;
-    	String errorStream = workingDir + File.separatorChar + RUN_TEST_STDERR;
-    	
-    	String[] command = new String[] { RUN_TEST_SH_CMD, directory.getPath(), 
-    			antTestCmdStr, outputStream, errorStream, };
-    	    	
-        Util.runProcess(command, dir);
-        
-        FileInputStream stdOutStream = new FileInputStream(new File(RUN_TEST_STDOUT));
-        FileInputStream stdErrStream = new FileInputStream(new File(RUN_TEST_STDERR));
-        
-        List<String> outputStreamContent = Util.getInputStreamContent(stdOutStream);
-        List<String> errorStreamContent = Util.getInputStreamContent(stdErrStream);
-        
-        Compilable compilable = buildSuccessful(outputStreamContent, errorStreamContent);
-        TestResult testResult = null;
-        
-        if (compilable == Compilable.YES) {
-            testResult = getTestResult(outputStreamContent, errorStreamContent);
-        }
-        
-        return new Pair<Compilable, TestResult>(compilable, testResult);
-	}
-	
-	/**
-	 * Parses test results from output and error streams 
-	 * and returns a TestResult.
-	 * 
-	 * @return a TestResult.
-	 */
-	protected abstract TestResult getTestResult(List<String> outputStreamContent, 
-			List<String> errorStreamContent);
-
-	/**
-     * @return YES if build successful, NO if build failed, 
-     *         and NO_BUILD_FILE if there is no build file.
-     */
-	private Compilable buildSuccessful(List<String> outputStreamContent,
-			List<String> errorStreamContent) {
+	public Compilable build() throws IOException, InterruptedException {
+		Pair<List<String>, List<String>> result = run(buildCommand);
+		List<String> outputStreamContent = result.getFirst();
+		List<String> errorStreamContent = result.getSecond();
+		
 		Pattern buildSuccessfulPattern = Pattern.compile(BUILD_SUCCESSFUL_PATTERN);
 	    Pattern buildFailedPattern = Pattern.compile(BUILD_FAILED_PATTERN);
 	
@@ -130,8 +75,55 @@ public abstract class AntBuildStrategy implements IBuildStrategy, Serializable {
 	        }
 	    }
 	
-	    return Compilable.NO_BUILD_FILE;
+	    return Compilable.NO_BUILD_FILE;		
 	}
+	
+	@Override
+	public TestResult runTest() throws IOException, InterruptedException {
+		Pair<List<String>, List<String>> result = run(testCommand);
+		List<String> outputStreamContent = result.getFirst();
+		List<String> errorStreamContent = result.getSecond();
+		
+		return getTestResult(outputStreamContent, errorStreamContent);
+	}
+	
+	/**
+	 * Runs the command.
+	 * 
+	 * @return outputStreamContent and errorStreamContent of the command.
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	private Pair<List<String>, List<String>> run(String command) 
+			throws IOException, InterruptedException {
+    	File workingDir = new File(System.getProperty("user.dir"));
+    	    	
+    	String outputStream = workingDir.getPath() + File.separatorChar + RUN_TEST_STDOUT;
+    	String errorStream = workingDir.getPath() + File.separatorChar + RUN_TEST_STDERR;
+    	
+    	String[] runScriptCommand = new String[] { RUN_TEST_SH_CMD, directory.getPath(), 
+    			command, outputStream, errorStream, };
+    	    	
+        Util.runProcess(runScriptCommand, workingDir);
+        
+        FileInputStream stdOutStream = new FileInputStream(new File(RUN_TEST_STDOUT));
+        FileInputStream stdErrStream = new FileInputStream(new File(RUN_TEST_STDERR));
+        
+        List<String> outputStreamContent = Util.getInputStreamContent(stdOutStream);
+        List<String> errorStreamContent = Util.getInputStreamContent(stdErrStream);
+        
+        return new Pair<List<String>, List<String>>(outputStreamContent, 
+        		errorStreamContent);
+	}
+	
+	/**
+	 * Parses test results from output and error streams 
+	 * and returns a TestResult.
+	 * 
+	 * @return a TestResult.
+	 */
+	protected abstract TestResult getTestResult(List<String> outputStreamContent, 
+			List<String> errorStreamContent);
 
 	@Override
 	public boolean equals(Object other) {
@@ -142,12 +134,14 @@ public abstract class AntBuildStrategy implements IBuildStrategy, Serializable {
         AntBuildStrategy buildStrategy = (AntBuildStrategy) other;
         
         return directory.equals(buildStrategy.directory) 
-        		&& antTestCmdStr.equals(buildStrategy.antTestCmdStr);
+        		&& buildCommand.equals(buildStrategy.buildCommand) 
+        		&& testCommand.equals(buildStrategy.testCommand);
 	}
 	
 	@Override
 	public int hashCode() {
-		return 11 * directory.hashCode() + 13 * antTestCmdStr.hashCode();
+		return 11 * directory.hashCode() + 13 * buildCommand.hashCode() 
+			+ 17 * testCommand.hashCode();
 	}
 
 }

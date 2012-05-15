@@ -53,6 +53,10 @@ public class GitRepository implements IRepository, Serializable {
 	@Override
 	public boolean checkoutCommit(String commitID) throws IOException,
 			InterruptedException {
+		// discard changes in working directory before check out commit
+		Util.runProcess(
+				new String[] { "git", "checkout", "--", "./" }, directory);
+		
 		Process checkoutProcess = Util.runProcess(
                 new String[] { "git", "checkout", commitID }, directory);
         return checkoutProcess.exitValue() == 0;

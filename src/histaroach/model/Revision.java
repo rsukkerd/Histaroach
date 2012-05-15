@@ -1,7 +1,6 @@
 package histaroach.model;
 
 import histaroach.buildstrategy.IBuildStrategy;
-import histaroach.util.Pair;
 
 import java.io.Serializable;
 import java.util.List;
@@ -48,8 +47,8 @@ public class Revision implements Serializable {
      * 
      * @throws Exception 
      */
-    public Revision(IRepository repository, String commitID, Map<Revision, List<DiffFile>> parentToDiffFiles) 
-    		throws Exception {
+    public Revision(IRepository repository, String commitID, 
+    		Map<Revision, List<DiffFile>> parentToDiffFiles) throws Exception {
     	this.commitID = commitID;
     	this.parentToDiffFiles = parentToDiffFiles;
     	        
@@ -61,9 +60,13 @@ public class Revision implements Serializable {
         
     	IBuildStrategy buildStrategy = repository.getBuildStrategy();
     	
-    	Pair<Compilable, TestResult> result = buildStrategy.runTestViaShellScript();
-    	compilable = result.getFirst();
-		testResult = result.getSecond();
+    	compilable = buildStrategy.build();
+	    
+	    if (compilable == Compilable.YES) {
+	    	testResult = buildStrategy.runTest();
+	    } else {
+	    	testResult = null;
+	    }
     }
     
     /**

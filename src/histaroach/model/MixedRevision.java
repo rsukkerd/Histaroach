@@ -3,7 +3,6 @@ package histaroach.model;
 import histaroach.buildstrategy.IBuildStrategy;
 import histaroach.model.DiffFile.DiffType;
 import histaroach.model.Revision.Compilable;
-import histaroach.util.Pair;
 import histaroach.util.Util;
 
 import java.io.File;
@@ -130,10 +129,14 @@ public class MixedRevision {
 	 */
 	public void runTest() throws Exception {
 		IBuildStrategy buildStrategy = repository.getBuildStrategy();
-		// Pair<COMPILABLE, TestResult> pair = buildStrategy.runTest();
-		Pair<Compilable, TestResult> pair = buildStrategy.runTestViaShellScript();
-	    compilable = pair.getFirst();
-	    testResult = pair.getSecond();
+		
+	    compilable = buildStrategy.build();
+	    
+	    if (compilable == Compilable.YES) {
+	    	testResult = buildStrategy.runTest();
+	    } else {
+	    	testResult = null;
+	    }
 	}
 
 	/**

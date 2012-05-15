@@ -1,8 +1,9 @@
 package histaroach.buildstrategy;
 
+import java.io.IOException;
+
 import histaroach.model.TestResult;
 import histaroach.model.Revision.Compilable;
-import histaroach.util.Pair;
 
 
 /**
@@ -12,23 +13,21 @@ import histaroach.util.Pair;
 public interface IBuildStrategy {
 	
 	/**
-     * Compiles the project, runs tests, and 
-     * parses the test results.
-     * 
-     * @return a pair of Compilable state and TestResult.
-     * @throws Exception
-     */
-	public Pair<Compilable, TestResult> runTest() throws Exception;
+	 * Compiles source files and test files of the project.
+	 * 
+	 * @return a Compilable state.
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	public Compilable build() throws IOException, InterruptedException;
 	
 	/**
-     * Compiles the project, runs tests, and 
-     * parses the test results. 
+     * Runs tests and parses the test results.
      * 
-     * This method is an alternative of runTest().
-     * 
-     * @return a pair of Compilable state and TestResult.
-     * @throws Exception
+     * @return a TestResult.
+	 * @throws InterruptedException 
+	 * @throws IOException 
      */
-	public Pair<Compilable, TestResult> runTestViaShellScript() throws Exception;
+	public TestResult runTest() throws IOException, InterruptedException;
 
 }

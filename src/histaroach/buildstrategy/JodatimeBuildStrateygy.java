@@ -1,10 +1,6 @@
 package histaroach.buildstrategy;
 
-import histaroach.model.GitRepository;
-import histaroach.model.IRepository;
 import histaroach.model.TestResult;
-import histaroach.model.Revision.Compilable;
-import histaroach.util.Pair;
 import histaroach.util.Util;
 
 import java.io.File;
@@ -25,50 +21,25 @@ public class JodatimeBuildStrateygy extends AntBuildStrategy {
 	private static final String[] ENSURE_NO_HALT_ON_FAILURE = { "sed", "-i", "-e", 
 		"s/haltonfailure=\"yes\"/haltonfailure=\"no\"/", "build.xml" };
 	
-	private static final String ENSURE_EXCEPTION_MESSAGE = "ensure haltonfailure=\"no\" unsuccessful";
-	private static final String RESTORE_EXCEPTION_MESSAGE = "restore build.xml unsuccessful";
-	private static final String TEST_COMMAND = "test";
+	private static final String BUILD_TARGET_NAME = "compile.tests test.time";
+	private static final String TEST_TARGET_NAME = "test";
 	
 	private final File directory;
-	private final IRepository repository;
 	
 	/**
 	 * Creates a JodatimeBuildStrategy.
 	 */
 	public JodatimeBuildStrateygy(File directory, String antCommand) {
-		super(directory, antCommand, TEST_COMMAND);
+		super(directory, antCommand, BUILD_TARGET_NAME, TEST_TARGET_NAME);
+		
 		this.directory = directory;
-		repository = new GitRepository(directory, this);
 	}
 	
 	@Override
-	public Pair<Compilable, TestResult> runTest() throws Exception {
-		if (!ensureNoHaltOnFailure()) {
-			throw new Exception(ENSURE_EXCEPTION_MESSAGE);
-		}
-		
-		Pair<Compilable, TestResult> result = super.runTest();
-		
-		if (!restoreBuildFile()) {
-			throw new Exception(RESTORE_EXCEPTION_MESSAGE);
-		}
-		
-		return result;
-	}
-	
-	@Override
-	public Pair<Compilable, TestResult> runTestViaShellScript() throws Exception {
-		if (!ensureNoHaltOnFailure()) {
-			throw new Exception(ENSURE_EXCEPTION_MESSAGE);
-		}
-		
-		Pair<Compilable, TestResult> result = super.runTestViaShellScript();
-		
-		if (!restoreBuildFile()) {
-			throw new Exception(RESTORE_EXCEPTION_MESSAGE);
-		}
-		
-		return result;
+	public TestResult runTest() throws IOException, InterruptedException {
+		ensureNoHaltOnFailure();
+		TestResult testResult = super.runTest();
+		return testResult;
 	}
 	
 	@Override
@@ -87,22 +58,9 @@ public class JodatimeBuildStrateygy extends AntBuildStrategy {
 	 * @throws InterruptedException
 	 */
 	private boolean ensureNoHaltOnFailure() throws IOException, InterruptedException {
-		File builFile = new File(directory.getPath() + File.separatorChar + BUILD_XML);
-	
+		File buildFile = new File(directory.getPath() + File.separatorChar + BUILD_XML);
 		Process sedProcess = Util.runProcess(ENSURE_NO_HALT_ON_FAILURE, directory);
-		return !builFile.exists() || sedProcess.exitValue() == 0;
-	}
-	
-	/**
-	 * Restores build.xml after ensureNoHaltOnFailure().
-	 * 
-	 * @return true if the method successfully restored 
-	 *         build.xml.
-	 * @throws IOException
-	 * @throws InterruptedException
-	 */
-	private boolean restoreBuildFile() throws IOException, InterruptedException {
-		return repository.discardFileChange(BUILD_XML);
+		return !buildFile.exists() || sedProcess.exitValue() == 0;
 	}
 
 }
