@@ -5,7 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import histaroach.buildstrategy.IBuildStrategy;
-import histaroach.buildstrategy.VoldemortBuildStrategy;
+import histaroach.buildstrategy.MyBuildStrategy;
 import histaroach.model.DiffFile;
 import histaroach.model.GitRepository;
 import histaroach.model.MixedRevision;
@@ -48,8 +48,8 @@ public class MixedRevisionTest {
 	private static final File DIR = new File(PATHNAME);
 	private static final File DIR_CLONE = new File(PATHNAME_CLONE);
 	
-	private static final IBuildStrategy BUILD_STRATEGY = new VoldemortBuildStrategy(DIR, ANT_COMMAND);
-	private static final IBuildStrategy BUILD_STRATEGY_CLONE = new VoldemortBuildStrategy(DIR_CLONE, ANT_COMMAND);
+	private static final IBuildStrategy BUILD_STRATEGY = new MyBuildStrategy(DIR, ANT_COMMAND);
+	private static final IBuildStrategy BUILD_STRATEGY_CLONE = new MyBuildStrategy(DIR_CLONE, ANT_COMMAND);
 	
 	private static final IRepository REPOSITORY = new GitRepository(DIR, BUILD_STRATEGY);
 	private static final IRepository REPOSITORY_CLONE = new GitRepository(DIR_CLONE, BUILD_STRATEGY_CLONE);
@@ -150,9 +150,9 @@ public class MixedRevisionTest {
 	private static final File PRJ = new File(PRJ_PATHNAME);
 	private static final File PRJ_CLONE = new File(PRJ_PATHNAME_CLONE);
 	
-	private static final IBuildStrategy PRJ_BUILD_STRATEGY = new VoldemortBuildStrategy(
+	private static final IBuildStrategy PRJ_BUILD_STRATEGY = new MyBuildStrategy(
 			PRJ, ANT_COMMAND);
-	private static final IBuildStrategy PRJ_BUILD_STRATEGY_CLONE = new VoldemortBuildStrategy(
+	private static final IBuildStrategy PRJ_BUILD_STRATEGY_CLONE = new MyBuildStrategy(
 			PRJ_CLONE, ANT_COMMAND);
 	
 	private static final IRepository PRJ_REPOSITORY = new GitRepository(PRJ, PRJ_BUILD_STRATEGY);

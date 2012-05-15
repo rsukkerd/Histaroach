@@ -3,7 +3,7 @@ package histaroach.model;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import histaroach.buildstrategy.IBuildStrategy;
-import histaroach.buildstrategy.VoldemortBuildStrategy;
+import histaroach.buildstrategy.MyBuildStrategy;
 import histaroach.model.DiffFile.DiffType;
 import histaroach.model.Revision.Compilable;
 import histaroach.util.Util;
@@ -33,7 +33,7 @@ public class RepositoryBuildStrategyTest {
 	
 	private static final File PROJ_DIR = new File(PROJ);
 	
-	private static final IBuildStrategy PROJ_BUILD_STARTEGY = new VoldemortBuildStrategy(PROJ_DIR, 
+	private static final IBuildStrategy PROJ_BUILD_STARTEGY = new MyBuildStrategy(PROJ_DIR, 
 			ANT_COMMAND);
 	
 	private static final IRepository REPOSITORY_PROJ = new GitRepository(PROJ_DIR, PROJ_BUILD_STARTEGY);
