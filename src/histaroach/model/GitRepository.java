@@ -26,6 +26,7 @@ public class GitRepository implements IRepository, Serializable {
 	 */
 	private static final long serialVersionUID = -3708734056581889395L;
 
+	private static final int HASH_LENGTH = 7;
 	private static final String[] LOG_COMMAND = 
 		{ "git", "log", "--pretty=format:%h %p", "--date-order" };
 
@@ -105,13 +106,16 @@ public class GitRepository implements IRepository, Serializable {
 	@Override
 	public HistoryGraph buildHistoryGraph(String startCommitID, String endCommitID) 
 			throws Exception {
+		String shortStartCommitID = startCommitID.substring(0, HASH_LENGTH);
+		String shortEndCommitID = endCommitID.substring(0, HASH_LENGTH);
+		
 		HistoryGraph hGraph = new HistoryGraph();
 		
 		// check out startCommit, which will be the new HEAD
-		boolean checkoutCommitSuccessful = checkoutCommit(startCommitID);
+		boolean checkoutCommitSuccessful = checkoutCommit(shortStartCommitID);
 		
 		if (!checkoutCommitSuccessful) {
-			throw new Exception("git checkout commit " + startCommitID + " unsuccessful");
+			throw new Exception("git checkout commit " + shortStartCommitID + " unsuccessful");
 		}
 		
 		// "git log" shows HEAD's history
@@ -135,7 +139,7 @@ public class GitRepository implements IRepository, Serializable {
          * 
          * This graph will not be modified.
          */
-        Map<String, List<String>> commitIDToParentsIDs = getCommitIDToParentsIDs(lines, endCommitID);
+        Map<String, List<String>> commitIDToParentsIDs = getCommitIDToParentsIDs(lines, shortEndCommitID);
         
         /*
          * The parentEdgeCounter map maps a revision's commit id to a count 
