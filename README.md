@@ -26,8 +26,8 @@ For TestIsolationDataGenerator:
  * -p : Project name. Example: voldemort.
  * -r : Project repository path. Example: /Users/Name/Project/voldemort/
  * -b : Project build command. Example: ant
- * -s : Start commit ID (the latest commit in the range). Example: ea2c4f0
- * -e : End commit ID (the earliest commit in the range). Example: fbd0f95
+ * -s : Start commit ID (the latest commit in the range), at least 7-character long. Example: ea2c4f0
+ * -e : End commit ID (the earliest commit in the range), at least 7-character long. Example: fbd0f95
 
 
 Using the compiled utilities

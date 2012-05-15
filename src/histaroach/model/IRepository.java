@@ -50,6 +50,7 @@ public interface IRepository {
 	 * Builds a HistoryGraph containing Revisions from startCommit 
 	 * to endCommit.
 	 * 
+	 * @requires startCommitID and endCommitID are each at least 7-character long.
 	 * @return a HistoryGraph containing Revisions from startCommit 
 	 *         to endCommit.
 	 * @throws Exception
