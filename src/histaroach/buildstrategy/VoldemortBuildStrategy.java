@@ -1,5 +1,6 @@
 package histaroach.buildstrategy;
 
+import histaroach.model.DiffFile;
 import histaroach.model.TestResult;
 
 import java.io.File;
@@ -25,6 +26,8 @@ public class VoldemortBuildStrategy extends AntBuildStrategy {
 	
 	private static final String BUILD_TARGET_NAME = "build buildtest";
 	private static final String TEST_TARGET_NAME = "junit";
+	
+	private static final String TEST_FILE_SUFFIX = "Test.java";
 	
 	/**
 	 * Creates a VoldemortBuildStrategy.
@@ -59,6 +62,11 @@ public class VoldemortBuildStrategy extends AntBuildStrategy {
 		TestResult testResult = new TestResult(allTests, failedTests);
 		
 		return testResult;
+	}
+
+	@Override
+	public boolean isTestFile(DiffFile diffFile) {
+		return diffFile.getFileName().endsWith(TEST_FILE_SUFFIX);
 	}
 
 }

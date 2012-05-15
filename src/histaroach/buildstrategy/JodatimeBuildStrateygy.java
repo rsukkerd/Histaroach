@@ -1,5 +1,6 @@
 package histaroach.buildstrategy;
 
+import histaroach.model.DiffFile;
 import histaroach.model.TestResult;
 import histaroach.util.Util;
 
@@ -61,6 +62,12 @@ public class JodatimeBuildStrateygy extends AntBuildStrategy {
 		File buildFile = new File(directory.getPath() + File.separatorChar + BUILD_XML);
 		Process sedProcess = Util.runProcess(ENSURE_NO_HALT_ON_FAILURE, directory);
 		return !buildFile.exists() || sedProcess.exitValue() == 0;
+	}
+
+	@Override
+	public boolean isTestFile(DiffFile diffFile) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

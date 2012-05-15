@@ -1,5 +1,6 @@
 package histaroach.buildstrategy;
 
+import histaroach.model.DiffFile;
 import histaroach.model.TestResult;
 
 import java.io.File;
@@ -25,6 +26,8 @@ public class MyBuildStrategy extends AntBuildStrategy {
 	
 	private static final String BUILD_TARGET_NAME = "build";
 	private static final String TEST_TARGET_NAME = "junit";
+	
+	private static final String TEST_FILE_SUFFIX = "Test.java";
 	
 	public MyBuildStrategy(File directory, String antCommand) {
 		super(directory, antCommand, BUILD_TARGET_NAME, TEST_TARGET_NAME);
@@ -56,6 +59,11 @@ public class MyBuildStrategy extends AntBuildStrategy {
 		TestResult testResult = new TestResult(allTests, failedTests);
 		
 		return testResult;
+	}
+
+	@Override
+	public boolean isTestFile(DiffFile diffFile) {
+		return diffFile.getFileName().endsWith(TEST_FILE_SUFFIX);
 	}
 
 }

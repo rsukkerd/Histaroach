@@ -1,9 +1,10 @@
 package histaroach.buildstrategy;
 
-import java.io.IOException;
-
-import histaroach.model.TestResult;
+import histaroach.model.DiffFile;
 import histaroach.model.Revision.Compilable;
+import histaroach.model.TestResult;
+
+import java.io.IOException;
 
 
 /**
@@ -29,5 +30,11 @@ public interface IBuildStrategy {
 	 * @throws IOException 
      */
 	public TestResult runTest() throws IOException, InterruptedException;
+	
+	/**
+	 * 
+	 * @return true if a diffFile is a test file.
+	 */
+	public boolean isTestFile(DiffFile diffFile);
 
 }

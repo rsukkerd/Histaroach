@@ -1,5 +1,6 @@
 package histaroach.algorithm;
 
+import histaroach.buildstrategy.IBuildStrategy;
 import histaroach.model.DiffFile;
 import histaroach.model.Flip;
 import histaroach.model.IRepository;
@@ -46,14 +47,15 @@ public class MixedRevisionGenerator {
 		
 		return sortedFlips;
 	}
-
+	
 	public MixedRevisionGenerator(IRepository repository, IRepository clonedRepository) {
 		this.repository = repository;
 		this.clonedRepository = clonedRepository;
 	}
 	
 	/**
-	 * @return a list of all possible MixedRevisions from flips. 
+	 * @return a list of all possible MixedRevisions (but not including 
+	 *         mixing test files) from flips. 
 	 *         These MixedRevisions do not know their Compilable state 
 	 *         nor their TestResult.
 	 */
@@ -70,23 +72,24 @@ public class MixedRevisionGenerator {
 	}
 	
 	/**
-	 * @return a list of all possible MixedRevisions from flip. 
+	 * @return a list of all possible MixedRevisions (but not including 
+	 *         mixing test files) from flip. 
 	 *         These MixedRevisions do not know their Compilable state 
 	 *         nor their TestResult.
 	 */
 	public List<MixedRevision> generateMixedRevisionsFromFlip(Flip flip) {
 		List<MixedRevision> mixedRevisionsOfFlip = new ArrayList<MixedRevision>();
-		List<DiffFile> diffFiles = flip.getDiffFiles();
+		List<DiffFile> nonTestDiffFiles = filterDiffFiles(flip.getDiffFiles());
 		
-		for (int r = 1; r < diffFiles.size(); r++) {
-			CombinationGenerator generator = new CombinationGenerator(diffFiles.size(), r);
+		for (int r = 1; r < nonTestDiffFiles.size(); r++) {
+			CombinationGenerator generator = new CombinationGenerator(nonTestDiffFiles.size(), r);
 			
 			while (generator.hasMore()) {
 				int[] indices = generator.getNext();
 				Set<DiffFile> combination = new HashSet<DiffFile>();
 				
 				for (int index : indices) {
-					DiffFile diffFile = diffFiles.get(index);
+					DiffFile diffFile = nonTestDiffFiles.get(index);
 					combination.add(diffFile);
 				}
 								
@@ -99,5 +102,24 @@ public class MixedRevisionGenerator {
 		}
 		
 		return mixedRevisionsOfFlip;
+	}
+
+	/**
+	 * Filters out test files from diffFiles.
+	 * 
+	 * @return a list of all non-test DiffFiles in diffFiles.
+	 */
+	public List<DiffFile> filterDiffFiles(List<DiffFile> diffFiles) {
+		IBuildStrategy buildStrategy = repository.getBuildStrategy();
+		List<DiffFile> nonTestDiffFiles = new ArrayList<DiffFile>();
+		
+		for (DiffFile diffFile : diffFiles) {
+			
+			if (!buildStrategy.isTestFile(diffFile)) {
+				nonTestDiffFiles.add(diffFile);
+			}
+		}
+		
+		return nonTestDiffFiles;
 	}
 }
