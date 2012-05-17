@@ -109,7 +109,7 @@ public class MixedRevisionGenerator {
 	 * 
 	 * @return a list of all non-test DiffFiles in diffFiles.
 	 */
-	public List<DiffFile> filterDiffFiles(List<DiffFile> diffFiles) {
+	public List<DiffFile> filterDiffFiles(Set<DiffFile> diffFiles) {
 		IBuildStrategy buildStrategy = repository.getBuildStrategy();
 		List<DiffFile> nonTestDiffFiles = new ArrayList<DiffFile>();
 		

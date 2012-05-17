@@ -4,7 +4,7 @@ import histaroach.buildstrategy.IBuildStrategy;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -39,11 +39,11 @@ public interface IRepository {
 	public boolean discardFileChange(String filename) throws IOException, InterruptedException;
 	
 	/**
-     * @return a list of DiffFiles between baseCommit and otherCommit.
+     * @return a set of DiffFiles between baseCommit and otherCommit.
      * @throws InterruptedException 
      * @throws IOException 
      */
-	public List<DiffFile> getDiffFiles(String baseCommitID,
+	public Set<DiffFile> getDiffFiles(String baseCommitID,
             String otherCommitID) throws IOException, InterruptedException;
 
 	/**

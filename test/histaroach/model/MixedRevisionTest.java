@@ -20,10 +20,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -66,7 +64,7 @@ public class MixedRevisionTest {
 	private static final DiffFile DIFF_FILE_2 = new DiffFile(DiffType.DELETED, FILENAME_2);
 	private static final DiffFile DIFF_FILE_3 = new DiffFile(DiffType.ADDED, FILENAME_3);
 	
-	private static final List<DiffFile> DIFF_FILES = new ArrayList<DiffFile>();
+	private static final Set<DiffFile> DIFF_FILES = new HashSet<DiffFile>();
 	static {
 		DIFF_FILES.add(DIFF_FILE_1);
 		DIFF_FILES.add(DIFF_FILE_2);
@@ -81,20 +79,20 @@ public class MixedRevisionTest {
 	private static final String COMMIT_1 = "a3e38d0";
 	private static final String COMMIT_2 = "1e7bdee";
 	
-	private static final Map<Revision, List<DiffFile>> PARENT_TO_DIFF_FILES_1 
-		= new HashMap<Revision, List<DiffFile>>();
+	private static final Map<Revision, Set<DiffFile>> PARENT_TO_DIFF_FILES_1 = 
+		new HashMap<Revision, Set<DiffFile>>();
 	
-	private static final Revision REVISION_1 
-		= new Revision(COMMIT_1, PARENT_TO_DIFF_FILES_1, Compilable.UNKNOWN, null);
+	private static final Revision REVISION_1 = 
+		new Revision(COMMIT_1, PARENT_TO_DIFF_FILES_1, Compilable.UNKNOWN, null);
 	
-	private static final Map<Revision, List<DiffFile>> PARENT_TO_DIFF_FILES_2 
-		= new HashMap<Revision, List<DiffFile>>();
+	private static final Map<Revision, Set<DiffFile>> PARENT_TO_DIFF_FILES_2 = 
+		new HashMap<Revision, Set<DiffFile>>();
 	static {
 		PARENT_TO_DIFF_FILES_2.put(REVISION_1, DIFF_FILES);
 	}
 	
-	private static final Revision REVISION_2 
-		= new Revision(COMMIT_2, PARENT_TO_DIFF_FILES_2, Compilable.UNKNOWN, null);
+	private static final Revision REVISION_2 = 
+		new Revision(COMMIT_2, PARENT_TO_DIFF_FILES_2, Compilable.UNKNOWN, null);
 	
 	private static final String FILE_1_REVISION_1 = "f1r1";
 	private static final String FILE_1_REVISION_2 = "f1r2";
@@ -163,7 +161,7 @@ public class MixedRevisionTest {
 	private static final DiffFile PRJ_DIFF_FILE_2 = new DiffFile(DiffType.MODIFIED, "src/proj/F2.java");
 	private static final DiffFile PRJ_DIFF_FILE_3 = new DiffFile(DiffType.MODIFIED, "src/proj/F3.java");
 	
-	private static final List<DiffFile> PRJ_DIFF_FILES = new ArrayList<DiffFile>();
+	private static final Set<DiffFile> PRJ_DIFF_FILES = new HashSet<DiffFile>();
 	static {
 		PRJ_DIFF_FILES.add(PRJ_DIFF_FILE_1);
 		PRJ_DIFF_FILES.add(PRJ_DIFF_FILE_2);
@@ -183,21 +181,21 @@ public class MixedRevisionTest {
 	private static final TestResult COMBINATION_2_TEST_RESULT = new TestResult(TESTS, TESTS);
 	private static final TestResult COMBINATION_3_TEST_RESULT = new TestResult(TESTS, new HashSet<String>());
 	
-	private static final Map<Revision, List<DiffFile>> PRJ_PARENT_TO_DIFF_FILES_1 
-		= new HashMap<Revision, List<DiffFile>>();
+	private static final Map<Revision, Set<DiffFile>> PRJ_PARENT_TO_DIFF_FILES_1 = 
+		new HashMap<Revision, Set<DiffFile>>();
 
-	private static final Revision PRJ_REVISION_1 
-		= new Revision(PRJ_COMMIT_1, PRJ_PARENT_TO_DIFF_FILES_1, 
+	private static final Revision PRJ_REVISION_1 = 
+		new Revision(PRJ_COMMIT_1, PRJ_PARENT_TO_DIFF_FILES_1, 
 				Compilable.YES, PRJ_TEST_RESULT_1);
 	
-	private static final Map<Revision, List<DiffFile>> PRJ_PARENT_TO_DIFF_FILES_2 
-		= new HashMap<Revision, List<DiffFile>>();
+	private static final Map<Revision, Set<DiffFile>> PRJ_PARENT_TO_DIFF_FILES_2 = 
+		new HashMap<Revision, Set<DiffFile>>();
 	static {
 		PRJ_PARENT_TO_DIFF_FILES_2.put(PRJ_REVISION_1, PRJ_DIFF_FILES);
 	}
 	
-	private static final Revision PRJ_REVISION_2 
-		= new Revision(PRJ_COMMIT_2, PRJ_PARENT_TO_DIFF_FILES_2, 
+	private static final Revision PRJ_REVISION_2 = 
+		new Revision(PRJ_COMMIT_2, PRJ_PARENT_TO_DIFF_FILES_2, 
 				Compilable.YES, PRJ_TEST_RESULT_2);
 	
 	// not compilable

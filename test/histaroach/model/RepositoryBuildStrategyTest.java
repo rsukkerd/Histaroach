@@ -9,10 +9,8 @@ import histaroach.model.Revision.Compilable;
 import histaroach.util.Util;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,20 +41,23 @@ public class RepositoryBuildStrategyTest {
 	private static final String COMMIT_3 = "5ee21b8";
 	private static final String COMMIT_4 = "bbd79d7";
 	
-	private static final DiffFile DIFF_FILE_BUILD = new DiffFile(DiffType.ADDED, "build.xml");
-	private static final DiffFile DIFF_FILE_MAIN = new DiffFile(DiffType.MODIFIED, "src/proj/Main.java");
-	private static final DiffFile DIFF_FILE_TEST = new DiffFile(DiffType.MODIFIED, "src/proj/tests/Main2Test.java");
+	private static final DiffFile DIFF_FILE_BUILD = new DiffFile(DiffType.ADDED, 
+			"build.xml");
+	private static final DiffFile DIFF_FILE_MAIN = new DiffFile(DiffType.MODIFIED, 
+			"src/proj/Main.java");
+	private static final DiffFile DIFF_FILE_TEST = new DiffFile(DiffType.MODIFIED, 
+			"src/proj/tests/Main2Test.java");
 	
-	private static final List<DiffFile> DIFF_FILES_2 = new ArrayList<DiffFile>();
+	private static final Set<DiffFile> DIFF_FILES_2 = new HashSet<DiffFile>();
 	static {
 		DIFF_FILES_2.add(DIFF_FILE_BUILD);
 		DIFF_FILES_2.add(DIFF_FILE_MAIN);
 	}
-	private static final List<DiffFile> DIFF_FILES_3 = new ArrayList<DiffFile>();
+	private static final Set<DiffFile> DIFF_FILES_3 = new HashSet<DiffFile>();
 	static {
 		DIFF_FILES_3.add(DIFF_FILE_MAIN);
 	}
-	private static final List<DiffFile> DIFF_FILES_4 = new ArrayList<DiffFile>();
+	private static final Set<DiffFile> DIFF_FILES_4 = new HashSet<DiffFile>();
 	static {
 		DIFF_FILES_4.add(DIFF_FILE_TEST);
 	}
@@ -85,14 +86,16 @@ public class RepositoryBuildStrategyTest {
 	/*
 	 * revision 1 in proj
 	 */
-	private static final Map<Revision, List<DiffFile>> PARENT_DIFF_FILES_1 = new HashMap<Revision, List<DiffFile>>();
+	private static final Map<Revision, Set<DiffFile>> PARENT_DIFF_FILES_1 = 
+		new HashMap<Revision, Set<DiffFile>>();
 	private static final Revision REVISION_1 = new Revision(COMMIT_1, PARENT_DIFF_FILES_1, 
 			Compilable.NO_BUILD_FILE, null);
 	
 	/*
 	 * revision 2 in proj
 	 */
-	private static final Map<Revision, List<DiffFile>> PARENT_DIFF_FILES_2 = new HashMap<Revision, List<DiffFile>>();
+	private static final Map<Revision, Set<DiffFile>> PARENT_DIFF_FILES_2 = 
+		new HashMap<Revision, Set<DiffFile>>();
 	static {
 		PARENT_DIFF_FILES_2.put(REVISION_1, DIFF_FILES_2);
 	}
@@ -102,7 +105,8 @@ public class RepositoryBuildStrategyTest {
 	/*
 	 * revision 3 in proj
 	 */
-	private static final Map<Revision, List<DiffFile>> PARENT_DIFF_FILES_3 = new HashMap<Revision, List<DiffFile>>();
+	private static final Map<Revision, Set<DiffFile>> PARENT_DIFF_FILES_3 = 
+		new HashMap<Revision, Set<DiffFile>>();
 	static {
 		PARENT_DIFF_FILES_3.put(REVISION_2, DIFF_FILES_3);
 	}
@@ -112,7 +116,8 @@ public class RepositoryBuildStrategyTest {
 	/*
 	 * revision 4 in proj
 	 */
-	private static final Map<Revision, List<DiffFile>> PARENT_DIFF_FILES_4 = new HashMap<Revision, List<DiffFile>>();
+	private static final Map<Revision, Set<DiffFile>> PARENT_DIFF_FILES_4 = 
+		new HashMap<Revision, Set<DiffFile>>();
 	static {
 		PARENT_DIFF_FILES_4.put(REVISION_3, DIFF_FILES_4);
 	}

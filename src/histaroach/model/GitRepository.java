@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -74,9 +75,9 @@ public class GitRepository implements IRepository, Serializable {
 	}
 
 	@Override
-	public List<DiffFile> getDiffFiles(String baseCommitID,
+	public Set<DiffFile> getDiffFiles(String baseCommitID,
 			String otherCommitID) throws IOException, InterruptedException {
-		List<DiffFile> diffFiles = new ArrayList<DiffFile>();
+		Set<DiffFile> diffFiles = new HashSet<DiffFile>();
 
         Process diffProcess = Util.runProcess(new String[] { "git", "diff",
                 "--name-status", otherCommitID, baseCommitID }, directory);
@@ -187,7 +188,7 @@ public class GitRepository implements IRepository, Serializable {
         	parentEdgeCounter.remove(commitID);
         	
         	// create a Revision object
-        	Map<Revision, List<DiffFile>> parentToDiffFiles = new HashMap<Revision, List<DiffFile>>();
+        	Map<Revision, Set<DiffFile>> parentToDiffFiles = new HashMap<Revision, Set<DiffFile>>();
         	List<String> parentsIDs = commitIDToParentsIDs.get(commitID);
         	
         	for (String parentID : parentsIDs) {
@@ -199,7 +200,7 @@ public class GitRepository implements IRepository, Serializable {
         		}
         		
         		Revision parent = revisions.get(parentID);
-        		List<DiffFile> diffFiles = getDiffFiles(commitID, parentID);
+        		Set<DiffFile> diffFiles = getDiffFiles(commitID, parentID);
         		
         		parentToDiffFiles.put(parent, diffFiles);
         	}

@@ -3,7 +3,6 @@ package histaroach.model;
 import histaroach.buildstrategy.IBuildStrategy;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,7 +33,7 @@ public class Revision implements Serializable {
     }
 
     private final String commitID;
-    private final Map<Revision, List<DiffFile>> parentToDiffFiles;
+    private final Map<Revision, Set<DiffFile>> parentToDiffFiles;
     private Compilable compilable;
     private /*@Nullable*/ TestResult testResult;
 
@@ -48,7 +47,7 @@ public class Revision implements Serializable {
      * @throws Exception 
      */
     public Revision(IRepository repository, String commitID, 
-    		Map<Revision, List<DiffFile>> parentToDiffFiles) throws Exception {
+    		Map<Revision, Set<DiffFile>> parentToDiffFiles) throws Exception {
     	this.commitID = commitID;
     	this.parentToDiffFiles = parentToDiffFiles;
     	        
@@ -73,7 +72,7 @@ public class Revision implements Serializable {
      * Creates a Revision, whose Compilable state and 
      * TestResult are given.
      */
-    public Revision(String commitID, Map<Revision, List<DiffFile>> parentToDiffFiles, 
+    public Revision(String commitID, Map<Revision, Set<DiffFile>> parentToDiffFiles, 
     		Compilable compilable, TestResult testResult) {
     	this.commitID = commitID;
     	this.compilable = compilable;
@@ -90,10 +89,10 @@ public class Revision implements Serializable {
     }
 
     /**
-     * @return a list of DiffFiles corresponding to the parent, 
+     * @return a set of DiffFiles corresponding to the parent, 
      *         null if the parent is not a parent of this Revision.
      */
-    public List<DiffFile> getDiffFiles(Revision parent) {
+    public Set<DiffFile> getDiffFiles(Revision parent) {
         return parentToDiffFiles.get(parent);
     }
     
@@ -127,13 +126,13 @@ public class Revision implements Serializable {
                 
         for (Revision parent : parents) {
         	String parentID = parent.commitID;
-        	List<DiffFile> diffFiles = parentToDiffFiles.get(parent);
+        	Set<DiffFile> diffFiles = parentToDiffFiles.get(parent);
         	
         	boolean foundMatch = false;
         	
         	for (Revision otherParent : otherParents) {
         		String otherParentID = otherParent.commitID;
-        		List<DiffFile> otherDiffFiles = other.parentToDiffFiles.get(otherParent);
+        		Set<DiffFile> otherDiffFiles = other.parentToDiffFiles.get(otherParent);
         		
         		if (parentID.equals(otherParentID) && diffFiles.equals(otherDiffFiles)) {
         			foundMatch = true;
@@ -159,7 +158,7 @@ public class Revision implements Serializable {
         
         for (Revision parent : parentToDiffFiles.keySet()) {
         	String parentID = parent.commitID;
-        	List<DiffFile> diffFiles = parentToDiffFiles.get(parent);
+        	Set<DiffFile> diffFiles = parentToDiffFiles.get(parent);
         	
         	code += 19 * parentID.hashCode() + 23 * diffFiles.hashCode();
         }
@@ -180,7 +179,7 @@ public class Revision implements Serializable {
         	result += "Parent: " + parent.commitID + "\n";
         	result += "Diff Files:\n";
         	
-        	List<DiffFile> diffFiles = parentToDiffFiles.get(parent);
+        	Set<DiffFile> diffFiles = parentToDiffFiles.get(parent);
         	for (DiffFile diffFile : diffFiles) {
         		result += diffFile + "\n";
         	}

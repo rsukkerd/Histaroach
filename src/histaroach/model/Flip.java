@@ -1,6 +1,5 @@
 package histaroach.model;
 
-import java.util.List;
 import java.util.Set;
 
 
@@ -51,9 +50,9 @@ public class Flip implements Comparable<Flip> {
 	}
 	
 	/**
-	 * @return a list of DiffFiles between the child and the parent.
+	 * @return a set of DiffFiles between the child and the parent.
 	 */
-	public List<DiffFile> getDiffFiles() {
+	public Set<DiffFile> getDiffFiles() {
 		return child.getDiffFiles(parent);
 	}
 	
@@ -97,7 +96,7 @@ public class Flip implements Comparable<Flip> {
 				+ "parent commit: " + parent.getCommitID() + "\n";
 		
 		str += "diff files: \n";
-		List<DiffFile> diffFiles = getDiffFiles();
+		Set<DiffFile> diffFiles = getDiffFiles();
 		for (DiffFile diffFile : diffFiles) {
 			str += diffFile.toString() + "\n";
 		}
@@ -121,8 +120,8 @@ public class Flip implements Comparable<Flip> {
 
 	@Override
 	public int compareTo(Flip other) {
-		List<DiffFile> diffFiles = getDiffFiles();
-		List<DiffFile> otherDiffFiles = other.getDiffFiles();
+		Set<DiffFile> diffFiles = getDiffFiles();
+		Set<DiffFile> otherDiffFiles = other.getDiffFiles();
 		
 		return ((Integer) diffFiles.size()).compareTo(otherDiffFiles.size());
 	}
