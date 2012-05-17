@@ -79,20 +79,13 @@ public class MixedRevisionGenerator {
 	 */
 	public List<MixedRevision> generateMixedRevisionsFromFlip(Flip flip) {
 		List<MixedRevision> mixedRevisionsOfFlip = new ArrayList<MixedRevision>();
-		List<DiffFile> nonTestDiffFiles = filterDiffFiles(flip.getDiffFiles());
+		Set<DiffFile> nonTestDiffFiles = filterDiffFiles(flip.getDiffFiles());
 		
-		for (int r = 1; r < nonTestDiffFiles.size(); r++) {
-			CombinationGenerator generator = new CombinationGenerator(nonTestDiffFiles.size(), r);
+		for (int r = 1; r < nonTestDiffFiles.size(); r++) {			
+			CombinationGenerator<DiffFile> combinations = 
+				new CombinationGenerator<DiffFile>(nonTestDiffFiles, r);
 			
-			while (generator.hasMore()) {
-				int[] indices = generator.getNext();
-				Set<DiffFile> combination = new HashSet<DiffFile>();
-				
-				for (int index : indices) {
-					DiffFile diffFile = nonTestDiffFiles.get(index);
-					combination.add(diffFile);
-				}
-								
+			for (Set<DiffFile> combination : combinations) {
 				MixedRevision mixedRevision = new MixedRevision(flip.getChildRevision(), 
 						repository, clonedRepository);
 				mixedRevision.setRevertedFiles(combination, flip.getParentRevision());
@@ -107,11 +100,11 @@ public class MixedRevisionGenerator {
 	/**
 	 * Filters out test files from diffFiles.
 	 * 
-	 * @return a list of all non-test DiffFiles in diffFiles.
+	 * @return a set of all non-test DiffFiles in diffFiles.
 	 */
-	public List<DiffFile> filterDiffFiles(Set<DiffFile> diffFiles) {
+	public Set<DiffFile> filterDiffFiles(Set<DiffFile> diffFiles) {
 		IBuildStrategy buildStrategy = repository.getBuildStrategy();
-		List<DiffFile> nonTestDiffFiles = new ArrayList<DiffFile>();
+		Set<DiffFile> nonTestDiffFiles = new HashSet<DiffFile>();
 		
 		for (DiffFile diffFile : diffFiles) {
 			
