@@ -50,8 +50,11 @@ public class Util {
 
 		//cleanup timer
 		if ( !pkt.killed ) {
+			//the killed flag is false if the process terminated naturally
+			//in this case we have to make sure that the timer thread stops waiting and doesn't interfere later on
 			t.interrupt();
 		} else {
+			//the process had to be killed by us, and thus this is a problem
 			throw new InterruptedException( "Process had to be killed" );
 		}
 
@@ -155,7 +158,7 @@ final class ProcessKillTimer implements Runnable {
 
 	/**
 	 * @param p the process to be killed after a timeout
-	 * @param timeout 
+	 * @param timeout in seconds
 	 */
 	ProcessKillTimer( Process p, int timeout ) {
 		this.proc = p;
@@ -172,8 +175,11 @@ final class ProcessKillTimer implements Runnable {
 				wait( timeout * 1000L );
 			}
 		} catch (InterruptedException e) {
+			//this exception will be thrown when the main thread calls interrupt(),
+			//which can only happen if the process terminated naturally
 			return;
 		}
+		//kill the process and set the flag so we know we killed it
 		proc.destroy();
 		killed = true;
 	}
