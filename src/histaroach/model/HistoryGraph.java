@@ -3,9 +3,11 @@ package histaroach.model;
 import histaroach.model.Revision.Compilable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -21,7 +23,8 @@ import java.util.Set;
  */
 public class HistoryGraph implements Iterable<Revision> {
 	
-	private final Set<Revision> revisions;
+	// map: Revision's commit id -> Revision object
+	private final Map<String, Revision> revisions;
 	// for Revisions' topological ordering in iterator() and toString()
 	private final List<Revision> orderedRevisions;
 	
@@ -29,7 +32,7 @@ public class HistoryGraph implements Iterable<Revision> {
 	 * Creates an empty HistoryGraph.
 	 */
     public HistoryGraph() {
-        revisions = new HashSet<Revision>();
+        revisions = new HashMap<String, Revision>();
         orderedRevisions = new ArrayList<Revision>();
     }
 
@@ -39,8 +42,17 @@ public class HistoryGraph implements Iterable<Revision> {
      * @modifies this
      */
     public void addRevision(Revision revision) {
-        revisions.add(revision);
+        revisions.put(revision.getCommitID(), revision);
         orderedRevisions.add(revision);
+    }
+    
+    /**
+     * Looks up a Revision by its commitID.
+     * 
+     * @return a Revision of commitID.
+     */
+    public Revision lookUpRevision(String commitID) {
+    	return revisions.get(commitID);
     }
     
     /**
@@ -49,7 +61,7 @@ public class HistoryGraph implements Iterable<Revision> {
 	public Set<Flip> getAllFlips() {
 	    Set<Flip> flips = new HashSet<Flip>();
 	
-	    for (Revision revision : revisions) {
+	    for (Revision revision : orderedRevisions) {
 	    	
 	        if (revision.isCompilable() != Compilable.YES) {
 	        	continue;
