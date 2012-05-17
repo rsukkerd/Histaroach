@@ -11,6 +11,10 @@ import histaroach.model.HistoryGraph;
 import histaroach.model.IRepository;
 import histaroach.model.MixedRevision;
 import histaroach.util.HistoryGraphXMLReader;
+import histaroach.util.MixedRevisionXMLReader;
+import histaroach.util.MixedRevisionXMLWriter;
+import histaroach.util.XMLReader;
+import histaroach.util.XMLWriter;
 
 import java.io.File;
 import java.util.List;
@@ -132,14 +136,29 @@ public class TestIsolationDataReader {
         IRepository repository = new GitRepository(repoDir, buildStrategy);
         IRepository clonedRepository = new GitRepository(clonedRepoDir, clonedBuildStrategy);
         
-        HistoryGraphXMLReader reader = new HistoryGraphXMLReader(new File(hGraphXML));
-	    HistoryGraph historyGraph = reader.reconstructHistoryGraph();
-    	Set<Flip> flips = historyGraph.getAllFlips();
-    	
-    	MixedRevisionGenerator generator = new MixedRevisionGenerator(repository, clonedRepository);
-    	List<MixedRevision> mixedRevisions = generator.generateMixedRevisionsFromFlips(flips);
-    	
-    	MixedRevisionAnalysis analysis = new MixedRevisionAnalysis(mixedRevisions);
-    	analysis.runTestOnMixedRevisions(startIndex, numMixedRevisions, mixedRevisionOutput);
+        XMLReader<HistoryGraph> hGraphreader = new HistoryGraphXMLReader(new File(hGraphXML));
+	    HistoryGraph historyGraph = hGraphreader.read();
+	    
+	    File xmlFile = new File("output/mixedRevisions.xml");
+        
+        if (numMixedRevisions > 0) {
+        	XMLReader<List<MixedRevision>> mRevisionReader = new MixedRevisionXMLReader(
+        			xmlFile, repository, clonedRepository, historyGraph);
+        	List<MixedRevision> mixedRevisions = mRevisionReader.read();
+        	
+        	MixedRevisionAnalysis analysis = new MixedRevisionAnalysis(mixedRevisions);
+        	analysis.runTestOnMixedRevisions(startIndex, numMixedRevisions, 
+        			mixedRevisionOutput);
+        } else {
+        	Set<Flip> flips = historyGraph.getAllFlips();
+        	
+        	MixedRevisionGenerator generator = new MixedRevisionGenerator(repository, 
+        			clonedRepository);
+        	List<MixedRevision> mixedRevisions = generator.generateMixedRevisionsFromFlips(
+        			flips);
+        	
+        	XMLWriter writer = new MixedRevisionXMLWriter(xmlFile, mixedRevisions);
+        	writer.write();
+        }
 	}
 }

@@ -7,6 +7,7 @@ import histaroach.model.GitRepository;
 import histaroach.model.HistoryGraph;
 import histaroach.model.IRepository;
 import histaroach.util.HistoryGraphXMLWriter;
+import histaroach.util.XMLWriter;
 
 import java.io.File;
 
@@ -120,9 +121,9 @@ public class TestIsolationDataGenerator {
         
         IRepository repository = new GitRepository(repoDir, buildStrategy);
         
-        HistoryGraph hGraph = repository.buildHistoryGraph(startCommitID, endCommitID);
+        HistoryGraph historyGraph = repository.buildHistoryGraph(startCommitID, endCommitID);
         
-        saveHistoryGraph(hGraph);
+        saveHistoryGraph(historyGraph);
     }
 
     /**
@@ -131,14 +132,14 @@ public class TestIsolationDataGenerator {
      * @throws ParserConfigurationException 
      * @throws TransformerException 
      */
-    public static void saveHistoryGraph(HistoryGraph hGraph) throws ParserConfigurationException, 
+    public static void saveHistoryGraph(HistoryGraph historyGraph) throws ParserConfigurationException, 
     		TransformerException {
     	
     	String fileName = HGRAPH_FILE_PREFIX + "_" + startCommitID + "_" + endCommitID 
     			+ XML_EXTENSION;
-    	File hGraphXML = new File(OUTPUT_PATH + File.separatorChar + fileName);
+    	File xmlFile = new File(OUTPUT_PATH + File.separatorChar + fileName);
     	
-    	HistoryGraphXMLWriter writer = new HistoryGraphXMLWriter(hGraph, hGraphXML);
+    	XMLWriter writer = new HistoryGraphXMLWriter(xmlFile, historyGraph);
     	writer.write();
     }
 }
