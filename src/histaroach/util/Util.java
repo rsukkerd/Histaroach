@@ -27,22 +27,40 @@ public class Util {
 	
 	/**
 	 * Creates a process that executes command in processDir.
+	 * The process will be forcibly terminated after 1 hour.
 	 * 
 	 * @return the process
 	 * @throws IOException 
-	 * @throws InterruptedException 
+	 * @throws InterruptedException when the started process had to be killed forcibly
 	 */
-    public static Process runProcess(String[] command, File processDir) 
-    		throws IOException, InterruptedException {
-        ProcessBuilder pBuilder = new ProcessBuilder(command);
-        pBuilder.directory(processDir);
-        Process p = null;
-        
-        p = pBuilder.start();
-        p.waitFor(); // make current thread waits until this process terminates
-        
-        return p;
-    }
+	public static Process runProcess(String[] command, File processDir) 
+			throws IOException, InterruptedException {
+		ProcessBuilder pBuilder = new ProcessBuilder(command);
+		pBuilder.directory(processDir);
+		Process p = null;
+
+		p = pBuilder.start();
+
+		//timer setup
+		ProcessKillTimer pkt = new ProcessKillTimer(p, 3600);
+		Thread t = new Thread( pkt ); //timer thread for 1 hour
+		t.start();
+
+		p.waitFor(); // make current thread waits until this process terminates
+
+		//cleanup timer
+		if ( !pkt.killed ) {
+			//the killed flag is false if the process terminated naturally
+			//in this case we have to make sure that the timer thread stops waiting and doesn't interfere later on
+			t.interrupt();
+		} else {
+			//the process had to be killed by us, and thus this is a problem
+			throw new InterruptedException( "Process had to be killed" );
+		}
+
+		return p;
+	}
+
     
     /**
      * Reads and caches content from inputStream.
@@ -129,5 +147,40 @@ public class Util {
 	    File file = new File(dir.getAbsolutePath() + File.separatorChar
 	            + filename);
 		FileUtils.forceDelete(file);
+	}
+}
+
+final class ProcessKillTimer implements Runnable {
+
+	private Process proc;
+	int timeout;
+	boolean killed = false;
+
+	/**
+	 * @param p the process to be killed after a timeout
+	 * @param timeout in seconds
+	 */
+	ProcessKillTimer( Process p, int timeout ) {
+		this.proc = p;
+		this.timeout = timeout;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Runnable#run()
+	 */
+	@Override
+	public void run() {
+		try {
+			synchronized (this) { 
+				wait( timeout * 1000L );
+			}
+		} catch (InterruptedException e) {
+			//this exception will be thrown when the main thread calls interrupt(),
+			//which can only happen if the process terminated naturally
+			return;
+		}
+		//kill the process and set the flag so we know we killed it
+		proc.destroy();
+		killed = true;
 	}
 }
