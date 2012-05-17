@@ -1,14 +1,13 @@
 package histaroach.algorithm;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashSet;
 import java.util.Set;
 
-import junit.framework.TestCase;
-
 import org.junit.Test;
 
-
-public class CombinationGeneratorTest extends TestCase {
+public class CombinationGeneratorTest {
 	
 	private static final String WORD_1 = "abc";
 	private static final String WORD_2 = "def";
@@ -108,32 +107,32 @@ public class CombinationGeneratorTest extends TestCase {
 	}
 	
 	@Test
-	public void OneChooseOneTest() {
+	public void testOneChooseOne() {
 		checkCombinations(COLLECTION_1, 1, COMBINATIONS_1_1);
 	}
 	
 	@Test
-	public void TwoChooseOneTest() {
+	public void testTwoChooseOne() {
 		checkCombinations(COLLECTION_2, 1, COMBINATIONS_2_1);
 	}
 	
 	@Test
-	public void TwoChooseTwoTest() {
+	public void testTwoChooseTwo() {
 		checkCombinations(COLLECTION_2, 2, COMBINATIONS_2_2);
 	}
 	
 	@Test
-	public void ThreeChooseOneTest() {
+	public void testThreeChooseOne() {
 		checkCombinations(COLLECTION_3, 1, COMBINATIONS_3_1);
 	}
 	
 	@Test
-	public void ThreeChooseTwoTest() {
+	public void testThreeChooseTwo() {
 		checkCombinations(COLLECTION_3, 2, COMBINATIONS_3_2);
 	}
 	
 	@Test
-	public void ThreeChooseThreeTest() {
+	public void testThreeChooseThree() {
 		checkCombinations(COLLECTION_3, 3, COMBINATIONS_3_3);
 	}
 	

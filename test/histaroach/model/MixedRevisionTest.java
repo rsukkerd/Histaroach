@@ -1,5 +1,9 @@
 package histaroach.model;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
+
 import histaroach.buildstrategy.IBuildStrategy;
 import histaroach.buildstrategy.MyBuildStrategy;
 import histaroach.model.DiffFile;
@@ -22,13 +26,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.io.FileUtils;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 
-public class MixedRevisionTest extends TestCase {
+public class MixedRevisionTest {
 	
 	private static final String DEST_PATH = "test-data/";
 	private static final String ANT_COMMAND = "ant";
@@ -216,14 +220,14 @@ public class MixedRevisionTest extends TestCase {
 		COMBINATION_3.add(PRJ_DIFF_FILE_3);
 	}
 	
-	@Override
-	protected void setUp() throws FileNotFoundException, IOException {
+	@Before
+	public void setUp() throws FileNotFoundException, IOException {
 		Util.untar(PRJ_TAR_FILE, DEST_PATH);
 		Util.untar(PRJ_TAR_FILE_CLONE, DEST_PATH);
 	}
 	
-	@Override
-	protected void tearDown() throws IOException {
+	@After
+	public void tearDown() throws IOException {
 		FileUtils.deleteDirectory(PRJ);
 		FileUtils.deleteDirectory(PRJ_CLONE);
 	}

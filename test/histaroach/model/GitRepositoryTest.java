@@ -1,5 +1,8 @@
 package histaroach.model;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import histaroach.buildstrategy.AntBuildStrategy;
 import histaroach.buildstrategy.IBuildStrategy;
 import histaroach.buildstrategy.VoldemortBuildStrategy;
@@ -17,13 +20,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.io.FileUtils;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 
-public class GitRepositoryTest extends TestCase {
+public class GitRepositoryTest {
 	
 	private static final String TEST_DATA_PATH = "test-data/";
 	private static final String ANT_COMMAND = "ant";
@@ -851,13 +854,13 @@ public class GitRepositoryTest extends TestCase {
 		HGRAPH_5_PARTIAL_1, HGRAPH_5_PARTIAL_2, 
 		HGRAPH_6_PARTIAL_1, HGRAPH_6_PARTIAL_2 };
 	
-	@Override
-	protected void setUp() throws FileNotFoundException, IOException {
+	@Before
+	public void setUp() throws FileNotFoundException, IOException {
 		Util.untar(SAMPLE_REPOSITORIES_TAR, TEST_DATA_PATH);
 	}
 	
-	@Override
-	protected void tearDown() throws IOException {
+	@After
+	public void tearDown() throws IOException {
 		FileUtils.deleteDirectory(new File(SAMPLE_REPOSITORIES));
 	}
 	

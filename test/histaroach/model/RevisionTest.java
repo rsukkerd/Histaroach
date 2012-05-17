@@ -1,5 +1,7 @@
 package histaroach.model;
 
+import static org.junit.Assert.assertEquals;
+
 import histaroach.buildstrategy.IBuildStrategy;
 import histaroach.buildstrategy.MyBuildStrategy;
 import histaroach.model.DiffFile.DiffType;
@@ -14,13 +16,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.io.FileUtils;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 
-public class RevisionTest extends TestCase {
+public class RevisionTest {
 
 	private static final String DEST_PATH = "test-data/";
 	private static final String ANT_COMMAND = "ant";
@@ -137,13 +139,13 @@ public class RevisionTest extends TestCase {
 		EXPECTED_HGRAPH_PROJ.addRevision(REVISION_4);
 	}
 	
-	@Override
-	protected void setUp() throws FileNotFoundException, IOException {
+	@Before
+	public void setUp() throws FileNotFoundException, IOException {
 		Util.untar(PROJ_TAR_FILE, DEST_PATH);
 	}
 	
-	@Override
-	protected void tearDown() throws IOException {
+	@After
+	public void tearDown() throws IOException {
 		FileUtils.deleteDirectory(PROJ_DIR);
 	}
 	
