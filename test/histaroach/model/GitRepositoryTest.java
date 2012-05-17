@@ -1,7 +1,5 @@
 package histaroach.model;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import histaroach.buildstrategy.AntBuildStrategy;
 import histaroach.buildstrategy.IBuildStrategy;
 import histaroach.buildstrategy.VoldemortBuildStrategy;
@@ -10,6 +8,8 @@ import histaroach.model.Revision.Compilable;
 import histaroach.util.Util;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,11 +17,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import junit.framework.TestCase;
+
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 
-public class GitRepositoryTest {
+public class GitRepositoryTest extends TestCase {
 	
 	private static final String TEST_DATA_PATH = "test-data/";
 	private static final String ANT_COMMAND = "ant";
@@ -849,9 +851,18 @@ public class GitRepositoryTest {
 		HGRAPH_5_PARTIAL_1, HGRAPH_5_PARTIAL_2, 
 		HGRAPH_6_PARTIAL_1, HGRAPH_6_PARTIAL_2 };
 	
+	@Override
+	protected void setUp() throws FileNotFoundException, IOException {
+		Util.untar(SAMPLE_REPOSITORIES_TAR, TEST_DATA_PATH);
+	}
+	
+	@Override
+	protected void tearDown() throws IOException {
+		FileUtils.deleteDirectory(new File(SAMPLE_REPOSITORIES));
+	}
+	
 	@Test
 	public void testBuildFullHistoryGraph() throws Exception {
-		Util.untar(SAMPLE_REPOSITORIES_TAR, TEST_DATA_PATH);
 		
 		for (int i = 0; i < REPO_DIRS.length; i++) {
 			IRepository repo = new GitRepository(REPO_DIRS[i], BUILD_STRATEGIES[i]);
@@ -861,14 +872,11 @@ public class GitRepositoryTest {
 			
 			assertNotNull("constructor returns null on " + REPO_DIRS[i], actualHGraph);
 			assertEquals("result mismatched on " + REPO_DIRS[i], EXPECTED_HGRAPHS[i], actualHGraph);
-		}
-		
-		FileUtils.deleteDirectory(new File(SAMPLE_REPOSITORIES));
+		}		
 	}
 	
 	@Test
 	public void testBuildPartialHistoryGraph() throws Exception {
-		Util.untar(SAMPLE_REPOSITORIES_TAR, TEST_DATA_PATH);
 		
 		for (int i = 2; i < REPO_DIRS_PARTIAL.length; i++) {
 			IRepository repo = new GitRepository(REPO_DIRS_PARTIAL[i], BUILD_STRATEGIES_PARTIAL[i]);
@@ -879,9 +887,7 @@ public class GitRepositoryTest {
 			assertNotNull("constructor returns null on " + REPO_DIRS_PARTIAL[i], actualHGraph);
 			assertEquals("result mismatched on " + REPO_DIRS_PARTIAL[i], 
 					EXPECTED_HGRAPHS_PARTIAL[i], actualHGraph);
-		}
-		
-		FileUtils.deleteDirectory(new File(SAMPLE_REPOSITORIES));
+		}		
 	}
 	
 	/**

@@ -1,14 +1,14 @@
 package histaroach.algorithm;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import junit.framework.TestCase;
 
 import org.junit.Test;
 
 
-public class CombinationGeneratorTest {
+public class CombinationGeneratorTest extends TestCase {
 	
 	private static final String WORD_1 = "abc";
 	private static final String WORD_2 = "def";

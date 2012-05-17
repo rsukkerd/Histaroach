@@ -1,9 +1,5 @@
 package histaroach.model;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import histaroach.buildstrategy.IBuildStrategy;
 import histaroach.buildstrategy.MyBuildStrategy;
 import histaroach.model.DiffFile;
@@ -18,6 +14,7 @@ import histaroach.util.Util;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
@@ -25,11 +22,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import junit.framework.TestCase;
+
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 
-public class MixedRevisionTest {
+public class MixedRevisionTest extends TestCase {
 	
 	private static final String DEST_PATH = "test-data/";
 	private static final String ANT_COMMAND = "ant";
@@ -217,6 +216,18 @@ public class MixedRevisionTest {
 		COMBINATION_3.add(PRJ_DIFF_FILE_3);
 	}
 	
+	@Override
+	protected void setUp() throws FileNotFoundException, IOException {
+		Util.untar(PRJ_TAR_FILE, DEST_PATH);
+		Util.untar(PRJ_TAR_FILE_CLONE, DEST_PATH);
+	}
+	
+	@Override
+	protected void tearDown() throws IOException {
+		FileUtils.deleteDirectory(PRJ);
+		FileUtils.deleteDirectory(PRJ_CLONE);
+	}
+	
 	@Test
 	public void testRevertNotCompilable() throws Exception {
 		checkTestResult(COMBINATION_1, Compilable.NO, null);
@@ -239,9 +250,6 @@ public class MixedRevisionTest {
 	 */
 	private void checkTestResult(Set<DiffFile> combination, Compilable expectedCompilable, 
 			TestResult expectedTestResult) throws Exception {
-		Util.untar(PRJ_TAR_FILE, DEST_PATH);
-		Util.untar(PRJ_TAR_FILE_CLONE, DEST_PATH);
-		
 		MixedRevision mr = new MixedRevision(PRJ_REVISION_2, PRJ_REPOSITORY, PRJ_REPOSITORY_CLONE);
 		
 		mr.setRevertedFiles(combination, PRJ_REVISION_1);
@@ -253,8 +261,5 @@ public class MixedRevisionTest {
 		assertEquals(expectedTestResult, mr.getTestResult());
 		
 		mr.restoreBaseRevision();
-		
-		FileUtils.deleteDirectory(PRJ);
-		FileUtils.deleteDirectory(PRJ_CLONE);
 	}
 }
