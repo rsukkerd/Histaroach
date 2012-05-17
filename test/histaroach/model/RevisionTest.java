@@ -1,7 +1,5 @@
 package histaroach.model;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import histaroach.buildstrategy.IBuildStrategy;
 import histaroach.buildstrategy.MyBuildStrategy;
 import histaroach.model.DiffFile.DiffType;
@@ -9,16 +7,20 @@ import histaroach.model.Revision.Compilable;
 import histaroach.util.Util;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import junit.framework.TestCase;
+
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 
-public class RepositoryBuildStrategyTest {
+public class RevisionTest extends TestCase {
 
 	private static final String DEST_PATH = "test-data/";
 	private static final String ANT_COMMAND = "ant";
@@ -135,16 +137,41 @@ public class RepositoryBuildStrategyTest {
 		EXPECTED_HGRAPH_PROJ.addRevision(REVISION_4);
 	}
 	
-	@Test
-	public void testBuildStrategy() throws Exception {
+	@Override
+	protected void setUp() throws FileNotFoundException, IOException {
 		Util.untar(PROJ_TAR_FILE, DEST_PATH);
-		
-		HistoryGraph actualHGraph = null;
-		actualHGraph = REPOSITORY_PROJ.buildHistoryGraph(COMMIT_4, COMMIT_1);
-		
-		assertNotNull("constructor returns null on " + PROJ, actualHGraph);
-		assertEquals("result mismatched on " + PROJ, EXPECTED_HGRAPH_PROJ, actualHGraph);
-		
+	}
+	
+	@Override
+	protected void tearDown() throws IOException {
 		FileUtils.deleteDirectory(PROJ_DIR);
+	}
+	
+	@Test
+	public void testCreateRevision1() throws Exception {
+		checkRevision(REVISION_1, COMMIT_1, PARENT_DIFF_FILES_1);
+	}
+	
+	@Test
+	public void testCreateRevision2() throws Exception {
+		checkRevision(REVISION_2, COMMIT_2, PARENT_DIFF_FILES_2);
+	}
+	
+	@Test
+	public void testCreateRevision3() throws Exception {
+		checkRevision(REVISION_3, COMMIT_3, PARENT_DIFF_FILES_3);
+	}
+	
+	@Test
+	public void testCreateRevision4() throws Exception {
+		checkRevision(REVISION_4, COMMIT_4, PARENT_DIFF_FILES_4);
+	}
+	
+	private void checkRevision(Revision expectedRevision, String commitID, 
+			Map<Revision, Set<DiffFile>> parentToDiffFiles) throws Exception {
+		Revision actualRevision = new Revision(REPOSITORY_PROJ, commitID, 
+				parentToDiffFiles);
+		
+		assertEquals(expectedRevision, actualRevision);
 	}
 }
