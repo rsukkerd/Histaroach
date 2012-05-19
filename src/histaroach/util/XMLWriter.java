@@ -21,6 +21,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
 
@@ -55,7 +56,8 @@ public abstract class XMLWriter {
 	
 	public abstract void write() throws TransformerException;
 
-	protected void write(Element rootElement) throws TransformerException {
+	protected void write(Element alienRootElement) throws TransformerException {
+		Node rootElement = doc.importNode(alienRootElement, true);
 		doc.appendChild(rootElement);
 		
 		/* write the content into xml file */
