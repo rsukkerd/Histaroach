@@ -59,6 +59,8 @@ public class GitRepository implements IRepository, Serializable {
 		Util.runProcess(
 				new String[] { "git", "checkout", "--", "./" }, directory);
 		
+		Util.killOtherJavaProcesses();
+		
 		Process checkoutProcess = Util.runProcess(
                 new String[] { "git", "checkout", commitID }, directory);
         return checkoutProcess.exitValue() == 0;

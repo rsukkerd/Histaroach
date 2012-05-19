@@ -161,6 +161,22 @@ public class Util {
 		String jvmName = ManagementFactory.getRuntimeMXBean().getName();
 		return jvmName.split("@")[0];
 	}
+
+	/**
+	 * Kills all other java processes under the same user of this application.
+	 */
+	public static void killOtherJavaProcesses() {
+		Process p;
+		try {
+			String[] command = { Util.KILL_JAVA_PROCESSES_SH, Util.getOwnPID() };
+			p = Runtime.getRuntime().exec(command);
+			p.waitFor();
+		} catch (Exception e) {
+			System.err.println("Warning: " + Util.KILL_JAVA_PROCESSES_SH 
+					+ " has terminated unexpectedly.");
+			e.printStackTrace();
+		}
+	}
 }
 
 final class ProcessKillTimer implements Runnable {
@@ -196,16 +212,6 @@ final class ProcessKillTimer implements Runnable {
 		proc.destroy();
 		killed = true;
 		
-		// kill all other java processes under this user.
-		Process p;
-		try {
-			String[] command = { Util.KILL_JAVA_PROCESSES_SH, Util.getOwnPID() };
-			p = Runtime.getRuntime().exec(command);
-			p.waitFor();
-		} catch (Exception e) {
-			System.err.println("Warning: " + Util.KILL_JAVA_PROCESSES_SH 
-					+ " has terminated unexpectedly.");
-			e.printStackTrace();
-		}
+		Util.killOtherJavaProcesses();
 	}
 }
