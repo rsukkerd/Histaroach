@@ -93,7 +93,7 @@ public class RevisionTest {
 	private static final Map<Revision, Set<DiffFile>> PARENT_DIFF_FILES_1 = 
 		new HashMap<Revision, Set<DiffFile>>();
 	private static final Revision REVISION_1 = new Revision(COMMIT_1, PARENT_DIFF_FILES_1, 
-			Compilable.NO_BUILD_FILE, null);
+			Compilable.NO_BUILD_FILE, false, null);
 	
 	/*
 	 * revision 2 in proj
@@ -104,7 +104,7 @@ public class RevisionTest {
 		PARENT_DIFF_FILES_2.put(REVISION_1, DIFF_FILES_2);
 	}
 	private static final Revision REVISION_2 = new Revision(COMMIT_2, PARENT_DIFF_FILES_2, 
-			Compilable.NO, null);
+			Compilable.NO, false, null);
 	
 	/*
 	 * revision 3 in proj
@@ -115,7 +115,7 @@ public class RevisionTest {
 		PARENT_DIFF_FILES_3.put(REVISION_2, DIFF_FILES_3);
 	}
 	private static final Revision REVISION_3 = new Revision(COMMIT_3, PARENT_DIFF_FILES_3, 
-			Compilable.YES, TEST_RESULT_3);
+			Compilable.YES, false, TEST_RESULT_3);
 	
 	/*
 	 * revision 4 in proj
@@ -126,7 +126,7 @@ public class RevisionTest {
 		PARENT_DIFF_FILES_4.put(REVISION_3, DIFF_FILES_4);
 	}
 	private static final Revision REVISION_4 = new Revision(COMMIT_4, PARENT_DIFF_FILES_4, 
-			Compilable.YES, TEST_RESULT_4);
+			Compilable.YES, false, TEST_RESULT_4);
 	
 	/*
 	 * revision 5 in proj

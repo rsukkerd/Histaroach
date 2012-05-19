@@ -122,7 +122,7 @@ public class GitRepositoryTest {
 	 * revision 1 in hGraph1
 	 */
 	private static final Revision REVISION_1_1 = new Revision(COMMIT_1_1, PARENT_TO_DIFF_FILES_1_1, 
-			Compilable.NO_BUILD_FILE, null);
+			Compilable.NO_BUILD_FILE, false, null);
 	
 	
 	/*
@@ -140,7 +140,7 @@ public class GitRepositoryTest {
 	 *  revision 1 in hGraph 2
 	 */
 	private static final Revision REVISION_1_2 = new Revision(COMMIT_1_2, PARENT_TO_DIFF_FILES_1_2, 
-			Compilable.NO_BUILD_FILE, null);
+			Compilable.NO_BUILD_FILE, false, null);
 	
 	/**
 	 *  parents/diff files of revision 2 in hGraph 2
@@ -154,7 +154,7 @@ public class GitRepositoryTest {
 	 *  revision 2 in hGraph 2
 	 */
 	private static final Revision REVISION_2_2 = new Revision(COMMIT_2_2, PARENT_TO_DIFF_FILES_2_2, 
-			Compilable.NO_BUILD_FILE, null);
+			Compilable.NO_BUILD_FILE, false, null);
 	
 	
 	/*
@@ -174,7 +174,7 @@ public class GitRepositoryTest {
 	 *  revision 1 in hGraph 3
 	 */
 	private static final Revision REVISION_1_3 = new Revision(COMMIT_1_3, PARENT_TO_DIFF_FILES_1_3, 
-			Compilable.NO_BUILD_FILE, null);
+			Compilable.NO_BUILD_FILE, false, null);
 	
 	/**
 	 *  parents/diff files of revision 2 in hGraph 3
@@ -188,7 +188,7 @@ public class GitRepositoryTest {
 	 *  revision 2 in hGraph 3
 	 */
 	private static final Revision REVISION_2_3 = new Revision(COMMIT_2_3, PARENT_TO_DIFF_FILES_2_3, 
-			Compilable.NO_BUILD_FILE, null);
+			Compilable.NO_BUILD_FILE, false, null);
 	
 	/**
 	 *  parents/diff files of revision 3 in hGraph 3
@@ -202,7 +202,7 @@ public class GitRepositoryTest {
 	 *  revision 3 in hGraph 3
 	 */
 	private static final Revision REVISION_3_3 = new Revision(COMMIT_3_3, PARENT_TO_DIFF_FILES_3_3, 
-			Compilable.NO_BUILD_FILE, null);
+			Compilable.NO_BUILD_FILE, false, null);
 	
 	
 	/*
@@ -223,7 +223,7 @@ public class GitRepositoryTest {
 	 *  revision 1 in hGraph 4
 	 */
 	private static final Revision REVISION_1_4 = new Revision(COMMIT_1_4, PARENT_TO_DIFF_FILES_1_4, 
-			Compilable.NO_BUILD_FILE, null);
+			Compilable.NO_BUILD_FILE, false, null);
 	
 	/**
 	 *  parents/diff files of revision 2 in hGraph 4
@@ -237,7 +237,7 @@ public class GitRepositoryTest {
 	 *  revision 2 in hGraph 4
 	 */
 	private static final Revision REVISION_2_4 = new Revision(COMMIT_2_4, PARENT_TO_DIFF_FILES_2_4, 
-			Compilable.NO_BUILD_FILE, null);
+			Compilable.NO_BUILD_FILE, false, null);
 	
 	/**
 	 *  parents/diff files of revision 3 in hGraph 4
@@ -251,7 +251,7 @@ public class GitRepositoryTest {
 	 *  revision 3 in hGraph 4 in hGraph 4
 	 */
 	private static final Revision REVISION_3_4 = new Revision(COMMIT_3_4, PARENT_TO_DIFF_FILES_3_4, 
-			Compilable.NO_BUILD_FILE, null);
+			Compilable.NO_BUILD_FILE, false, null);
 	
 	/**
 	 *  parents/diff files of revision 4 in hGraph 4
@@ -266,7 +266,7 @@ public class GitRepositoryTest {
 	 *  revision 4 in hGraph 4
 	 */
 	private static final Revision REVISION_4_4 = new Revision(COMMIT_4_4, PARENT_TO_DIFF_FILES_4_4, 
-			Compilable.NO_BUILD_FILE, null);
+			Compilable.NO_BUILD_FILE, false, null);
 	
 	
 	/*
@@ -323,7 +323,7 @@ public class GitRepositoryTest {
 	 *  revision 1 in hGraph 5
 	 */
 	private static final Revision REVISION_1_5 = new Revision(COMMIT_1_5, PARENT_TO_DIFF_FILES_1_5, 
-			Compilable.NO_BUILD_FILE, null);
+			Compilable.NO_BUILD_FILE, false, null);
 	
 	/**
 	 *  parents/diff files of revision 2 in hGraph 5
@@ -337,7 +337,7 @@ public class GitRepositoryTest {
 	 *  revision 2 in hGraph 5
 	 */
 	private static final Revision REVISION_2_5 = new Revision(COMMIT_2_5, PARENT_TO_DIFF_FILES_2_5, 
-			Compilable.NO_BUILD_FILE, null);
+			Compilable.NO_BUILD_FILE, false, null);
 	
 	/**
 	 *  parents/diff files of revision 3 in hGraph 5
@@ -351,7 +351,7 @@ public class GitRepositoryTest {
 	 *  revision 3 in hGraph 5
 	 */
 	private static final Revision REVISION_3_5 = new Revision(COMMIT_3_5, PARENT_TO_DIFF_FILES_3_5, 
-			Compilable.NO_BUILD_FILE, null);
+			Compilable.NO_BUILD_FILE, false, null);
 	
 	/**
 	 *  parents/diff files of revision 4 in hGraph 5
@@ -365,7 +365,7 @@ public class GitRepositoryTest {
 	 *  revision 4 in hGraph 5
 	 */
 	private static final Revision REVISION_4_5 = new Revision(COMMIT_4_5, PARENT_TO_DIFF_FILES_4_5, 
-			Compilable.NO_BUILD_FILE, null);
+			Compilable.NO_BUILD_FILE, false, null);
 	
 	/**
 	 *  parents/diff files of revision 5 in hGraph 5
@@ -381,7 +381,7 @@ public class GitRepositoryTest {
 	 *  revision 5 in hGraph 5
 	 */
 	private static final Revision REVISION_5_5 = new Revision(COMMIT_5_5, PARENT_TO_DIFF_FILES_5_5, 
-			Compilable.NO_BUILD_FILE, null);
+			Compilable.NO_BUILD_FILE, false, null);
 	
 	
 	/*
@@ -404,7 +404,7 @@ public class GitRepositoryTest {
 	 *  revision 1 in hGraph 6
 	 */
 	private static final Revision REVISION_1_6 = new Revision(COMMIT_1_6, PARENT_TO_DIFF_FILES_1_6, 
-			Compilable.NO_BUILD_FILE, null);
+			Compilable.NO_BUILD_FILE, false, null);
 	
 	/**
 	 *  parents/diff files of revision 2 in hGraph 6
@@ -418,7 +418,7 @@ public class GitRepositoryTest {
 	 *  revision 2 in hGraph 6
 	 */
 	private static final Revision REVISION_2_6 = new Revision(COMMIT_2_6, PARENT_TO_DIFF_FILES_2_6, 
-			Compilable.NO_BUILD_FILE, null);
+			Compilable.NO_BUILD_FILE, false, null);
 	
 	/**
 	 *  parents/diff files of revision 3 in hGraph 6
@@ -432,7 +432,7 @@ public class GitRepositoryTest {
 	 *  revision 3 in hGraph 6
 	 */
 	private static final Revision REVISION_3_6 = new Revision(COMMIT_3_6, PARENT_TO_DIFF_FILES_3_6, 
-			Compilable.NO_BUILD_FILE, null);
+			Compilable.NO_BUILD_FILE, false, null);
 	
 	/**
 	 *  parents/diff files of revision 4 in hGraph 6
@@ -447,7 +447,7 @@ public class GitRepositoryTest {
 	 *  revision 4 in hGraph 6
 	 */
 	private static final Revision REVISION_4_6 = new Revision(COMMIT_4_6, PARENT_TO_DIFF_FILES_4_6, 
-			Compilable.NO_BUILD_FILE, null);
+			Compilable.NO_BUILD_FILE, false, null);
 	
 	/**
 	 *  parents/diff files of revision 5 in hGraph 6
@@ -461,7 +461,7 @@ public class GitRepositoryTest {
 	 *  revision 5 in hGraph 6
 	 */
 	private static final Revision REVISION_5_6 = new Revision(COMMIT_5_6, PARENT_TO_DIFF_FILES_5_6, 
-			Compilable.NO_BUILD_FILE, null);
+			Compilable.NO_BUILD_FILE, false, null);
 	
 	/**
 	 *  parents/diff files of revision 6 in hGraph 6
@@ -476,7 +476,7 @@ public class GitRepositoryTest {
 	 *  revision 6 in hGraph 6
 	 */
 	private static final Revision REVISION_6_6 = new Revision(COMMIT_6_6, PARENT_TO_DIFF_FILES_6_6, 
-			Compilable.NO_BUILD_FILE, null);
+			Compilable.NO_BUILD_FILE, false, null);
 	
 	
 	/*
@@ -490,7 +490,7 @@ public class GitRepositoryTest {
 	 * revision 2 in partial hGraph 3
 	 */
 	private static final Revision REVISION_2_3_PARTIAL = new Revision(COMMIT_2_3, 
-			new HashMap<Revision, Set<DiffFile>>(), Compilable.NO_BUILD_FILE, null);
+			new HashMap<Revision, Set<DiffFile>>(), Compilable.NO_BUILD_FILE, false, null);
 	
 	
 	/*
@@ -505,13 +505,13 @@ public class GitRepositoryTest {
 	 * revision 2 in partial hGraph 4_1
 	 */
 	private static final Revision REVISION_2_4_PARTIAL_1 = new Revision(COMMIT_2_4, 
-			new HashMap<Revision, Set<DiffFile>>(), Compilable.NO_BUILD_FILE, null);
+			new HashMap<Revision, Set<DiffFile>>(), Compilable.NO_BUILD_FILE, false, null);
 	
 	/**
 	 * revision 3 in partial hGraph 4_1
 	 */
 	private static final Revision REVISION_3_4_PARTIAL_1 = new Revision(COMMIT_3_4, 
-			new HashMap<Revision, Set<DiffFile>>(), Compilable.NO_BUILD_FILE, null);
+			new HashMap<Revision, Set<DiffFile>>(), Compilable.NO_BUILD_FILE, false, null);
 	
 	/*
 	 * revisions in partial hGraph 4_2
@@ -525,7 +525,7 @@ public class GitRepositoryTest {
 	 * revision 3 in partial hGraph 4_2
 	 */
 	private static final Revision REVISION_3_4_PARTIAL_2 = new Revision(COMMIT_3_4, 
-			new HashMap<Revision, Set<DiffFile>>(), Compilable.NO_BUILD_FILE, null);
+			new HashMap<Revision, Set<DiffFile>>(), Compilable.NO_BUILD_FILE, false, null);
 	
 	/**
 	 * parents/diff files of revision 4 in partial hGraph 4_2
@@ -539,7 +539,7 @@ public class GitRepositoryTest {
 	 * revision 4 in partial hGraph 4_2
 	 */
 	private static final Revision REVISION_4_4_PARTIAL_2 = new Revision(COMMIT_4_4, 
-			PARENT_TO_DIFF_FILES_4_4_PARTIAL_2, Compilable.NO_BUILD_FILE, null);
+			PARENT_TO_DIFF_FILES_4_4_PARTIAL_2, Compilable.NO_BUILD_FILE, false, null);
 	
 	
 	/*
@@ -553,13 +553,13 @@ public class GitRepositoryTest {
 	 * revision 3 in partial hGraph 5_1
 	 */
 	private static final Revision REVISION_3_5_PARTIAL_1 = new Revision(COMMIT_3_5, 
-			new HashMap<Revision, Set<DiffFile>>(), Compilable.NO_BUILD_FILE, null);
+			new HashMap<Revision, Set<DiffFile>>(), Compilable.NO_BUILD_FILE, false, null);
 	
 	/**
 	 * revision 4 in partial hGraph 5_1
 	 */
 	private static final Revision REVISION_4_5_PARTIAL_1 = new Revision(COMMIT_4_5, 
-			new HashMap<Revision, Set<DiffFile>>(), Compilable.NO_BUILD_FILE, null);
+			new HashMap<Revision, Set<DiffFile>>(), Compilable.NO_BUILD_FILE, false, null);
 	
 	/**
 	 * parents/diff files of revision 5 in partial hGraph 5_1
@@ -574,7 +574,7 @@ public class GitRepositoryTest {
 	 * revision 5 in partial hGraph 5_1
 	 */
 	private static final Revision REVISION_5_5_PARTIAL_1 = new Revision(COMMIT_5_5, 
-			PARENT_TO_DIFF_FILES_5_5_PARTIAL_1, Compilable.NO_BUILD_FILE, null);
+			PARENT_TO_DIFF_FILES_5_5_PARTIAL_1, Compilable.NO_BUILD_FILE, false, null);
 	
 	
 	/*
@@ -588,7 +588,7 @@ public class GitRepositoryTest {
 	 * revision 4 in partial hGraph 5_2
 	 */
 	private static final Revision REVISION_4_5_PARTIAL_2 = new Revision(COMMIT_4_5, 
-			new HashMap<Revision, Set<DiffFile>>(), Compilable.NO_BUILD_FILE, null);
+			new HashMap<Revision, Set<DiffFile>>(), Compilable.NO_BUILD_FILE, false, null);
 	
 	/**
 	 * parents/diff files of revision 5 in partial hGraph 5_2
@@ -602,7 +602,7 @@ public class GitRepositoryTest {
 	 * revision 5 in partial hGraph 5_2
 	 */
 	private static final Revision REVISION_5_5_PARTIAL_2 = new Revision(COMMIT_5_5, 
-			PARENT_TO_DIFF_FILES_5_5_PARTIAL_2, Compilable.NO_BUILD_FILE, null);
+			PARENT_TO_DIFF_FILES_5_5_PARTIAL_2, Compilable.NO_BUILD_FILE, false, null);
 	
 	
 	/*
@@ -619,13 +619,13 @@ public class GitRepositoryTest {
 	 * revision 3 in partial hGraph 6_1
 	 */
 	private static final Revision REVISION_3_6_PARTIAL_1 = new Revision(COMMIT_3_6, 
-			new HashMap<Revision, Set<DiffFile>>(), Compilable.NO_BUILD_FILE, null);
+			new HashMap<Revision, Set<DiffFile>>(), Compilable.NO_BUILD_FILE, false, null);
 	
 	/**
 	 * revision 5 in partial hGraph 6_1
 	 */
 	private static final Revision REVISION_5_6_PARTIAL_1 = new Revision(COMMIT_5_6, 
-			new HashMap<Revision, Set<DiffFile>>(), Compilable.NO_BUILD_FILE, null);
+			new HashMap<Revision, Set<DiffFile>>(), Compilable.NO_BUILD_FILE, false, null);
 	
 	/**
 	 * parents/diff files of revision 4 in partial hGraph 6_1
@@ -639,7 +639,7 @@ public class GitRepositoryTest {
 	 * revision 4 in partial hGraph 6_1
 	 */
 	private static final Revision REVISION_4_6_PARTIAL_1 = new Revision(COMMIT_4_6, 
-			PARENT_TO_DIFF_FILES_4_6_PARTIAL_1, Compilable.NO_BUILD_FILE, null);
+			PARENT_TO_DIFF_FILES_4_6_PARTIAL_1, Compilable.NO_BUILD_FILE, false, null);
 	
 	
 	/*
@@ -656,13 +656,13 @@ public class GitRepositoryTest {
 	 * revision 4 in partial hGraph 6_2
 	 */
 	private static final Revision REVISION_4_6_PARTIAL_2 = new Revision(COMMIT_4_6, 
-			new HashMap<Revision, Set<DiffFile>>(), Compilable.NO_BUILD_FILE, null);
+			new HashMap<Revision, Set<DiffFile>>(), Compilable.NO_BUILD_FILE, false, null);
 	
 	/**
 	 * revision 5 in partial hGraph 6_2
 	 */
 	private static final Revision REVISION_5_6_PARTIAL_2 = new Revision(COMMIT_5_6, 
-			new HashMap<Revision, Set<DiffFile>>(), Compilable.NO_BUILD_FILE, null);
+			new HashMap<Revision, Set<DiffFile>>(), Compilable.NO_BUILD_FILE, false, null);
 	
 	
 	/**
