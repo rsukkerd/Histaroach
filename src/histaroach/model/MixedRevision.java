@@ -39,7 +39,8 @@ public class MixedRevision {
     private final File clonedRepoDir;
     
     private Compilable compilable;
-    private TestResult testResult;
+    private boolean testAborted;
+	private TestResult testResult;
     // map: a set of reverted files -> a Revision they are reverted to
     private Map<Set<DiffFile>, Revision> revertedFileRecords;
     
@@ -57,9 +58,7 @@ public class MixedRevision {
         repoDir = repository.getDirectory();
         clonedRepoDir = clonedRepository.getDirectory();
         
-        compilable = Compilable.UNKNOWN;
-        testResult = null;
-        revertedFileRecords = new HashMap<Set<DiffFile>, Revision>();        
+        resetFields();
     }
     
     /**
@@ -133,9 +132,18 @@ public class MixedRevision {
 	    compilable = buildStrategy.build();
 	    
 	    if (compilable == Compilable.YES) {
-	    	testResult = buildStrategy.runTest();
+	    	
+	    	try {
+	    		testResult = buildStrategy.runTest();
+	    		testAborted = false;
+	    	} catch (InterruptedException e) {
+	    		testResult = null;
+	    		testAborted = true;
+	    	}
+	    	
 	    } else {
 	    	testResult = null;
+	    	testAborted = false;
 	    }
 	}
 
@@ -148,6 +156,7 @@ public class MixedRevision {
     public MixedRevision makeCopy() throws Exception {
     	MixedRevision copy = new MixedRevision(baseRevision, repository, clonedRepository);
     	copy.compilable = compilable;
+    	copy.testAborted = testAborted;
     	
     	if (testResult == null) {
     		copy.testResult = null;
@@ -194,9 +203,7 @@ public class MixedRevision {
     		}
     	}
     	
-    	revertedFileRecords = new HashMap<Set<DiffFile>, Revision>();
-    	compilable = Compilable.UNKNOWN;
-    	testResult = null;
+    	resetFields();
     }
     
     public Revision getBaseRevision() {
@@ -207,12 +214,23 @@ public class MixedRevision {
         return compilable;
     }
     
-    public TestResult getTestResult() {
+    public boolean hasTestAborted() {
+		return testAborted;
+	}
+
+	public TestResult getTestResult() {
         return testResult;
     }
     
     public Map<Set<DiffFile>, Revision> getRevertedFileRecords() {
     	return revertedFileRecords;
+    }
+    
+    private void resetFields() {
+    	compilable = Compilable.UNKNOWN;
+    	testAborted = false;
+        testResult = null;
+        revertedFileRecords = new HashMap<Set<DiffFile>, Revision>();
     }
     
     @Override
@@ -225,7 +243,8 @@ public class MixedRevision {
 
 		return baseRevision.equals(mr.baseRevision) && compilable == mr.compilable 
 				&& ((testResult == null && mr.testResult == null) || 
-						(testResult != null && testResult.equals(mr.testResult)))
+						(testResult != null && testResult.equals(mr.testResult))) 
+				&& testAborted == mr.testAborted 
 				&& revertedFileRecords.equals(mr.revertedFileRecords);
 	}
 
@@ -236,6 +255,10 @@ public class MixedRevision {
 		
 		if (testResult != null) {
 			hashCode += 19 * testResult.hashCode();
+		}
+		
+		if (testAborted) {
+			hashCode += 23;
 		}
 		
 		return hashCode;
@@ -257,7 +280,12 @@ public class MixedRevision {
         str += "Compilable: " + compilable + "\n";
         
         if (compilable == Compilable.YES) {
-            str += testResult.toString();
+
+        	if (testAborted) {
+        		str += "Test Aborted\n";
+        	} else {
+        		str += testResult.toString();
+        	}
         }
         
         return str;

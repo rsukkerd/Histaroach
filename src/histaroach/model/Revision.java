@@ -34,9 +34,10 @@ public class Revision implements Serializable {
 
     private final String commitID;
     private final Map<Revision, Set<DiffFile>> parentToDiffFiles;
-    private Compilable compilable;
-    private /*@Nullable*/ TestResult testResult;
-
+    private final Compilable compilable;
+    private final boolean testAborted;
+	private final /*@Nullable*/ TestResult testResult;
+	
     /**
      * Creates a Revision, whose Compilable state and 
      * TestResult are populated in this constructor. 
@@ -62,9 +63,24 @@ public class Revision implements Serializable {
     	compilable = buildStrategy.build();
 	    
 	    if (compilable == Compilable.YES) {
-	    	testResult = buildStrategy.runTest();
+	    	TestResult testResult;
+	    	boolean testAborted;
+	    	
+	    	try {
+	    		testResult = buildStrategy.runTest();
+	    		testAborted = false;
+	    	} catch (InterruptedException e) {
+	    		// the process was killed forcibly
+	    		testResult = null;
+	    		testAborted = true;
+	    	}
+	    	
+	    	this.testResult = testResult;
+	    	this.testAborted = testAborted;
+	    	
 	    } else {
 	    	testResult = null;
+	    	testAborted = false;
 	    }
     }
     
@@ -73,9 +89,10 @@ public class Revision implements Serializable {
      * TestResult are given.
      */
     public Revision(String commitID, Map<Revision, Set<DiffFile>> parentToDiffFiles, 
-    		Compilable compilable, TestResult testResult) {
+    		Compilable compilable, boolean testAborted, TestResult testResult) {
     	this.commitID = commitID;
     	this.compilable = compilable;
+    	this.testAborted = testAborted;
     	this.testResult = testResult;
     	this.parentToDiffFiles = parentToDiffFiles;
     }
@@ -101,12 +118,20 @@ public class Revision implements Serializable {
     }
 
     /**
+	 * @return true if the process that runs tests has been aborted. 
+	 *         If true, getTestResult() returns null.
+	 */
+	public boolean hasTestAborted() {
+		return testAborted;
+	}
+
+	/**
      * @return a TestResult; null if this Revision is not compilable.
      */
     public TestResult getTestResult() {
         return testResult;
     }
-
+    
     @Override
     public boolean equals(Object object) {
         if (object == null || !object.getClass().equals(this.getClass())) {
@@ -119,6 +144,7 @@ public class Revision implements Serializable {
         boolean boolCompilable = compilable == other.compilable;
         boolean boolTestResult = (testResult == null && other.testResult == null) 
         						|| (testResult != null && testResult.equals(other.testResult));
+        boolean boolTestAborted = testAborted == other.testAborted;
         
         // check equality of parents' IDs and DiffFiles
         Set<Revision> parents = parentToDiffFiles.keySet();
@@ -145,7 +171,7 @@ public class Revision implements Serializable {
         	}
         }
         
-        return boolCommitID && boolCompilable && boolTestResult;
+        return boolCommitID && boolCompilable && boolTestResult && boolTestAborted;
     }
 
     @Override
@@ -154,6 +180,10 @@ public class Revision implements Serializable {
         
         if (testResult != null) {
             code += 17 * testResult.hashCode();
+        }
+        
+        if (testAborted) {
+        	code += 29;
         }
         
         for (Revision parent : parentToDiffFiles.keySet()) {
@@ -172,9 +202,14 @@ public class Revision implements Serializable {
         result += "Compilable: " + compilable + "\n";
         
         if (compilable == Compilable.YES) {
-            result += testResult.toString();
+        	
+        	if (testAborted) {
+        		result += "Test Aborted\n";
+        	} else {
+        		result += testResult.toString();
+        	}
         }
-                
+                        
         for (Revision parent : parentToDiffFiles.keySet()) {
         	result += "Parent: " + parent.commitID + "\n";
         	result += "Diff Files:\n";

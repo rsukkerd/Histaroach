@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +25,8 @@ public class Util {
 	 * Single space character
 	 */
 	public static final String SINGLE_SPACE_CHAR = " ";
+	public static final int TIMEOUT = 3600;
+	public static final String KILL_JAVA_PROCESSES_SH = "./kill_j_a_v_a_processes.sh";
 	
 	/**
 	 * Creates a process that executes command in processDir.
@@ -42,7 +45,7 @@ public class Util {
 		p = pBuilder.start();
 
 		//timer setup
-		ProcessKillTimer pkt = new ProcessKillTimer(p, 3600);
+		ProcessKillTimer pkt = new ProcessKillTimer(p, TIMEOUT);
 		Thread t = new Thread( pkt ); //timer thread for 1 hour
 		t.start();
 
@@ -60,7 +63,6 @@ public class Util {
 
 		return p;
 	}
-
     
     /**
      * Reads and caches content from inputStream.
@@ -148,6 +150,17 @@ public class Util {
 	            + filename);
 		FileUtils.forceDelete(file);
 	}
+	
+	/**
+	 * Looks up this java application's PID. 
+	 * Specific to Sun's JVM.
+	 * 
+	 * @return this java application's PID.
+	 */
+	public static String getOwnPID() {
+		String jvmName = ManagementFactory.getRuntimeMXBean().getName();
+		return jvmName.split("@")[0];
+	}
 }
 
 final class ProcessKillTimer implements Runnable {
@@ -182,5 +195,17 @@ final class ProcessKillTimer implements Runnable {
 		//kill the process and set the flag so we know we killed it
 		proc.destroy();
 		killed = true;
+		
+		// kill all other java processes under this user.
+		Process p;
+		try {
+			String[] command = { Util.KILL_JAVA_PROCESSES_SH, Util.getOwnPID() };
+			p = Runtime.getRuntime().exec(command);
+			p.waitFor();
+		} catch (Exception e) {
+			System.err.println("Warning: " + Util.KILL_JAVA_PROCESSES_SH 
+					+ " has terminated unexpectedly.");
+			e.printStackTrace();
+		}
 	}
 }
