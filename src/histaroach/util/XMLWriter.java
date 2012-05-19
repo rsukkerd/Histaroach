@@ -32,6 +32,7 @@ public abstract class XMLWriter {
 	
 	public static final String COMMIT_ID = "commitID";
 	public static final String COMPILABLE = "Compilable";
+	public static final String TEST_ABORTED = "testAborted";
 	public static final String TEST_RESULT = "TestResult";
 	public static final String TESTS = "Tests";
 	public static final String FAILED_TESTS = "FailedTests";
@@ -85,6 +86,13 @@ public abstract class XMLWriter {
 		return compilableElement;
 	}
 	
+	public Element createTestAbortedElement(boolean testAborted) {
+		Element testAbortedElement = doc.createElement(TEST_ABORTED);
+		addText(testAbortedElement, Boolean.toString(testAborted));
+		
+		return testAbortedElement;
+	}
+
 	public Element createTestResultElement(TestResult testResult) {
 		Element testResultElement = doc.createElement(TEST_RESULT);
 				

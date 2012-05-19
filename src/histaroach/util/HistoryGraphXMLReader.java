@@ -60,11 +60,13 @@ public class HistoryGraphXMLReader extends XMLReader<HistoryGraph> {
 		
 		Element commitIDElement = iter.next();		// <commitID>
 		Element compilableElement = iter.next();	// <Compilable>
+		Element testAbortedElement = iter.next();	// <testAborted>
 		Element testResultElement = iter.next();	// <TestResult>
 		Element parentsElement = iter.next();		// <Parents>
 		
 		String commitID = getString(commitIDElement);
 		Compilable compilable = parseCompilableElement(compilableElement);
+		boolean testAborted = parseTestAbortedElement(testAbortedElement);
 		TestResult testResult = null;
 		
 		if (compilable == Compilable.YES) {
@@ -73,7 +75,8 @@ public class HistoryGraphXMLReader extends XMLReader<HistoryGraph> {
 		
 		Map<Revision, Set<DiffFile>> parentToDiffFiles = parseDiffRecordsElement(parentsElement);
 		
-		Revision revision = new Revision(commitID, parentToDiffFiles, compilable, testResult);
+		Revision revision = new Revision(commitID, parentToDiffFiles, compilable, 
+				testAborted, testResult);
 		
 		return revision;
 	}

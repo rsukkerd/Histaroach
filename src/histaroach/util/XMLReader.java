@@ -62,6 +62,12 @@ public abstract class XMLReader<T> {
 		return Compilable.NO_BUILD_FILE;
 	}
 	
+	public boolean parseTestAbortedElement(Element testAbortedElement) {
+		String testAbortedStr = getString(testAbortedElement);
+		
+		return testAbortedStr.equals(Boolean.TRUE.toString());
+	}
+	
 	public TestResult parseTestResultElement(Element testResultElement) { // <TestResult>
 		Iterator<Element> iter = traverseContainedElements(testResultElement).iterator();
 		

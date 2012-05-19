@@ -50,17 +50,20 @@ public class HistoryGraphXMLWriter extends XMLWriter {
 	public Element createRevisionElement(Revision revision) {
 		String commitID = revision.getCommitID();
 		Compilable compilable = revision.isCompilable();
+		boolean testAborted = revision.hasTestAborted();
 		TestResult testResult = revision.getTestResult();
 		
 		Element revisionElement = doc.createElement(REVISION);
 		
 		Element commitIDElement = createCommitIDElement(commitID);
 		Element compilableElement = createCompilableElement(compilable);
+		Element testAbortedElement = createTestAbortedElement(testAborted);
 		Element testResultElement = createTestResultElement(testResult);
 		Element parentsElement = createParentsElement(revision);
 		
 		revisionElement.appendChild(commitIDElement);
 		revisionElement.appendChild(compilableElement);
+		revisionElement.appendChild(testAbortedElement);
 		revisionElement.appendChild(testResultElement);
 		revisionElement.appendChild(parentsElement);
 		
