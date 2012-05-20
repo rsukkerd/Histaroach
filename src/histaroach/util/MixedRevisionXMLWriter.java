@@ -34,7 +34,7 @@ public class MixedRevisionXMLWriter extends XMLWriter {
 	}
 
 	@Override
-	public void write() throws TransformerException {
+	public void buildDocument() throws TransformerException {
 		Element rootElement = doc.createElement(MIXED_REVISIONS);
 		
 		for (MixedRevision mixedRevision : mixedRevisions) {
@@ -44,7 +44,7 @@ public class MixedRevisionXMLWriter extends XMLWriter {
 		
 		doc.appendChild(rootElement);
 		
-		write(rootElement);
+		write();
 	}
 
 	public Element createMixedRevisionElement(MixedRevision mixedRevision) {

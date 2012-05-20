@@ -21,7 +21,6 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
 
@@ -54,12 +53,21 @@ public abstract class XMLWriter {
 		doc = builder.newDocument();
 	}
 	
-	public abstract void write() throws TransformerException;
+	/**
+	 * Creates all element nodes, builds the DOM tree and and appends 
+	 * its root to the document.
+	 * 
+	 * @modifies this
+	 * @throws TransformerException
+	 */
+	public abstract void buildDocument() throws TransformerException;
 
-	protected void write(Element alienRootElement) throws TransformerException {
-		Node rootElement = doc.importNode(alienRootElement, true);
-		doc.appendChild(rootElement);
-		
+	/**
+	 * Writes the document to the xml file.
+	 * 
+	 * @throws TransformerException
+	 */
+	protected void write() throws TransformerException {
 		/* write the content into xml file */
 		TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		Transformer transformer = transformerFactory.newTransformer();

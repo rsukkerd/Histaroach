@@ -140,6 +140,6 @@ public class TestIsolationDataGenerator {
     	File xmlFile = new File(OUTPUT_PATH + File.separatorChar + fileName);
     	
     	XMLWriter writer = new HistoryGraphXMLWriter(xmlFile, historyGraph);
-    	writer.write();
+    	writer.buildDocument();
     }
 }

@@ -34,7 +34,7 @@ public class HistoryGraphXMLWriter extends XMLWriter {
 	}
 
 	@Override
-	public void write() throws TransformerException {
+	public void buildDocument() throws TransformerException {
 		Element rootElement = doc.createElement(HISTORY_GRAPH);
 		
 		for (Revision revision : historyGraph) {
@@ -44,7 +44,7 @@ public class HistoryGraphXMLWriter extends XMLWriter {
 		
 		doc.appendChild(rootElement);
 		
-		write(rootElement);
+		write();
 	}
 	
 	public Element createRevisionElement(Revision revision) {

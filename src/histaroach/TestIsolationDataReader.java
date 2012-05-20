@@ -158,7 +158,7 @@ public class TestIsolationDataReader {
         			flips);
         	
         	XMLWriter writer = new MixedRevisionXMLWriter(xmlFile, mixedRevisions);
-        	writer.write();
+        	writer.buildDocument();
         }
 	}
 }
