@@ -49,6 +49,20 @@ public class TestIsolationDataReader {
 	public static String projName = null;
 
 	/**
+	 * Repository directory.
+	 */
+	@Option(value = "-r Repository directory",
+	        aliases = { "-repoDir" })
+	public static File repoDir = null;
+	
+	/**
+	 * Cloned repository directory.
+	 */
+	@Option(value = "-c Cloned repository directory",
+	        aliases = { "-clonedRepoDir" })
+	public static File clonedRepoDir = null;
+	
+	/**
      * HistoryGraph xml file.
      */
     @Option(value = "-H HistoryGraph xml file", 
@@ -77,20 +91,6 @@ public class TestIsolationDataReader {
     public static int numMixedRevisions = 0;
     
     /**
-	 * Full path to the repository directory.
-	 */
-	@Option(value = "-r Full path to the repository directory",
-	        aliases = { "-repoPath" })
-	public static String repoPath = null;
-	
-	/**
-	 * Full path to the cloned repository directory.
-	 */
-	@Option(value = "-c Full path to the cloned repository directory",
-	        aliases = { "-clonedRepoPath" })
-	public static String clonedRepoPath = null;
-
-	/**
 	 * Build command. Default is 'ant'.
 	 */
 	@Option(value = "-b build command (Optional)", 
@@ -117,15 +117,12 @@ public class TestIsolationDataReader {
 	        return;
 	    }
 	    
-	    if (projName == null || repoPath == null || clonedRepoPath == null || 
+	    if (projName == null || repoDir == null || clonedRepoDir == null || 
 	    		hGraphXML == null) {
 	    	plumeOptions.print_usage();
 	    	return;
 	    }
-	    
-    	File repoDir = new File(repoPath);
-	    File clonedRepoDir = new File(clonedRepoPath);
-	    
+	    	    
 	    IBuildStrategy buildStrategy = null;
         IBuildStrategy clonedBuildStrategy = null;
         
@@ -145,7 +142,7 @@ public class TestIsolationDataReader {
         XMLReader<HistoryGraph> reader = new HistoryGraphXMLReader(hGraphXML);
 	    HistoryGraph historyGraph = reader.read();
 
-	    if (numMixedRevisions > 0) {
+	    if (mRevisionXML != null) {
         	runTestOnMixedRevisions(historyGraph, repository, clonedRepository);
         } else {
         	generateMixedRevisions(historyGraph, repository, clonedRepository);
@@ -191,17 +188,30 @@ public class TestIsolationDataReader {
 		XMLReader<List<MixedRevision>> reader = new MixedRevisionXMLReader(
     			mRevisionXML, repository, clonedRepository, historyGraph);
     	List<MixedRevision> mixedRevisions = reader.read();
+    	MixedRevisionAnalysis analysis = new MixedRevisionAnalysis(mixedRevisions);
     	
     	String xmlFilename = mRevisionXML.getName();
-    	String filename = xmlFilename.substring(0, xmlFilename.indexOf(
-    			TestIsolationDataGenerator.XML_EXTENSION)) + 
-    			"_" + startIndex + "_" + (startIndex + numMixedRevisions) + 
-    			TXT_EXTENSION;
+    	String filename;
+    	
+    	if (numMixedRevisions > 0) {
+    		filename = xmlFilename.substring(0, xmlFilename.indexOf(
+        			TestIsolationDataGenerator.XML_EXTENSION)) + 
+        			"_" + startIndex + "_" + (startIndex + numMixedRevisions) + 
+        			TXT_EXTENSION;
+    	} else {
+    		filename = xmlFilename.substring(0, xmlFilename.indexOf(
+        			TestIsolationDataGenerator.XML_EXTENSION)) + 
+        			TXT_EXTENSION;
+    	}
+    	
     	File txtFile = new File(TestIsolationDataGenerator.OUTPUT_PATH + 
     			File.separatorChar + filename);
     	
-    	MixedRevisionAnalysis analysis = new MixedRevisionAnalysis(mixedRevisions);
-    	analysis.runTestOnMixedRevisions(startIndex, numMixedRevisions, 
-    			txtFile);
+    	if (numMixedRevisions > 0) {
+	    	analysis.runTestOnMixedRevisions(startIndex, numMixedRevisions, 
+	    			txtFile);
+    	} else {
+    		analysis.runTestOnMixedRevisions(txtFile);
+    	}
 	}
 }

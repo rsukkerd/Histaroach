@@ -43,6 +43,17 @@ public class MixedRevisionAnalysis {
 	}
 	
 	/**
+	 * For all MixedRevisions in mixedRevisions, creates actual mixed revisions 
+	 * on the file system, runs tests on them and records the results to 
+	 * an output file.
+	 * 
+	 * @throws Exception
+	 */
+	public void runTestOnMixedRevisions(File outputFile) throws Exception {
+		runTestOnMixedRevisions(0, mixedRevisions.size(), outputFile);
+	}
+	
+	/**
 	 * For a specified range in mixedRevisions, creates actual mixed revisions 
 	 * on the file system, runs tests on them and records the results to 
 	 * an output file.
