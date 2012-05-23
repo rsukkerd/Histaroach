@@ -1,13 +1,14 @@
 package histaroach.algorithm;
 
 import histaroach.model.DiffFile;
+import histaroach.model.DiffFile.DiffType;
 import histaroach.model.MixedRevision;
 import histaroach.model.Revision;
-import histaroach.model.TestResult;
-import histaroach.model.DiffFile.DiffType;
 import histaroach.model.Revision.Compilable;
+import histaroach.model.TestResult;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.util.List;
 import java.util.Map;
@@ -49,8 +50,8 @@ public class MixedRevisionAnalysis {
 	 * @throws Exception
 	 */
 	public void runTestOnMixedRevisions(int startIndex, int numElements, 
-			String outputFileName) throws Exception {
-		FileWriter fstream = new FileWriter(outputFileName);
+			File outputFile) throws Exception {
+		FileWriter fstream = new FileWriter(outputFile);
 		BufferedWriter out = new BufferedWriter(fstream);
 		out.write(HEADER);
 		out.flush();
