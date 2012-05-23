@@ -20,6 +20,9 @@ import java.io.File;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
 import plume.Option;
 import plume.OptionGroup;
 import plume.Options;
@@ -27,6 +30,9 @@ import plume.Options;
 
 public class TestIsolationDataReader {
 
+	public static final String MREVISION_FILE_PREFIX = "mixedRevision";
+	public static final String TXT_EXTENSION = ".txt";
+	
 	/**
      * Print the short usage message.
      */
@@ -45,16 +51,16 @@ public class TestIsolationDataReader {
 	/**
      * HistoryGraph xml file.
      */
-    @Option(value = "-x HistoryGraph xml file", 
+    @Option(value = "-H HistoryGraph xml file", 
     		aliases = { "-hGraphXML" })
-    public static String hGraphXML = null;
+    public static File hGraphXML = null;
     
     /**
-     * MixedRevision output file.
+     * MixedRevision xml file.
      */
-    @Option(value = "-m MixedRevision output file", 
-    		aliases = { "-mixedRevisionOutput" })
-    public static String mixedRevisionOutput = null;
+    @Option(value = "-M MixedRevision xml file", 
+    		aliases = { "-mRevisionXML" })
+    public static File mRevisionXML = null;
     
     /**
      * Start index of MixedRevision to begin analysis.
@@ -136,29 +142,66 @@ public class TestIsolationDataReader {
         IRepository repository = new GitRepository(repoDir, buildStrategy);
         IRepository clonedRepository = new GitRepository(clonedRepoDir, clonedBuildStrategy);
         
-        XMLReader<HistoryGraph> hGraphreader = new HistoryGraphXMLReader(new File(hGraphXML));
-	    HistoryGraph historyGraph = hGraphreader.read();
-	    
-	    File xmlFile = new File("output/mixedRevisions.xml");
-        
-        if (numMixedRevisions > 0) {
-        	XMLReader<List<MixedRevision>> mRevisionReader = new MixedRevisionXMLReader(
-        			xmlFile, repository, clonedRepository, historyGraph);
-        	List<MixedRevision> mixedRevisions = mRevisionReader.read();
-        	
-        	MixedRevisionAnalysis analysis = new MixedRevisionAnalysis(mixedRevisions);
-        	analysis.runTestOnMixedRevisions(startIndex, numMixedRevisions, 
-        			mixedRevisionOutput);
+        XMLReader<HistoryGraph> reader = new HistoryGraphXMLReader(hGraphXML);
+	    HistoryGraph historyGraph = reader.read();
+
+	    if (numMixedRevisions > 0) {
+        	runTestOnMixedRevisions(historyGraph, repository, clonedRepository);
         } else {
-        	Set<Flip> flips = historyGraph.getAllFlips();
-        	
-        	MixedRevisionGenerator generator = new MixedRevisionGenerator(repository, 
-        			clonedRepository);
-        	List<MixedRevision> mixedRevisions = generator.generateMixedRevisionsFromFlips(
-        			flips);
-        	
-        	XMLWriter writer = new MixedRevisionXMLWriter(xmlFile, mixedRevisions);
-        	writer.buildDocument();
+        	generateMixedRevisions(historyGraph, repository, clonedRepository);
         }
+	}
+	
+	/**
+	 * Generates a list of MixedRevisions from all flips in historyGraph, 
+	 * and writes them to an xml file.
+	 * 
+	 * @throws ParserConfigurationException
+	 * @throws TransformerException
+	 */
+	public static void generateMixedRevisions(HistoryGraph historyGraph, 
+			IRepository repository, IRepository clonedRepository) 
+			throws ParserConfigurationException, TransformerException {
+		Set<Flip> flips = historyGraph.getAllFlips();
+    	
+    	MixedRevisionGenerator generator = new MixedRevisionGenerator(repository, 
+    			clonedRepository);
+    	List<MixedRevision> mixedRevisions = generator.generateMixedRevisionsFromFlips(
+    			flips);
+    	
+    	String filename = hGraphXML.getName().replaceFirst(
+    			TestIsolationDataGenerator.HGRAPH_FILE_PREFIX, MREVISION_FILE_PREFIX);
+    	File xmlFile = new File(TestIsolationDataGenerator.OUTPUT_PATH + 
+    			File.separatorChar + filename);
+    	
+    	XMLWriter writer = new MixedRevisionXMLWriter(xmlFile, mixedRevisions);
+    	writer.buildDocument();
+	}
+	
+	/**
+	 * For a specified range in mixedRevisions, creates actual mixed revisions 
+	 * on the file system, runs tests on them and records the results to 
+	 * an output file.
+	 * 
+	 * @throws Exception
+	 */
+	public static void runTestOnMixedRevisions(HistoryGraph historyGraph, 
+			IRepository repository, IRepository clonedRepository) 
+			throws Exception {
+		XMLReader<List<MixedRevision>> reader = new MixedRevisionXMLReader(
+    			mRevisionXML, repository, clonedRepository, historyGraph);
+    	List<MixedRevision> mixedRevisions = reader.read();
+    	
+    	String xmlFilename = mRevisionXML.getName();
+    	String filename = xmlFilename.substring(0, xmlFilename.indexOf(
+    			TestIsolationDataGenerator.XML_EXTENSION)) + 
+    			"_" + startIndex + "_" + (startIndex + numMixedRevisions) + 
+    			TXT_EXTENSION;
+    	File txtFile = new File(TestIsolationDataGenerator.OUTPUT_PATH + 
+    			File.separatorChar + filename);
+    	
+    	MixedRevisionAnalysis analysis = new MixedRevisionAnalysis(mixedRevisions);
+    	analysis.runTestOnMixedRevisions(startIndex, numMixedRevisions, 
+    			txtFile);
 	}
 }
