@@ -10,6 +10,7 @@ import histaroach.model.TestResult;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,11 +24,12 @@ import java.util.Set;
 public class MixedRevisionAnalysis {
 		
 	private static final String COLUMN_SEPARATOR_CHAR = ";";
+	private static final String FILE_SEPARATOR_CHAR = ",";
 	private static final String NEW_LINE_CHAR = "\n";
 	
 	private static final String HEADER = 
-		"mixedRevisionID baseRevisionID otherRevisionID file revertType " + 
-		"compilable test mixedTestResult baseTestResult otherTestResult" + NEW_LINE_CHAR;
+		"mixedRevisionID;baseRevisionID;otherRevisionID;revertedFiles;" + 
+		"compilable;testAborted;test;mixedTestResult;baseTestResult;otherTestResult" + NEW_LINE_CHAR;
 	
 	private static final String ADDED_CHAR = "+";
 	private static final String DELETED_CHAR = "-";
@@ -111,12 +113,20 @@ public class MixedRevisionAnalysis {
 				baseRevision.getCommitID() + COLUMN_SEPARATOR_CHAR + 
 				otherRevision.getCommitID();
 			
-			for (DiffFile revertedFile : revertedFiles) {
-				// file revertType
-				String lineRevertedFile = getLineRevertedFile(revertedFile);
+			// ?file1,?file2,...,?fileN
+			String lineRevertedFiles = getLineRevertedFiles(revertedFiles);
 			
-				lines += getFullLine(mixedRevision, baseTestResult, otherTestResult, 
-						lineHeader, lineRevertedFile) + NEW_LINE_CHAR;
+			if (mixedRevision.isCompilable() == Compilable.YES && 
+					!mixedRevision.hasTestAborted()) {
+				TestResult mixedTestResult = mixedRevision.getTestResult();
+				assert mixedTestResult != null;
+			
+				for (String test : baseTestResult.getAllTests()) {
+					lines += getFullLine(test, mixedTestResult, baseTestResult, 
+							otherTestResult, lineHeader, lineRevertedFiles);
+				}
+			} else {
+				lines += getFullLineNoTestResult(mixedRevision, lineHeader, lineRevertedFiles);
 			}
 		}
 		
@@ -125,62 +135,81 @@ public class MixedRevisionAnalysis {
 	
 	/**
 	 * Line format: 
-	 * mixedRevisionID baseRevisionID otherRevisionID 
-	 * file revertType 
-	 * compilable test mixedTestResult baseTestResult otherTestResult
+	 * mixedRevisionID baseRevisionID otherRevisionID revertedFiles 
+	 * compilable testAborted test mixedTestResult baseTestResult otherTestResult
 	 */
-	private String getFullLine(MixedRevision mixedRevision, 
+	private String getFullLine(String test, TestResult mixedTestResult, 
 			TestResult baseTestResult, TestResult otherTestResult, 
-			String lineHeader, String lineRevertedFile) {
+			String lineHeader, String lineRevertedFiles) {
 		String line = "";
 		
-		if (mixedRevision.isCompilable() == Compilable.YES) {
-			TestResult mixedTestResult = mixedRevision.getTestResult();
-			
-			for (String test : baseTestResult.getAllTests()) {
-				line += lineHeader + COLUMN_SEPARATOR_CHAR;
-				line += lineRevertedFile + COLUMN_SEPARATOR_CHAR;
+		line += lineHeader + COLUMN_SEPARATOR_CHAR;
+		line += lineRevertedFiles + COLUMN_SEPARATOR_CHAR;
 				
-				// compilable
-				line += TRUE + COLUMN_SEPARATOR_CHAR;
-				
-				// test mixedTestResult baseTestResult otherTestResult
-				line += getLineTestResults(test, mixedTestResult, baseTestResult, 
-						otherTestResult) + NEW_LINE_CHAR;
-			}
-		} else {
-			line += lineHeader + COLUMN_SEPARATOR_CHAR;
-			line += lineRevertedFile + COLUMN_SEPARATOR_CHAR;
-			
-			// compilable
-			line += FALSE + COLUMN_SEPARATOR_CHAR;
-			
-			line += NONE + COLUMN_SEPARATOR_CHAR +	// test
-					NONE + COLUMN_SEPARATOR_CHAR +	// baseTestResult
-					NONE + COLUMN_SEPARATOR_CHAR +	// otherTestResult
-					NONE + NEW_LINE_CHAR;			// mixedTestResult
-		}
+		// compilable testAborted
+		line += TRUE + COLUMN_SEPARATOR_CHAR + FALSE + COLUMN_SEPARATOR_CHAR;
+		
+		// test mixedTestResult baseTestResult otherTestResult
+		line += getLineTestResults(test, mixedTestResult, baseTestResult, 
+				otherTestResult) + NEW_LINE_CHAR;
 		
 		return line;
 	}
 	
 	/**
-	 * Format: file revertType
+	 * Line format: 
+	 * mixedRevisionID baseRevisionID otherRevisionID revertedFiles 
+	 * compilable testAborted n n n n
 	 */
-	private String getLineRevertedFile(DiffFile revertedFile) {
+	private String getFullLineNoTestResult(MixedRevision mixedRevision, 
+			String lineHeader, String lineRevertedFiles) {
+		String line = "";
+		
+		line += lineHeader + COLUMN_SEPARATOR_CHAR;
+		line += lineRevertedFiles + COLUMN_SEPARATOR_CHAR;
+		
+		// compilable
+		line += (mixedRevision.isCompilable() == Compilable.YES ? 
+				TRUE : FALSE) + COLUMN_SEPARATOR_CHAR;
+		
+		// testAborted
+		line += (mixedRevision.hasTestAborted() ? TRUE : FALSE) + 
+				COLUMN_SEPARATOR_CHAR;
+		
+		line += NONE + COLUMN_SEPARATOR_CHAR +	// test
+				NONE + COLUMN_SEPARATOR_CHAR +	// baseTestResult
+				NONE + COLUMN_SEPARATOR_CHAR +	// otherTestResult
+				NONE + NEW_LINE_CHAR;			// mixedTestResult
+		
+		return line;
+	}
+	
+	/**
+	 * Format: ?file1,?file2,...,?fileN
+	 */
+	private String getLineRevertedFiles(Set<DiffFile> revertedFiles) {
 		String res = "";
+		Iterator<DiffFile> iter = revertedFiles.iterator();
 		
-		String fileName = revertedFile.getFileName();
-		DiffType diffType = revertedFile.getDiffType();
-		
-		res += fileName + COLUMN_SEPARATOR_CHAR;
-		
-		if (diffType == DiffType.ADDED) {
-			res += DELETED_CHAR;
-		} else if (diffType == DiffType.DELETED) {
-			res += ADDED_CHAR;
-		} else {
-			res += MODIFIED_CHAR;
+		while (iter.hasNext()) {
+			DiffFile revertedFile = iter.next();
+			
+			String fileName = revertedFile.getFileName();
+			DiffType diffType = revertedFile.getDiffType();
+			
+			if (diffType == DiffType.ADDED) {
+				res += DELETED_CHAR;
+			} else if (diffType == DiffType.DELETED) {
+				res += ADDED_CHAR;
+			} else {
+				res += MODIFIED_CHAR;
+			}
+			
+			res += fileName;
+			
+			if (iter.hasNext()) {
+				res += FILE_SEPARATOR_CHAR;
+			}
 		}
 		
 		return res;
