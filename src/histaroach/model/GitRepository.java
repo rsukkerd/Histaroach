@@ -207,11 +207,14 @@ public class GitRepository implements IRepository, Serializable {
         		parentToDiffFiles.put(parent, diffFiles);
         	}
         	
+        	// print progress to stdout
+        	System.out.println("Processing commit " + commitID);
+        	
         	Revision revision = new Revision(this, commitID, parentToDiffFiles);
         	hGraph.addRevision(revision);
         	
         	// print progress to stdout
-        	System.out.println(revision);
+        	System.out.println("Finished processing commit " + commitID);
         	
         	revisions.put(commitID, revision);
         	
