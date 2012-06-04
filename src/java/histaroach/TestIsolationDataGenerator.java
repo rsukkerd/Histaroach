@@ -25,7 +25,7 @@ import plume.Options;
  */
 public class TestIsolationDataGenerator {
 	
-	public static final String OUTPUT_PATH = "output";
+	public static final String OUTPUT_PATH = "data";
 	
     // Prefix of files to which HistoryGraph instances are written.
     public static final String HGRAPH_FILE_PREFIX = "historyGraph";
