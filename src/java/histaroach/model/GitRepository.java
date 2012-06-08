@@ -30,6 +30,10 @@ public class GitRepository implements IRepository, Serializable {
 	private static final int HASH_LENGTH = 7;
 	private static final String[] LOG_COMMAND = 
 		{ "git", "log", "--pretty=format:%h %p", "--date-order" };
+	private static final String[] CLEAN_TRACKED_CHANGES = 
+		{ "git", "checkout", "--", "./" };
+	private static final String[] CLEAN_UNTRACKED_FILES = 	
+		{ "git", "clean", "-f", "-d" };
 
 	private final File directory;
 	private final IBuildStrategy buildStrategy;
@@ -55,9 +59,10 @@ public class GitRepository implements IRepository, Serializable {
 	@Override
 	public boolean checkoutCommit(String commitID) throws IOException,
 			InterruptedException {
-		// discard changes in working directory before check out commit
-		Util.runProcess(
-				new String[] { "git", "checkout", "--", "./" }, directory);
+		// discard tracked changes in the working directory
+		Util.runProcess(CLEAN_TRACKED_CHANGES, directory);
+		// discard untracked files in the working directory
+		Util.runProcess(CLEAN_UNTRACKED_FILES, directory);
 		
 		Util.killOtherJavaProcesses();
 		
