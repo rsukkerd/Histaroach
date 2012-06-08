@@ -33,11 +33,33 @@ For TestIsolationDataGenerator:
 Using the compiled utilities
 -----------------------------
 
-### TestIsolationDataGenerator
+### DataCollector
 
 TODO
 
 
-### ParallelBugFixesFinder
+Output File Documentation
+--------------------------
 
-TODO
+### MixedRevision Output
+
+File Content:
+A MixedRevision output file contains a list of MixedRevisions and their test results. Each MixedRevision 
+in this file is created from a pair of child-parent Revisions, which contains at least 1 test flip. 
+A test flip can be from pass (in parent) to fail (in child) or vice versa.
+
+File Format:
+ * mixedRevisionID : a unique number for a particular MixedRevision
+ * baseRevisionID  : a child commit ID
+ * otherRevisionID : a parent commit ID
+ * revertedFiles   : a set of files that are reverted from child version to parent version
+ * (reverted type) : + means the file (from parent) is added to child;
+                     - means the file is removed from child;
+                     ~ means the file is replaced with the parent version of itself
+ * compilable      : 0 means this MixedRevision is not compilable; 1 means compilable;
+                     if 0, all of the test-related fields are 'n'
+ * testAborted     : 0 means the tests terminate OK; 1 means the process that runs the tests has aborted
+ * test            : name of a test
+ * mixedTestResult : 0 means this MixedRevision fails this test; 1 means passes
+ * baseTestResult  : 0 means the child of this MixedRevision fails this test; 1 means passes
+ * otherTestResult : 0 means the parent of this MixedRevision fails this test; 1 means passes
