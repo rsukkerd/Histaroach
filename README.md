@@ -55,10 +55,11 @@ File Format:
  * revertedFiles   : a set of files that are reverted from child version to parent version
  * (reverted type) : + means the file (from parent) is added to child;
                      - means the file is removed from child;
-                     ~ means the file is replaced with the parent version of itself
+                     ~ means the file in child is replaced with the parent version of itself
  * compilable      : 0 means this MixedRevision is not compilable; 1 means compilable;
                      if 0, all of the test-related fields are 'n'
- * testAborted     : 0 means the tests terminate OK; 1 means the process that runs the tests has aborted
+ * testAborted     : 0 means the tests terminate OK; 1 means the process that runs the tests has aborted;
+                     if 1, all of the test-related fields are 'n'
  * test            : name of a test
  * mixedTestResult : 0 means this MixedRevision fails this test; 1 means passes
  * baseTestResult  : 0 means the child of this MixedRevision fails this test; 1 means passes
