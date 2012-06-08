@@ -2,7 +2,7 @@ package histaroach.util;
 
 import java.io.File;
 
-import histaroach.TestIsolationDataGenerator;
+import histaroach.DataCollector;
 import histaroach.model.HistoryGraph;
 import histaroach.model.Revision;
 
@@ -14,9 +14,9 @@ public aspect GetHistoryGraphXML {
 		execution(void HistoryGraph.addRevision(Revision));
 	
 	after() returning: addRevision() {
-		String filename = TestIsolationDataGenerator.OUTPUT_PATH + File.separatorChar 
-						+ TestIsolationDataGenerator.HGRAPH_FILE_PREFIX 
-						+ TestIsolationDataGenerator.XML_EXTENSION;
+		String filename = DataCollector.DATA_PATH + File.separatorChar 
+						+ DataCollector.HISTORYGRAPH_PREFIX 
+						+ DataCollector.XML_EXTENSION;
 		File xmlFile = new File(filename);
 		HistoryGraph hGraph = (HistoryGraph) thisJoinPoint.getThis();
 		XMLWriter writer;
@@ -24,11 +24,11 @@ public aspect GetHistoryGraphXML {
 			writer = new HistoryGraphXMLWriter(xmlFile, hGraph);
 			writer.buildDocument();
 		} catch (ParserConfigurationException e) {
-			System.err.println("Warning: ParserConfigurationException thrown when " + 
+			System.err.println("Error: ParserConfigurationException thrown when " + 
 					"attempted to instantiate HistoryGraphXMLWriter.");
 			e.printStackTrace();
 		} catch (TransformerException e) {
-			System.err.println("Warning: TransformerException thrown during " + 
+			System.err.println("Error: TransformerException thrown during " + 
 					"XMLWriter.buildDocument() execution.");
 			e.printStackTrace();
 		}
