@@ -33,7 +33,7 @@ Using the compiled utilities
 Command line usage: DataCollector [mode option] [common options] [HistoryGraph/MixedRevision options]
 
 Mode Options:
- * --historyGraphMode                      - Collect HistoryGraph data [default false]
+ * --historyGraphMode                      - Collect HistoryGraph data
  * --mixedRevisionTemplateMode             - Create MixedRevision templates
  * --mixedRevisionTestResultMode           - Collect MixedRevision test results
  
