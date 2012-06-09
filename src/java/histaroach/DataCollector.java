@@ -14,6 +14,7 @@ import histaroach.util.HistoryGraphXMLReader;
 import histaroach.util.HistoryGraphXMLWriter;
 import histaroach.util.MixedRevisionXMLReader;
 import histaroach.util.MixedRevisionXMLWriter;
+import histaroach.util.Util;
 import histaroach.util.XMLReader;
 import histaroach.util.XMLWriter;
 
@@ -241,8 +242,9 @@ public class DataCollector {
     public static void saveHistoryGraph(HistoryGraph historyGraph) 
     		throws ParserConfigurationException, TransformerException {
     	
+    	String timeStamp = Util.getCurrentTimeStamp();
     	String fileName = HISTORYGRAPH_PREFIX + "_" + startCommitID + "_" + endCommitID 
-    			+ XML_EXTENSION;
+    			+ "_" + timeStamp + XML_EXTENSION;
     	File xmlFile = new File(DATA_PATH + File.separatorChar + fileName);
     	
     	XMLWriter writer = new HistoryGraphXMLWriter(xmlFile, historyGraph);
