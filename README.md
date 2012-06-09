@@ -22,12 +22,7 @@ TODO
 Using the command line
 -----------------------
 
-For TestIsolationDataGenerator:
- * -p : Project name. Example: voldemort.
- * -r : Project repository path. Example: /Users/Name/Project/voldemort/
- * -b : Project build command. Example: ant
- * -s : Start commit ID (the latest commit in the range), at least 7-character long. Example: ea2c4f0
- * -e : End commit ID (the earliest commit in the range), at least 7-character long. Example: fbd0f95
+TODO
 
 
 Using the compiled utilities
@@ -35,7 +30,30 @@ Using the compiled utilities
 
 ### DataCollector
 
-TODO
+Command line usage: DataCollector [mode option] [common options] [HistoryGraph/MixedRevision options]
+
+Mode Options:
+ * --historyGraphMode                      - Collect HistoryGraph data [default false]
+ * --mixedRevisionTemplateMode             - Create MixedRevision templates
+ * --mixedRevisionTestResultMode           - Collect MixedRevision test results
+ 
+Common Options:
+ * -p --projectName                        - Project name
+ * -r --repoDir                            - Repository directory
+ * -b --buildCommand                       - Build command (Optional) [default ant]
+ 
+HistoryGraph Options:
+ * -s --startCommitID                      - Starting commit ID for HistoryGraph analysis
+ * -e --endCommitID                        - Ending commit ID for HistoryGraph analysis
+
+MixedRevision Options:
+ * -c --clonedRepoDir                      - Cloned repository directory
+ * -H --historyGraphXML                    - HistoryGraph xml file
+ 
+MixedRevision (test results) Options:
+ * -M --mixedRevisionXML                   - MixedRevision xml file
+ * -i --startIndex                         - Index of MixedRevision to begin analysis (Optional)
+ * -n --numMixedRevisions                  - Number of MixedRevisions to analyze (Optional)
 
 
 Output File Documentation
