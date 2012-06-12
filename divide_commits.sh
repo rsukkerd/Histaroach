@@ -5,6 +5,7 @@ then
 fi
 cd $1
 git checkout -- ./
+git clean -f -d
 git checkout master
 lines=`git log --oneline | wc -l`
 size=$2
