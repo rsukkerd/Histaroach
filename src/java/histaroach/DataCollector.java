@@ -187,9 +187,10 @@ public class DataCollector {
 	        
 	        IRepository repository = new GitRepository(repoDir, buildStrategy);
 	        
+	        String timeStamp = Util.getCurrentTimeStamp();
 	        HistoryGraph historyGraph = repository.buildHistoryGraph(startCommitID, endCommitID);
 	        
-	        saveHistoryGraph(historyGraph);
+	        saveHistoryGraph(historyGraph, timeStamp);
 	    	
 	    } else if (mixedRevisionTemplateMode || mixedRevisionTestResultMode) {
 	    	if (clonedRepoDir == null || historyGraphXML == null) {
@@ -239,10 +240,8 @@ public class DataCollector {
      * @throws ParserConfigurationException 
      * @throws TransformerException 
      */
-    public static void saveHistoryGraph(HistoryGraph historyGraph) 
+    public static void saveHistoryGraph(HistoryGraph historyGraph, String timeStamp) 
     		throws ParserConfigurationException, TransformerException {
-    	
-    	String timeStamp = Util.getCurrentTimeStamp();
     	String fileName = HISTORYGRAPH_PREFIX + "_" + startCommitID + "_" + endCommitID 
     			+ "_" + timeStamp + XML_EXTENSION;
     	File xmlFile = new File(DATA_PATH + File.separatorChar + fileName);
