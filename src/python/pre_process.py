@@ -10,7 +10,10 @@
 #
 # Version: 1
 #
-# Usage: pre-process.py historaoch.output
+# Usage: pre-process.py -f historaoch.output [output options]
+# Output options:
+# --summary     prints a short summary of the processed file, does not write
+#               any data files
 
 import argparse
 
@@ -52,6 +55,12 @@ class TestResult:
 
     def __str__(self):
         return "Test: " + self.testName + " Parent: " + self.resultToString(self.parentResult) + " Child: " + self.resultToString(self.childResult) + " Mix: " + self.resultToString(self.mixResult)
+
+    def repairs_flip(self):
+        return self.parentResult == 1 and self.childResult == 0 and self.mixResult == 1
+
+    def breaks(self):
+        return self.mixResult == 0 and self.parentResult == 1 and self.childResult == 1
     
 
 class MixedRevision:
@@ -70,6 +79,14 @@ class MixedRevision:
             s = s + str(f) + ", "
         return s
 
+    def is_repaired(self):
+        tests_fixed = []
+        tests_broken = []
+        for t in self.tests:
+            if t.repairs_flip(): tests_fixed.append(t)
+            if t.breaks(): tests_broken.append(t)
+        return len(tests_fixed) > 0 and len(tests_broken) == 0
+
 class RevisionPair:
     parentID = ""
     childID = ""
@@ -85,6 +102,12 @@ class RevisionPair:
 
     def __str__(self):
         return "Revision Pair: " + self.parentID + ", " + self.childID + "\tMixed Revisions: " + str(len(self.mixedRevisions))
+
+    def is_repaired(self):
+        repairs = []
+        for t in self.mixedRevisions:
+            if t != None and t.is_repaired(): repairs.append(t)
+        return len(repairs) > 0
 
 def init_mix(mix,line):
     fields = line.split(';')
@@ -154,6 +177,24 @@ def read_data(inputfile):
     data.append( build_rev_pair(parentID, childID, revPairStrings) )
     return data
 
+def get_num_mixes(data):
+    i = 0
+    for d in data:
+        i = i + len(d.mixedRevisions)
+    return i
+
+def get_repaired_flips(data):
+    i = 0
+    for d in data:
+        if d.is_repaired(): i = i + 1
+    return i
+
+def print_summary(data):
+    print "\nHistaroach Log file summary\n"
+    print "Checked revision pairs: " + str(len(data)) + "\tTotal number of mixed Revisions: " + str(get_num_mixes(data))
+    print "Repaired flips: " + str(get_repaired_flips(data))
+    print "\n"
+
 def parse_arguments():
     '''
     Parse commandline arguments and return an object containing 
@@ -162,16 +203,17 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument( "-f", dest="INPUT_FILE", required=True, 
         help="The Histaroach output file to be processed")
+    #parser.add_argument( "--list-fixes", dest="LIST_FIXES")
+    parser.add_argument( "--summary", dest="SUMMARY", default=False, action='store_true')
     return parser.parse_args()
 
 def main():
     args = parse_arguments()
     infile = open(args.INPUT_FILE, "r")
     data = read_data(infile)
-    for d in data:
-        print d
-        for m in d.mixedRevisions:
-            print m
+    #produce requested output
+    if ( args.SUMMARY):
+        print_summary(data)
     return
 
 if __name__ == "__main__":

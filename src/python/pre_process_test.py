@@ -35,7 +35,22 @@ class PreProcessTest(unittest.TestCase):
         self.assertEqual( "voldemort.store.routed.NodeValueTest", data.tests[0].testName)
         self.assertEquals(0, data.tests[0].childResult)
         self.assertEquals(1, data.tests[1].childResult)
+
+    def test_mixed_rev_is_repaired(self):
+        input = [ "16;8378cec;d3867bf;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/fetcher/HdfsFetcher.java;1;0;voldemort.store.routed.HintedHandoffTest;1;0;1", "16;8378cec;d3867bf;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/fetcher/HdfsFetcher.java;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1"] 
+        mix = pre_process.build_mix(16, input)
+        self.assertTrue(mix.is_repaired())
+        input = [ "17;8378cec;d3867bf;~contrib/hadoop-store-builder/test/voldemort/store/readonly/checksum/CheckSumTests.java;1;0;voldemort.store.routed.HintedHandoffTest;1;0;1", "17;8378cec;d3867bf;~contrib/hadoop-store-builder/test/voldemort/store/readonly/checksum/CheckSumTests.java;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;0;1;1"] 
+        mix = pre_process.build_mix(17, input)
+        self.assertFalse(mix.is_repaired())
         
+        
+    def test_rev_pair_is_repaired(self):
+        #mix 16 repairs flip in HintedHandoffTest
+        infile = open("rev-sample.txt", "r")
+        data = pre_process.read_data(infile)
+        self.assertFalse(data[0].is_repaired())
+        self.assertTrue(data[2].is_repaired())
 
 if __name__ == "__main__":
 	unittest.main()
