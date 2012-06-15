@@ -67,11 +67,13 @@ class MixedRevision:
     mixID = -1
     changedFiles = []
     tests = []
+    compilable = True
 
     def __init__(self, mixID):
         self.mixID = mixID
         self.changedFiles = []
         self.tests = []
+        self.compilable = True
 
     def __str__(self):
         s = "Mixed Revision: " + str(self.mixID) + "\nChanged files: "  
@@ -103,24 +105,56 @@ class RevisionPair:
     def __str__(self):
         return "Revision Pair: " + self.parentID + ", " + self.childID + "\tMixed Revisions: " + str(len(self.mixedRevisions))
 
-    def is_repaired(self):
+    def get_repairs(self):
         repairs = []
         for t in self.mixedRevisions:
             if t != None and t.is_repaired(): repairs.append(t)
-        return len(repairs) > 0
+        return repairs
+        
+    def get_all_files(self):
+        files = []
+        for m in self.mixedRevisions:
+            if ( m == None): continue
+            for f in m.changedFiles:
+                if (not files.__contains__(f.fileName) ): files.append(f.fileName)
+        return files
+    
+    def is_repaired(self):
+        return len(self.get_repairs()) > 0
 
+    def get_smallest_fixes(self):
+        '''
+        Returns the list of fixed mixed revisions with the fewest files
+        '''
+        shortest = len(self.get_all_files()) - 1 
+        smallest = []
+        for r in self.get_repairs():
+            temp = len(r.changedFiles)
+            if ( temp == shortest ):
+                smallest.append(r)
+            if (temp < shortest):
+                shortest = temp
+                smallest = [r]
+        return smallest
+            
 def init_mix(mix,line):
     fields = line.split(';')
     for f in fields[3].split(','):
         mix.changedFiles.append( ChangedFile( f[1:], f[0] ))
 
 def build_mix( mixid, lines):
-    if (len(lines) == 0 ): return
+    if (len(lines) == 0 ): 
+        print "Empty lines for mixid " + str(mixid); 
+        return
     mix = MixedRevision( mixid )
     init_mix(mix, lines[0])
     for line in lines:
         fields = line.split(";")
-        mix.tests.append( TestResult(fields[6], int(fields[9]), int(fields[8]), int(fields[7]) ) )
+        if ( int(fields[4]) == 1 ):
+            mix.compilable = True
+            mix.tests.append( TestResult(fields[6], int(fields[9]), int(fields[8]), int(fields[7]) ) )
+        else:
+            mix.compilable = False
     return mix
 
 def build_rev_pair(parent, child, lines):
@@ -132,19 +166,23 @@ def build_rev_pair(parent, child, lines):
     for line in lines:
         #print "Processing line " + line
         fields = line.split(';')
+        #if ( int(fields[0]) == 19 ): print fields
         #print fields
         if (mixID == -1):
             mixID = int(fields[0])
             #print "Found new mix " + fields[0] + " for revs " + parent + ", " + child
         if ( mixID == int(fields[0]) ):
             #collect data for the same mix
+            #if ( mixID == 19 ): print "appending for 19"
             mixStrings.append(line)
         else:
             #create a new mixed rev
+            #print "Building mix rev " + str(mixID) + " with " + str(len(mixStrings)) + " lines"
             revPair.mixedRevisions.append( build_mix(mixID, mixStrings) )
             mixID = int(fields[0])
-            mixStrings = [] 
+            mixStrings = [line] 
             #print "Found new mix " + fields[0] + " for revs " + parent + ", " + child
+    #print "Building mix rev " + str(mixID) + " with " + str(len(mixStrings)) + " lines"
     revPair.mixedRevisions.append( build_mix(mixID, mixStrings) )
     return revPair
 
@@ -184,6 +222,9 @@ def get_num_mixes(data):
     return i
 
 def get_repaired_flips(data):
+    '''
+    Returns the number of repaired flips given a list of revision pairs
+    '''
     i = 0
     for d in data:
         if d.is_repaired(): i = i + 1
@@ -195,6 +236,20 @@ def print_summary(data):
     print "Repaired flips: " + str(get_repaired_flips(data))
     print "\n"
 
+def print_smallest_fix(rev_pair):
+    '''
+    Prints summary info about this fixed revision pair
+    '''
+    fixes = rev_pair.get_smallest_fixes()
+    print "\nRevision pair: " + rev_pair.parentID + ":" + rev_pair.childID + "\tSmallest fix size: " + str(len(fixes[0].changedFiles))
+    for f in fixes:
+        print f
+
+def print_fix_details(data):
+    print "Details"
+    for d in data:
+        if d.is_repaired(): print_smallest_fix(d)
+
 def parse_arguments():
     '''
     Parse commandline arguments and return an object containing 
@@ -203,7 +258,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument( "-f", dest="INPUT_FILE", required=True, 
         help="The Histaroach output file to be processed")
-    #parser.add_argument( "--list-fixes", dest="LIST_FIXES")
+    parser.add_argument( "--list-fixes", dest="LIST_FIXES", default=False, action='store_true')
     parser.add_argument( "--summary", dest="SUMMARY", default=False, action='store_true')
     return parser.parse_args()
 
@@ -212,8 +267,10 @@ def main():
     infile = open(args.INPUT_FILE, "r")
     data = read_data(infile)
     #produce requested output
-    if ( args.SUMMARY):
+    if ( args.SUMMARY or args.LIST_FIXES):
         print_summary(data)
+    if ( args.LIST_FIXES ):
+        print_fix_details(data)
     return
 
 if __name__ == "__main__":

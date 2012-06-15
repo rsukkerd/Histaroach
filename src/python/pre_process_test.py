@@ -23,6 +23,11 @@ class PreProcessTest(unittest.TestCase):
         data = pre_process.build_rev_pair("5400077", "b17f572",inputs)
         self.assertEqual( 3, len(data.mixedRevisions) )
 
+    def test_rev_pair_non_compileable(self):
+        input = [ "19;1ee8246;23c9b28;~test/unit/voldemort/store/readonly/ReadOnlyStorageEngineTestInstance.java;0;0;n;n;n;n" ]
+        data = pre_process.build_rev_pair("23c9b28", "1ee8246", input)
+        self.assertEqual( 1, len(data.mixedRevisions))
+
     def test_build_mix(self):
         input = [ "30;b17f572;5400077;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CheckSum.java,+contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/MD5CheckSum.java,~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32CheckSum.java;1;0;voldemort.store.routed.NodeValueTest;1;0;1", "30;b17f572;5400077;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CheckSum.java,~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/MD5CheckSum.java,~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32CheckSum.java;1;0;voldemort.store.http.HttpStoreTest;1;1;1"]
         data = pre_process.build_mix(30, input)
@@ -51,6 +56,18 @@ class PreProcessTest(unittest.TestCase):
         data = pre_process.read_data(infile)
         self.assertFalse(data[0].is_repaired())
         self.assertTrue(data[2].is_repaired())
+
+    def test_get_all_files(self):
+        input = [ "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.store.readonly.ReadOnlyStorageEngineTest;0;0;1", "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.client.rebalance.RebalanceTest;1;0;1", "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0", "19;1ee8246;23c9b28;~test/unit/voldemort/store/readonly/ReadOnlyStorageEngineTestInstance.java;0;0;n;n;n;n" ]
+        data = pre_process.build_rev_pair( "23c9b28", "1ee8246", input)
+        self.assertEqual(2, len(data.mixedRevisions))
+        self.assertEqual(2, len(data.get_all_files()) )
+
+    def test_rev_pair_get_smallest_fixes(self):
+        input = [ "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.store.readonly.ReadOnlyStorageEngineTest;0;0;1", "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.client.rebalance.RebalanceTest;1;0;1", "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0", "19;1ee8246;23c9b28;~test/unit/voldemort/store/readonly/ReadOnlyStorageEngineTestInstance.java;0;0;n;n;n;n" ]
+        data = pre_process.build_rev_pair( "23c9b28", "1ee8246", input)
+        self.assertTrue( data.is_repaired() )
+        self.assertEqual( 1, len(data.get_smallest_fixes()) )
 
 if __name__ == "__main__":
 	unittest.main()
