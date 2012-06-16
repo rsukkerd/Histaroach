@@ -257,7 +257,7 @@ def print_fix(rev_pair, deltas):
     '''
     Prints summary info about this fixed revision pair and set of deltas
     '''
-    print "\nRevision pair: " + rev_pair.parentID + ":" + rev_pair.childID + "\tDelta size: " + str(len(deltas[0].changedFiles))
+    print "\nRevision pair: " + rev_pair.parentID + ":" + rev_pair.childID + "\tFiles changed: " + str(len(rev_pair.get_all_files())) + "\tDelta size: " + str(len(deltas[0].changedFiles))
     for f in deltas:
         print f
 
