@@ -69,5 +69,12 @@ class PreProcessTest(unittest.TestCase):
         self.assertTrue( data.is_repaired() )
         self.assertEqual( 1, len(data.get_delta_p_bar()) )
 
+    def test_rev_pair_get_delta_p(self):
+        input = [ "21;b17f572;5400077;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/MD5CheckSum.java;1;0;voldemort.client.CachingStoreClientFactoryTest;1;1;1", "21;b17f572;5400077;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/MD5CheckSum.java;1;0;voldemort.server.EndToEndTest;1;0;1", "32;b17f572;5400077;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CheckSum.java,~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/Adler32CheckSum.java,~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32CheckSum.java;1;0;voldemort.client.CachingStoreClientFactoryTest;1;1;1", "32;b17f572;5400077;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CheckSum.java,~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/Adler32CheckSum.java,~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32CheckSum.java;1;0;voldemort.server.EndToEndTest;1;0;1" ]
+        data = pre_process.build_rev_pair( "5400077", "b17f572", input )
+        self.assertEqual( 4, len(data.get_all_files()) )
+        self.assertEqual( 1, len(data.get_delta_p()) )
+        self.assertEqual( 32, data.get_delta_p()[0].mixID )
+
 if __name__ == "__main__":
 	unittest.main()

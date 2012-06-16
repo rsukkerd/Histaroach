@@ -266,6 +266,13 @@ def print_delta_p_bar(data):
     print "-----------"
     for d in data:
         if d.is_repaired(): print_fix(d, d.get_delta_p_bar() )
+    print ""
+
+def print_delta_p(data):
+    print "Delta P"
+    print "-------"
+    for d in data:
+        if d.is_repaired(): print_fix(d, d.get_delta_p() )
 
 def parse_arguments():
     '''
@@ -276,6 +283,7 @@ def parse_arguments():
     parser.add_argument( "-f", dest="INPUT_FILE", required=True, 
         help="The Histaroach output file to be processed")
     parser.add_argument( "--delta-p-bar", dest="DELTA_P_BAR", default=False, action='store_true')
+    parser.add_argument( "--delta-p", dest="DELTA_P", default=False, action='store_true')
     parser.add_argument( "--summary", dest="SUMMARY", default=False, action='store_true')
     return parser.parse_args()
 
@@ -284,10 +292,12 @@ def main():
     infile = open(args.INPUT_FILE, "r")
     data = read_data(infile)
     #produce requested output
-    if ( args.SUMMARY or args.DELTA_P_BAR):
+    if ( args.SUMMARY or args.DELTA_P_BAR or args.DELTA_P):
         print_summary(data)
     if ( args.DELTA_P_BAR ):
         print_delta_p_bar(data)
+    if ( args.DELTA_P ):
+        print_delta_p(data)
     return
 
 if __name__ == "__main__":
