@@ -108,7 +108,7 @@ class RevisionPair:
     def get_repairs(self):
         repairs = []
         for t in self.mixedRevisions:
-            if t != None and t.is_repaired(): repairs.append(t)
+            if t.is_repaired(): repairs.append(t)
         return repairs
         
     def get_all_files(self):
@@ -122,7 +122,7 @@ class RevisionPair:
     def is_repaired(self):
         return len(self.get_repairs()) > 0
 
-    def get_smallest_fixes(self):
+    def get_delta_p_bar(self):
         '''
         Returns the list of fixed mixed revisions with the fewest files
         '''
@@ -136,6 +136,23 @@ class RevisionPair:
                 shortest = temp
                 smallest = [r]
         return smallest
+
+    def get_delta_p(self):
+        longest = 0
+        delta_p = []
+        for r in self.get_repairs():
+            temp = len(r.changedFiles)
+            if ( temp == longest ): delta_p.append(r)
+            if ( temp > longest ):
+                longest = temp
+                delta_p = [r]
+        return delta_p
+
+    def get_delta_f(self):
+        return []
+
+    def get_delta_f_bar(self):
+        return []
             
 def init_mix(mix,line):
     fields = line.split(';')
@@ -236,19 +253,19 @@ def print_summary(data):
     print "Repaired flips: " + str(get_repaired_flips(data))
     print "\n"
 
-def print_smallest_fix(rev_pair):
+def print_fix(rev_pair, deltas):
     '''
-    Prints summary info about this fixed revision pair
+    Prints summary info about this fixed revision pair and set of deltas
     '''
-    fixes = rev_pair.get_smallest_fixes()
-    print "\nRevision pair: " + rev_pair.parentID + ":" + rev_pair.childID + "\tSmallest fix size: " + str(len(fixes[0].changedFiles))
-    for f in fixes:
+    print "\nRevision pair: " + rev_pair.parentID + ":" + rev_pair.childID + "\tDelta size: " + str(len(deltas[0].changedFiles))
+    for f in deltas:
         print f
 
-def print_fix_details(data):
-    print "Details"
+def print_delta_p_bar(data):
+    print "Delta P bar"
+    print "-----------"
     for d in data:
-        if d.is_repaired(): print_smallest_fix(d)
+        if d.is_repaired(): print_fix(d, d.get_delta_p_bar() )
 
 def parse_arguments():
     '''
@@ -258,7 +275,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument( "-f", dest="INPUT_FILE", required=True, 
         help="The Histaroach output file to be processed")
-    parser.add_argument( "--list-fixes", dest="LIST_FIXES", default=False, action='store_true')
+    parser.add_argument( "--delta-p-bar", dest="DELTA_P_BAR", default=False, action='store_true')
     parser.add_argument( "--summary", dest="SUMMARY", default=False, action='store_true')
     return parser.parse_args()
 
@@ -267,10 +284,10 @@ def main():
     infile = open(args.INPUT_FILE, "r")
     data = read_data(infile)
     #produce requested output
-    if ( args.SUMMARY or args.LIST_FIXES):
+    if ( args.SUMMARY or args.DELTA_P_BAR):
         print_summary(data)
-    if ( args.LIST_FIXES ):
-        print_fix_details(data)
+    if ( args.DELTA_P_BAR ):
+        print_delta_p_bar(data)
     return
 
 if __name__ == "__main__":

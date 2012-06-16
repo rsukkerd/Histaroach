@@ -63,11 +63,11 @@ class PreProcessTest(unittest.TestCase):
         self.assertEqual(2, len(data.mixedRevisions))
         self.assertEqual(2, len(data.get_all_files()) )
 
-    def test_rev_pair_get_smallest_fixes(self):
+    def test_rev_pair_get_delta_p_bar(self):
         input = [ "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.store.readonly.ReadOnlyStorageEngineTest;0;0;1", "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.client.rebalance.RebalanceTest;1;0;1", "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0", "19;1ee8246;23c9b28;~test/unit/voldemort/store/readonly/ReadOnlyStorageEngineTestInstance.java;0;0;n;n;n;n" ]
         data = pre_process.build_rev_pair( "23c9b28", "1ee8246", input)
         self.assertTrue( data.is_repaired() )
-        self.assertEqual( 1, len(data.get_smallest_fixes()) )
+        self.assertEqual( 1, len(data.get_delta_p_bar()) )
 
 if __name__ == "__main__":
 	unittest.main()
