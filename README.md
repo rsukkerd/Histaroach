@@ -63,22 +63,22 @@ Output File Documentation
 
 File Content:
 A MixedRevision output file contains a list of MixedRevisions and their test results. Each MixedRevision 
-in this file is created from a pair of child-parent Revisions, which contains at least 1 test flip. 
+in this file is created from a pair of parent-child Revisions, which contains at least 1 test flip. 
 A test flip can be from pass (in parent) to fail (in child) or vice versa.
 
 File Format:
- * mixedRevisionID : a unique number for a particular MixedRevision
- * baseRevisionID  : a child commit ID
- * otherRevisionID : a parent commit ID
- * revertedFiles   : a set of files that are reverted from child version to parent version
- * (reverted type) : + means the file (from parent) is added to child;
-                     - means the file is removed from child;
-                     ~ means the file in child is replaced with the parent version of itself
- * compilable      : 0 means this MixedRevision is not compilable; 1 means compilable;
-                     if 0, all of the test-related fields are 'n'
- * testAborted     : 0 means the tests terminate OK; 1 means the process that runs the tests has aborted;
-                     if 1, all of the test-related fields are 'n'
- * test            : name of a test
- * mixedTestResult : 0 means this MixedRevision fails this test; 1 means passes
- * baseTestResult  : 0 means the child of this MixedRevision fails this test; 1 means passes
- * otherTestResult : 0 means the parent of this MixedRevision fails this test; 1 means passes
+ * mixedRevisionID  : a unique number for a particular MixedRevision
+ * parentCommitID   : a parent commit ID
+ * childCommitID    : a child commit ID
+ * delta            : a set of (file-level) changes that are applied to the parent to create this MixedRevision
+ * (change type)    : 'A' means the file is added;
+                      'D' means the file is deleted;
+                      'M' means the file is modified
+ * compilable       : 0 means this MixedRevision is not compilable; 1 means compilable;
+                      if 0, all of the test-related fields are 'n'
+ * testAborted      : 0 means the tests terminate OK; 1 means the process that runs the tests has aborted;
+                      if 1, all of the test-related fields are 'n'
+ * test             : name of a test
+ * mixedTestResult  : 0 means this MixedRevision fails this test; 1 means passes
+ * parentTestResult : 0 means the parent of this MixedRevision fails this test; 1 means passes
+ * childTestResult  : 0 means the child of this MixedRevision fails this test; 1 means passes
