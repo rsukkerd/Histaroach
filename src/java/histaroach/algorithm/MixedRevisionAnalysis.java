@@ -194,7 +194,8 @@ public class MixedRevisionAnalysis {
 				continue;
 			}
 			
-			String change = diffFile.getDiffType() + diffFile.getFileName();
+			String change = diffFile.getDiffType().toString().charAt(0) + 
+				diffFile.getFileName();
 			delta.add(change);
 		}
 		
