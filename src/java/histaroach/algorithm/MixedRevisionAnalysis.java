@@ -1,7 +1,6 @@
 package histaroach.algorithm;
 
 import histaroach.model.DiffFile;
-import histaroach.model.DiffFile.DiffType;
 import histaroach.model.MixedRevision;
 import histaroach.model.Revision;
 import histaroach.model.Revision.Compilable;
@@ -10,10 +9,12 @@ import histaroach.model.TestResult;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.lang.StringUtils;
 
 
 /**
@@ -23,17 +24,13 @@ import java.util.Set;
  */
 public class MixedRevisionAnalysis {
 		
-	private static final String COLUMN_SEPARATOR_CHAR = ";";
-	private static final String FILE_SEPARATOR_CHAR = ",";
-	private static final String NEW_LINE_CHAR = "\n";
+	private static final String COLUMN_SEPARATOR = ";";
+	private static final String FILE_SEPARATOR = ",";
 	
 	private static final String HEADER = 
-		"mixedRevisionID;baseRevisionID;otherRevisionID;revertedFiles;" + 
-		"compilable;testAborted;test;mixedTestResult;baseTestResult;otherTestResult" + NEW_LINE_CHAR;
+		"mixedRevisionID;parentCommitID;childCommitID;delta;" + 
+		"compilable;testAborted;test;mixedTestResult;parentTestResult;childTestResult\n";
 	
-	private static final String ADDED_CHAR = "+";
-	private static final String DELETED_CHAR = "-";
-	private static final String MODIFIED_CHAR = "~";
 	private static final String TRUE = "1";
 	private static final String FALSE = "0";
 	private static final String NONE = "n";
@@ -96,8 +93,8 @@ public class MixedRevisionAnalysis {
 			int mixedRevisionID) {
 		String lines = "";
 		
-		Revision baseRevision = mixedRevision.getBaseRevision();
-		TestResult baseTestResult = baseRevision.getTestResult();
+		Revision child = mixedRevision.getBaseRevision();
+		TestResult childTestResult = child.getTestResult();
 		
 		Map<Set<DiffFile>, Revision> revertedFileRecords = 
 			mixedRevision.getRevertedFileRecords();
@@ -105,28 +102,30 @@ public class MixedRevisionAnalysis {
 		for (Map.Entry<Set<DiffFile>, Revision> entry : revertedFileRecords.entrySet()) {
 			Set<DiffFile> revertedFiles = entry.getKey();
 			
-			Revision otherRevision = entry.getValue();
-			TestResult otherTestResult = otherRevision.getTestResult();
+			Revision parent = entry.getValue();
+			TestResult parentTestResult = parent.getTestResult();
 			
-			// mixedRevisionID baseRevisionID otherRevisionID
-			String lineHeader = mixedRevisionID + COLUMN_SEPARATOR_CHAR + 
-				baseRevision.getCommitID() + COLUMN_SEPARATOR_CHAR + 
-				otherRevision.getCommitID();
+			Set<DiffFile> totalDiffFiles = child.getDiffFiles(parent);
+			
+			// mixedRevisionID parentCommitID childCommitID
+			String lineHeader = mixedRevisionID + COLUMN_SEPARATOR + 
+				parent.getCommitID() + COLUMN_SEPARATOR + 
+				child.getCommitID();
 			
 			// ?file1,?file2,...,?fileN
-			String lineRevertedFiles = getLineRevertedFiles(revertedFiles);
+			String lineDelta = getLineDelta(revertedFiles, totalDiffFiles);
 			
 			if (mixedRevision.isCompilable() == Compilable.YES && 
 					!mixedRevision.hasTestAborted()) {
 				TestResult mixedTestResult = mixedRevision.getTestResult();
 				assert mixedTestResult != null;
 			
-				for (String test : baseTestResult.getAllTests()) {
-					lines += getFullLine(test, mixedTestResult, baseTestResult, 
-							otherTestResult, lineHeader, lineRevertedFiles);
+				for (String test : childTestResult.getAllTests()) {
+					lines += getFullLine(lineHeader, lineDelta, test, 
+							mixedTestResult, childTestResult, parentTestResult);
 				}
 			} else {
-				lines += getFullLineNoTestResult(mixedRevision, lineHeader, lineRevertedFiles);
+				lines += getFullLineNoTestResult(lineHeader, lineDelta, mixedRevision);
 			}
 		}
 		
@@ -135,51 +134,51 @@ public class MixedRevisionAnalysis {
 	
 	/**
 	 * Line format: 
-	 * mixedRevisionID baseRevisionID otherRevisionID revertedFiles 
-	 * compilable testAborted test mixedTestResult baseTestResult otherTestResult
+	 * mixedRevisionID parentCommitID childCommitID delta 
+	 * compilable testAborted test mixedTestResult parentTestResult childTestResult
 	 */
-	private String getFullLine(String test, TestResult mixedTestResult, 
-			TestResult baseTestResult, TestResult otherTestResult, 
-			String lineHeader, String lineRevertedFiles) {
+	private String getFullLine(String lineHeader, String lineDelta, 
+			String test, TestResult mixedTestResult, 
+			TestResult parentTestResult, TestResult childTestResult) {
 		String line = "";
 		
-		line += lineHeader + COLUMN_SEPARATOR_CHAR;
-		line += lineRevertedFiles + COLUMN_SEPARATOR_CHAR;
+		line += lineHeader + COLUMN_SEPARATOR;
+		line += lineDelta + COLUMN_SEPARATOR;
 				
 		// compilable testAborted
-		line += TRUE + COLUMN_SEPARATOR_CHAR + FALSE + COLUMN_SEPARATOR_CHAR;
+		line += TRUE + COLUMN_SEPARATOR + FALSE + COLUMN_SEPARATOR;
 		
-		// test mixedTestResult baseTestResult otherTestResult
-		line += getLineTestResults(test, mixedTestResult, baseTestResult, 
-				otherTestResult) + NEW_LINE_CHAR;
+		// test mixedTestResult parentTestResult childTestResult
+		line += getLineTestResults(test, mixedTestResult, parentTestResult, 
+				childTestResult) + "\n";
 		
 		return line;
 	}
 	
 	/**
 	 * Line format: 
-	 * mixedRevisionID baseRevisionID otherRevisionID revertedFiles 
+	 * mixedRevisionID parentCommitID childCommitID delta 
 	 * compilable testAborted n n n n
 	 */
-	private String getFullLineNoTestResult(MixedRevision mixedRevision, 
-			String lineHeader, String lineRevertedFiles) {
+	private String getFullLineNoTestResult(String lineHeader, 
+			String lineDelta, MixedRevision mixedRevision) {
 		String line = "";
 		
-		line += lineHeader + COLUMN_SEPARATOR_CHAR;
-		line += lineRevertedFiles + COLUMN_SEPARATOR_CHAR;
+		line += lineHeader + COLUMN_SEPARATOR;
+		line += lineDelta + COLUMN_SEPARATOR;
 		
 		// compilable
 		line += (mixedRevision.isCompilable() == Compilable.YES ? 
-				TRUE : FALSE) + COLUMN_SEPARATOR_CHAR;
+				TRUE : FALSE) + COLUMN_SEPARATOR;
 		
 		// testAborted
 		line += (mixedRevision.hasTestAborted() ? TRUE : FALSE) + 
-				COLUMN_SEPARATOR_CHAR;
+				COLUMN_SEPARATOR;
 		
-		line += NONE + COLUMN_SEPARATOR_CHAR +	// test
-				NONE + COLUMN_SEPARATOR_CHAR +	// baseTestResult
-				NONE + COLUMN_SEPARATOR_CHAR +	// otherTestResult
-				NONE + NEW_LINE_CHAR;			// mixedTestResult
+		line += NONE + COLUMN_SEPARATOR + // test
+				NONE + COLUMN_SEPARATOR + // baseTestResult
+				NONE + COLUMN_SEPARATOR + // otherTestResult
+				NONE + "\n";              // mixedTestResult
 		
 		return line;
 	}
@@ -187,43 +186,30 @@ public class MixedRevisionAnalysis {
 	/**
 	 * Format: ?file1,?file2,...,?fileN
 	 */
-	private String getLineRevertedFiles(Set<DiffFile> revertedFiles) {
-		String res = "";
-		Iterator<DiffFile> iter = revertedFiles.iterator();
+	private String getLineDelta(Set<DiffFile> revertedFiles, Set<DiffFile> totalDiffFiles) {		
+		Set<String> delta = new HashSet<String>();
 		
-		while (iter.hasNext()) {
-			DiffFile revertedFile = iter.next();
-			
-			String fileName = revertedFile.getFileName();
-			DiffType diffType = revertedFile.getDiffType();
-			
-			if (diffType == DiffType.ADDED) {
-				res += DELETED_CHAR;
-			} else if (diffType == DiffType.DELETED) {
-				res += ADDED_CHAR;
-			} else {
-				res += MODIFIED_CHAR;
+		for (DiffFile diffFile : totalDiffFiles) {
+			if (revertedFiles.contains(diffFile)) {
+				continue;
 			}
 			
-			res += fileName;
-			
-			if (iter.hasNext()) {
-				res += FILE_SEPARATOR_CHAR;
-			}
+			String change = diffFile.getDiffType() + diffFile.getFileName();
+			delta.add(change);
 		}
 		
-		return res;
+		return StringUtils.join(delta, FILE_SEPARATOR);		
 	}
 	
 	/**
-	 * Format: test mixedTestResult baseTestResult otherTestResult
+	 * Format: test mixedTestResult parentTestResult childTestResult
 	 */
 	private String getLineTestResults(String test, TestResult mixedTestResult, 
-			TestResult baseTestResult, TestResult otherTestResult) {
-		String testResults = test + COLUMN_SEPARATOR_CHAR + 
-					mixedTestResult.encodeAsString(test) + COLUMN_SEPARATOR_CHAR + 
-					baseTestResult.encodeAsString(test) + COLUMN_SEPARATOR_CHAR + 
-					otherTestResult.encodeAsString(test);
+			TestResult parentTestResult, TestResult childTestResult) {
+		String testResults = test + COLUMN_SEPARATOR + 
+					mixedTestResult.encodeAsString(test) + COLUMN_SEPARATOR + 
+					parentTestResult.encodeAsString(test) + COLUMN_SEPARATOR + 
+					childTestResult.encodeAsString(test);
 		
 		return testResults;
 	}
