@@ -39,11 +39,12 @@ public interface IRepository {
 	public boolean discardFileChange(String filename) throws IOException, InterruptedException;
 	
 	/**
-     * @return a set of DiffFiles between baseCommit and otherCommit.
+     * @return a set of DiffFiles between referenceCommit and otherCommit, 
+     *         where the DiffType is from the point of view of referenceCommit.
      * @throws InterruptedException 
      * @throws IOException 
      */
-	public Set<DiffFile> getDiffFiles(String baseCommitID,
+	public Set<DiffFile> getDiffFiles(String referenceCommitID,
             String otherCommitID) throws IOException, InterruptedException;
 
 	/**

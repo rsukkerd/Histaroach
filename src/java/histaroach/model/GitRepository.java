@@ -82,12 +82,12 @@ public class GitRepository implements IRepository, Serializable {
 	}
 
 	@Override
-	public Set<DiffFile> getDiffFiles(String baseCommitID,
+	public Set<DiffFile> getDiffFiles(String referenceCommitID,
 			String otherCommitID) throws IOException, InterruptedException {
 		Set<DiffFile> diffFiles = new HashSet<DiffFile>();
 
         Process diffProcess = Util.runProcess(new String[] { "git", "diff",
-                "--name-status", otherCommitID, baseCommitID }, directory);
+                "--name-status", referenceCommitID, otherCommitID }, directory);
         
         List<String> lines = Util.getInputStreamContent(diffProcess.getInputStream());
 
@@ -207,7 +207,7 @@ public class GitRepository implements IRepository, Serializable {
         		}
         		
         		Revision parent = revisions.get(parentID);
-        		Set<DiffFile> diffFiles = getDiffFiles(commitID, parentID);
+        		Set<DiffFile> diffFiles = getDiffFiles(parentID, commitID);
         		
         		parentToDiffFiles.put(parent, diffFiles);
         	}
