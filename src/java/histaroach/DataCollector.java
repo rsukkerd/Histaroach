@@ -288,7 +288,8 @@ public class DataCollector {
 		XMLReader<List<MixedRevision>> reader = new MixedRevisionXMLReader(
     			mixedRevisionXML, repository, clonedRepository, historyGraph);
     	List<MixedRevision> mixedRevisions = reader.read();
-    	MixedRevisionAnalysis analysis = new MixedRevisionAnalysis(mixedRevisions);
+    	MixedRevisionAnalysis analysis = new MixedRevisionAnalysis(mixedRevisions, 
+    			repository);
     	
     	String xmlFilename = mixedRevisionXML.getName();
     	String filename;

@@ -1,6 +1,7 @@
 package histaroach.algorithm;
 
 import histaroach.model.DiffFile;
+import histaroach.model.IRepository;
 import histaroach.model.MixedRevision;
 import histaroach.model.Revision;
 import histaroach.model.Revision.Compilable;
@@ -9,6 +10,7 @@ import histaroach.model.TestResult;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -36,9 +38,11 @@ public class MixedRevisionAnalysis {
 	private static final String NONE = "n";
 
 	private final List<MixedRevision> mixedRevisions;
+	private final IRepository repository;
 	
-	public MixedRevisionAnalysis(List<MixedRevision> mixedRevisions) {
+	public MixedRevisionAnalysis(List<MixedRevision> mixedRevisions, IRepository repository) {
 		this.mixedRevisions = mixedRevisions;
+		this.repository = repository;
 	}
 	
 	/**
@@ -88,9 +92,11 @@ public class MixedRevisionAnalysis {
 	 * Records data of mixedRevision.
 	 * 
 	 * @return a String representation of data of mixedRevision.
+	 * @throws InterruptedException 
+	 * @throws IOException 
 	 */
 	public String analyzeMixedRevision(MixedRevision mixedRevision, 
-			int mixedRevisionID) {
+			int mixedRevisionID) throws IOException, InterruptedException {
 		String lines = "";
 		
 		Revision child = mixedRevision.getBaseRevision();
@@ -106,6 +112,10 @@ public class MixedRevisionAnalysis {
 			TestResult parentTestResult = parent.getTestResult();
 			
 			Set<DiffFile> totalDiffFiles = child.getDiffFiles(parent);
+			if (totalDiffFiles == null) {
+				totalDiffFiles = repository.getDiffFiles(parent.getCommitID(), 
+						child.getCommitID());
+			}
 			
 			// mixedRevisionID parentCommitID childCommitID
 			String lineHeader = mixedRevisionID + COLUMN_SEPARATOR + 
@@ -186,7 +196,7 @@ public class MixedRevisionAnalysis {
 	/**
 	 * Format: ?file1,?file2,...,?fileN
 	 */
-	private String getLineDelta(Set<DiffFile> revertedFiles, Set<DiffFile> totalDiffFiles) {		
+	private String getLineDelta(Set<DiffFile> revertedFiles, Set<DiffFile> totalDiffFiles) {
 		Set<String> delta = new HashSet<String>();
 		
 		for (DiffFile diffFile : totalDiffFiles) {
