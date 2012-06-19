@@ -247,6 +247,11 @@ public class DataCollector {
     			+ "_" + timeStamp + XML_EXTENSION;
     	File dir = new File(DATA_PATH + File.separatorChar + startCommitID 
     			+ "-" + endCommitID);
+    	
+    	if (!dir.exists()) {
+    		dir.mkdir();
+    	}
+    	
     	File xmlFile = new File(dir, fileName);
     	
     	XMLWriter writer = new HistoryGraphXMLWriter(xmlFile, historyGraph);
