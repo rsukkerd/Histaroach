@@ -243,9 +243,11 @@ public class DataCollector {
      */
     public static void saveHistoryGraph(HistoryGraph historyGraph, String timeStamp) 
     		throws ParserConfigurationException, TransformerException {
-    	String fileName = HISTORYGRAPH_PREFIX + "_" + startCommitID + "_" + endCommitID 
+    	String fileName = HISTORYGRAPH_PREFIX + "_" + startCommitID + "-" + endCommitID 
     			+ "_" + timeStamp + XML_EXTENSION;
-    	File xmlFile = new File(DATA_PATH + File.separatorChar + fileName);
+    	File dir = new File(DATA_PATH + File.separatorChar + startCommitID 
+    			+ "-" + endCommitID);
+    	File xmlFile = new File(dir, fileName);
     	
     	XMLWriter writer = new HistoryGraphXMLWriter(xmlFile, historyGraph);
     	writer.buildDocument();
@@ -273,7 +275,7 @@ public class DataCollector {
     	
     	String filename = historyGraphXML.getName().replaceFirst(
     			HISTORYGRAPH_PREFIX, INTERMEDIATE_REVISION_PREFIX);
-    	File xmlFile = new File(DATA_PATH + File.separatorChar + filename);
+    	File xmlFile = new File(historyGraphXML.getParentFile(), filename);
     	
     	XMLWriter writer = new IntermediateRevisionXMLWriter(xmlFile, intermediateRevisions);
     	writer.buildDocument();
@@ -299,15 +301,14 @@ public class DataCollector {
     	String filename;
     	
     	if (numIntermediateRevisions > 0) {
-    		filename = xmlFilename.substring(0, xmlFilename.indexOf(XML_EXTENSION)) 
-    				+ "_" + startIndex + "_" + (startIndex + numIntermediateRevisions) 
-    				+ TXT_EXTENSION;
+    		String suffix = "_" + startIndex + "-" + (startIndex + 
+    				numIntermediateRevisions) + TXT_EXTENSION;
+    		filename = xmlFilename.replaceFirst(XML_EXTENSION, suffix);
     	} else {
-    		filename = xmlFilename.substring(0, xmlFilename.indexOf(XML_EXTENSION)) 
-    				+ TXT_EXTENSION;
+    		filename = xmlFilename.replaceFirst(XML_EXTENSION, TXT_EXTENSION);
     	}
     	
-    	File txtFile = new File(DATA_PATH + File.separatorChar + filename);
+    	File txtFile = new File(intermediateRevisionXML.getParentFile(), filename);
     	
     	if (numIntermediateRevisions > 0) {
 	    	analysis.runTestOnIntermediateRevisions(startIndex, numIntermediateRevisions, 
