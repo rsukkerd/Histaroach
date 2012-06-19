@@ -5,11 +5,13 @@ import histaroach.model.IntermediateRevision;
 import histaroach.model.Revision;
 import histaroach.model.Revision.Compilable;
 import histaroach.model.TestResult;
+import histaroach.util.Pair;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -25,61 +27,84 @@ public class IntermediateRevisionAnalysis {
 	private static final String COLUMN_SEPARATOR = ";";
 	private static final String FILE_SEPARATOR = ",";
 	
-	private static final String HEADER = 
+	private static final String HEADER1 = 
 		"IID;parentCommitID;childCommitID;delta;" + 
 		"compilable;testAborted;test;intermediateTestResult;parentTestResult;childTestResult\n";
+	private static final String HEADER2 = "parentCommitID;childCommitID;totalDelta\n";
 	
 	private static final String TRUE = "1";
 	private static final String FALSE = "0";
 	private static final String NONE = "n";
 
 	private final List<IntermediateRevision> intermediateRevisions;
+	private final BufferedWriter out1;
+	private final BufferedWriter out2;
 	
-	public IntermediateRevisionAnalysis(List<IntermediateRevision> intermediateRevisions) {
+	public IntermediateRevisionAnalysis(List<IntermediateRevision> intermediateRevisions, 
+			File outputFile1, File outputFile2) throws IOException {
 		this.intermediateRevisions = intermediateRevisions;
+		out1 = new BufferedWriter(new FileWriter(outputFile1));
+		out2 = new BufferedWriter(new FileWriter(outputFile1));
 	}
 	
 	/**
 	 * For all IntermediateRevisions, creates actual intermediate revisions 
 	 * on the file system, runs tests on them and records the results to 
-	 * an output file.
+	 * the output file.
 	 * 
 	 * @throws Exception
 	 */
-	public void runTestOnIntermediateRevisions(File outputFile) throws Exception {
-		runTestOnIntermediateRevisions(0, intermediateRevisions.size(), outputFile);
+	public void runTestOnIntermediateRevisions() throws Exception {
+		runTestOnIntermediateRevisions(0, intermediateRevisions.size());
 	}
 	
 	/**
 	 * For a specified range of IntermediateRevisions, creates actual 
 	 * intermediate revisions on the file system, runs tests on them 
-	 * and records the results to an output file.
+	 * and records the results to the output file.
 	 * 
 	 * @throws Exception
 	 */
-	public void runTestOnIntermediateRevisions(int startIndex, int numElements, 
-			File outputFile) throws Exception {
-		FileWriter fstream = new FileWriter(outputFile);
-		BufferedWriter out = new BufferedWriter(fstream);
-		out.write(HEADER);
-		out.flush();
+	public void runTestOnIntermediateRevisions(int startIndex, int numElements) 
+			throws Exception {
+		out1.write(HEADER1);
+		out1.flush();
+		out2.write(HEADER2);
+		out2.flush();
+		
+		Set<Pair<Revision, Revision>> pairs = new HashSet<Pair<Revision,Revision>>();
 		
 		for (int i = startIndex; i < startIndex + numElements; i++) {
 			// intermediateRevision already has its delta set
 			IntermediateRevision intermediateRevision = intermediateRevisions.get(i);
+			
+			Revision base = intermediateRevision.getBaseRevision();
+			Revision successor = intermediateRevision.getSuccessorRevision();
+			
+			Pair<Revision, Revision> pair = new Pair<Revision, Revision>(
+					base, successor);
+			
+			if (!pairs.contains(pair)) {
+				pairs.add(pair);
+				out2.write(base.getCommitID() + COLUMN_SEPARATOR + 
+						successor.getCommitID() + COLUMN_SEPARATOR);
+				out2.write(getLineDelta(intermediateRevision.getTotalDelta()) + "\n");
+				out2.flush();
+			}
 			
 			intermediateRevision.checkoutBaseSuccessorRevisions();
 			intermediateRevision.applyDelta();
 			intermediateRevision.runTest();
 			
 			String lines = analyzeIntermediateRevision(intermediateRevision, i);
-			out.write(lines);
-			out.flush();
+			out1.write(lines);
+			out1.flush();
 			
 			intermediateRevision.restoreBaseRevision();
 		}
 		
-		out.close();
+		out1.close();
+		out2.close();
 	}
 	
 	/**

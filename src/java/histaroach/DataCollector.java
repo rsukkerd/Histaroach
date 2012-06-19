@@ -299,27 +299,30 @@ public class DataCollector {
 		XMLReader<List<IntermediateRevision>> reader = new IntermediateRevisionXMLReader(
     			intermediateRevisionXML, repository, clonedRepository, historyGraph);
     	List<IntermediateRevision> intermediateRevisions = reader.read();
-    	IntermediateRevisionAnalysis analysis = new IntermediateRevisionAnalysis(
-    			intermediateRevisions);
     	
     	String xmlFilename = intermediateRevisionXML.getName();
-    	String filename;
+    	String suffix;
     	
     	if (numIntermediateRevisions > 0) {
-    		String suffix = "_" + startIndex + "-" + (startIndex + 
+    		suffix = "_" + startIndex + "-" + (startIndex + 
     				numIntermediateRevisions) + TXT_EXTENSION;
-    		filename = xmlFilename.replaceFirst(XML_EXTENSION, suffix);
     	} else {
-    		filename = xmlFilename.replaceFirst(XML_EXTENSION, TXT_EXTENSION);
+    		suffix = TXT_EXTENSION;
     	}
     	
-    	File txtFile = new File(intermediateRevisionXML.getParentFile(), filename);
+    	String filename1 = xmlFilename.replaceFirst(XML_EXTENSION, suffix);
+		String filename2 = xmlFilename.replaceFirst(XML_EXTENSION, "_totalDelta" + suffix);
+		
+    	File txtFile1 = new File(intermediateRevisionXML.getParentFile(), filename1);
+    	File txtFile2 = new File(intermediateRevisionXML.getParentFile(), filename2);
+    	
+    	IntermediateRevisionAnalysis analysis = new IntermediateRevisionAnalysis(
+    			intermediateRevisions, txtFile1, txtFile2);
     	
     	if (numIntermediateRevisions > 0) {
-	    	analysis.runTestOnIntermediateRevisions(startIndex, numIntermediateRevisions, 
-	    			txtFile);
+	    	analysis.runTestOnIntermediateRevisions(startIndex, numIntermediateRevisions);
     	} else {
-    		analysis.runTestOnIntermediateRevisions(txtFile);
+    		analysis.runTestOnIntermediateRevisions();
     	}
 	}
 }
