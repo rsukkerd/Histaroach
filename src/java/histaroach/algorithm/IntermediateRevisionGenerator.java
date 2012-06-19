@@ -29,26 +29,6 @@ public class IntermediateRevisionGenerator {
 	private final IRepository repository;
 	private final IRepository clonedRepository;
 	
-	/**
-	 * Encodes sorting and filtering policies for flips.
-	 * 
-	 * @return a list of sorted, filtered flips.
-	 */
-	public static List<Flip> sortAndFilter(Set<Flip> flips) {
-		List<Flip> sortedFlips = new ArrayList<Flip>();
-		
-		for (Flip flip : flips) {
-			
-			if (flip.getDiffFiles().size() <= MAX_NUM_DIFF_FILES) {
-				sortedFlips.add(flip);
-			}
-		}
-		
-		Collections.sort(sortedFlips);
-		
-		return sortedFlips;
-	}
-	
 	public IntermediateRevisionGenerator(IRepository repository, IRepository clonedRepository) {
 		this.repository = repository;
 		this.clonedRepository = clonedRepository;
@@ -111,6 +91,28 @@ public class IntermediateRevisionGenerator {
 		return intermediateRevisionsOfFlip;
 	}
 	
+	/**
+	 * Encodes sorting and filtering policies for flips.
+	 * 
+	 * @return a list of sorted, filtered flips.
+	 */
+	private List<Flip> sortAndFilter(Set<Flip> flips) {
+		List<Flip> sortedFlips = new ArrayList<Flip>();
+		
+		for (Flip flip : flips) {
+			Set<DiffFile> nonTestDelta = separateTestFromNonTest(
+					flip.getDiffFiles()).getFirst();
+			
+			if (nonTestDelta.size() <= MAX_NUM_DIFF_FILES) {
+				sortedFlips.add(flip);
+			}
+		}
+		
+		Collections.sort(sortedFlips);
+		
+		return sortedFlips;
+	}
+
 	/**
 	 * Divides totalDelta into non-test delta and test delta.
 	 * 
