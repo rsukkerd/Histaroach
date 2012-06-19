@@ -26,7 +26,7 @@ import org.w3c.dom.Text;
 
 /**
  * XMLWriter contains common methods and tag names used by HistoryGraphXMLWriter 
- * and MixedRevisionXMLWriter.
+ * and IntermediateRevisionXMLWriter.
  */
 public abstract class XMLWriter {
 	

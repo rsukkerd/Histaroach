@@ -12,8 +12,8 @@ import histaroach.model.IRepository;
 import histaroach.model.IntermediateRevision;
 import histaroach.util.HistoryGraphXMLReader;
 import histaroach.util.HistoryGraphXMLWriter;
-import histaroach.util.MixedRevisionXMLReader;
-import histaroach.util.MixedRevisionXMLWriter;
+import histaroach.util.IntermediateRevisionXMLReader;
+import histaroach.util.IntermediateRevisionXMLWriter;
 import histaroach.util.Util;
 import histaroach.util.XMLReader;
 import histaroach.util.XMLWriter;
@@ -275,7 +275,7 @@ public class DataCollector {
     			HISTORYGRAPH_PREFIX, INTERMEDIATE_REVISION_PREFIX);
     	File xmlFile = new File(DATA_PATH + File.separatorChar + filename);
     	
-    	XMLWriter writer = new MixedRevisionXMLWriter(xmlFile, intermediateRevisions);
+    	XMLWriter writer = new IntermediateRevisionXMLWriter(xmlFile, intermediateRevisions);
     	writer.buildDocument();
 	}
 	
@@ -289,7 +289,7 @@ public class DataCollector {
 	public static void runTestOnIntermediateRevisions(HistoryGraph historyGraph, 
 			IRepository repository, IRepository clonedRepository) 
 			throws Exception {
-		XMLReader<List<IntermediateRevision>> reader = new MixedRevisionXMLReader(
+		XMLReader<List<IntermediateRevision>> reader = new IntermediateRevisionXMLReader(
     			intermediateRevisionXML, repository, clonedRepository, historyGraph);
     	List<IntermediateRevision> intermediateRevisions = reader.read();
     	IntermediateRevisionAnalysis analysis = new IntermediateRevisionAnalysis(
