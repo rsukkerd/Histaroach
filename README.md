@@ -80,5 +80,6 @@ File Format:
                       if 1, all of the test-related fields are 'n'
  * test             : name of a test
  * intermediateTestResult : 0 means this IntermediateRevision fails this test; 1 means passes
- * parentTestResult : 0 means the parent of this IntermediateRevision fails this test; 1 means passes
+ * parentTestResult : 0 means the parent of this IntermediateRevision fails this test; 1 means passes;
+                      -1 means the parent does not have this test
  * childTestResult  : 0 means the child of this IntermediateRevision fails this test; 1 means passes
