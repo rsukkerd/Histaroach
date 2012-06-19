@@ -8,7 +8,7 @@ import histaroach.buildstrategy.IBuildStrategy;
 import histaroach.buildstrategy.MyBuildStrategy;
 import histaroach.model.DiffFile;
 import histaroach.model.GitRepository;
-import histaroach.model.MixedRevision;
+import histaroach.model.IntermediateRevision;
 import histaroach.model.IRepository;
 import histaroach.model.Revision;
 import histaroach.model.TestResult;
@@ -32,7 +32,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 
-public class MixedRevisionTest {
+public class IntermediateRevisionTest {
 	
 	private static final String DEST_PATH = "test-data/";
 	private static final String ANT_COMMAND = "ant";
@@ -97,28 +97,29 @@ public class MixedRevisionTest {
 	private static final Revision REVISION_2 = 
 		new Revision(COMMIT_2, PARENT_TO_DIFF_FILES_2, Compilable.UNKNOWN, false, null);
 	
-	private static final String FILE_1_REVISION_1 = "f1r1";
-	private static final String FILE_1_REVISION_2 = "f1r2";
+	private static final String FILE_1_CONTENT_VERSION_1 = "f1r1";
+	private static final String FILE_1_CONTENT_VERSION_2 = "f1r2";
 	
 	@Test
-	public void testRevertRestoreFiles() throws Exception {
+	public void testApplyDeltaRestoreBase() throws Exception {
 		Util.untar(TAR_FILE, DEST_PATH);
 		Util.untar(TAR_FILE_CLONE, DEST_PATH);
 		
-		MixedRevision mr = new MixedRevision(REVISION_2, REPOSITORY, REPOSITORY_CLONE);
-		mr.setRevertedFiles(COMBINATION, REVISION_1);
-		mr.checkoutBaseRevision();
-		mr.revertFiles();
+		IntermediateRevision imr = new IntermediateRevision(REVISION_1, REVISION_2, 
+				REPOSITORY, REPOSITORY_CLONE);
+		imr.checkoutBaseSuccessorRevisions();
+		imr.setDelta(COMBINATION);
+		imr.applyDelta();
 		
-		checkFile(FILE_1, FILE_1_REVISION_1);
+		checkFile(FILE_1, FILE_1_CONTENT_VERSION_2);
+		assertFalse(FILENAME_2 + " exists", FILE_2.exists());
+		assertTrue(FILENAME_3 + " does not exist", FILE_3.exists());
+		
+		imr.restoreBaseRevision();
+		
+		checkFile(FILE_1, FILE_1_CONTENT_VERSION_1);
 		assertTrue(FILENAME_2 + " does not exist", FILE_2.exists());
 		assertFalse(FILENAME_3 + " exists", FILE_3.exists());
-		
-		mr.restoreBaseRevision();
-		
-		checkFile(FILE_1, FILE_1_REVISION_2);
-		assertTrue(FILENAME_3 + " does not exist", FILE_3.exists());
-		assertFalse(FILENAME_2 + " exists", FILE_2.exists());
 		
 		FileUtils.deleteDirectory(DIR);
 		FileUtils.deleteDirectory(DIR_CLONE);
@@ -204,20 +205,21 @@ public class MixedRevisionTest {
 	// not compilable
 	private static final Set<DiffFile> COMBINATION_1 = new HashSet<DiffFile>();
 	static {
-		COMBINATION_1.add(PRJ_DIFF_FILE_1);
+		COMBINATION_1.add(PRJ_DIFF_FILE_2);
+		COMBINATION_1.add(PRJ_DIFF_FILE_3);
 	}
 	
 	// compilable, but still fail test
 	private static final Set<DiffFile> COMBINATION_2 = new HashSet<DiffFile>();
 	static {
-		COMBINATION_2.add(PRJ_DIFF_FILE_1);
-		COMBINATION_2.add(PRJ_DIFF_FILE_2);
+		COMBINATION_2.add(PRJ_DIFF_FILE_3);
 	}
 	
 	// pass test
 	private static final Set<DiffFile> COMBINATION_3 = new HashSet<DiffFile>();
 	static {
-		COMBINATION_3.add(PRJ_DIFF_FILE_3);
+		COMBINATION_3.add(PRJ_DIFF_FILE_1);
+		COMBINATION_3.add(PRJ_DIFF_FILE_2);
 	}
 	
 	@Before
@@ -233,37 +235,38 @@ public class MixedRevisionTest {
 	}
 	
 	@Test
-	public void testRevertNotCompilable() throws Exception {
+	public void testApplyDeltaNotCompilable() throws Exception {
 		checkTestResult(COMBINATION_1, Compilable.NO, null);
 	}
 	
 	@Test
-	public void testRevertFail() throws Exception {
+	public void testApplyDeltaFail() throws Exception {
 		checkTestResult(COMBINATION_2, Compilable.YES, COMBINATION_2_TEST_RESULT);
 	}
 	
 	@Test
-	public void testRevertPass() throws Exception {
+	public void testApplyDeltaPass() throws Exception {
 		checkTestResult(COMBINATION_3, Compilable.YES, COMBINATION_3_TEST_RESULT);
 	}
 	
 	/**
-	 * Checks if the test result after reverting files is as expected.
+	 * Checks if the test result after applying delta is as expected.
 	 * 
 	 * @throws Exception
 	 */
 	private void checkTestResult(Set<DiffFile> combination, Compilable expectedCompilable, 
 			TestResult expectedTestResult) throws Exception {
-		MixedRevision mr = new MixedRevision(PRJ_REVISION_2, PRJ_REPOSITORY, PRJ_REPOSITORY_CLONE);
+		IntermediateRevision imr = new IntermediateRevision(PRJ_REVISION_1, PRJ_REVISION_2, 
+				PRJ_REPOSITORY, PRJ_REPOSITORY_CLONE);
 		
-		mr.setRevertedFiles(combination, PRJ_REVISION_1);
-		mr.checkoutBaseRevision();
-		mr.revertFiles();
-		mr.runTest();
+		imr.checkoutBaseSuccessorRevisions();
+		imr.setDelta(combination);
+		imr.applyDelta();
+		imr.runTest();
 			
-		assertTrue(mr.isCompilable() == expectedCompilable);
-		assertEquals(expectedTestResult, mr.getTestResult());
+		assertTrue(imr.isCompilable() == expectedCompilable);
+		assertEquals(expectedTestResult, imr.getTestResult());
 		
-		mr.restoreBaseRevision();
+		imr.restoreBaseRevision();
 	}
 }
