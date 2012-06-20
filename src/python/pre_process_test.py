@@ -72,8 +72,9 @@ class PreProcessTest(unittest.TestCase):
         in_lines = self.make_lines(inputs)
         mix = pre_process.build_mix(16, in_lines)
         self.assertTrue(mix.is_repaired())
-        input = [ "17;8378cec;d3867bf;~contrib/hadoop-store-builder/test/voldemort/store/readonly/checksum/CheckSumTests.java;1;0;voldemort.store.routed.HintedHandoffTest;1;0;1", "17;8378cec;d3867bf;~contrib/hadoop-store-builder/test/voldemort/store/readonly/checksum/CheckSumTests.java;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;0;1;1"] 
-        mix = pre_process.build_mix(17, input)
+        inputs = [ "17;8378cec;d3867bf;~contrib/hadoop-store-builder/test/voldemort/store/readonly/checksum/CheckSumTests.java;1;0;voldemort.store.routed.HintedHandoffTest;1;0;1", "17;8378cec;d3867bf;~contrib/hadoop-store-builder/test/voldemort/store/readonly/checksum/CheckSumTests.java;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;0;1;1"] 
+        in_lines = self.make_lines(inputs)
+        mix = pre_process.build_mix(17, in_lines)
         self.assertFalse(mix.is_repaired())
         
         
