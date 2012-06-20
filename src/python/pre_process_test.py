@@ -18,13 +18,13 @@ class PreProcessTest(unittest.TestCase):
     
     def test_data_file_format(self):
         infile = open("rev-sample.txt", "r")
-        line = infile.readlines()[1]
+        line = infile.readlines()[2]
         infile.close()
         data = pre_process.InputFileLine(line.split(";"))
-        self.assertEqual( 0, data.mixID)
-        self.assertEqual( "ca9f374", data.parentID)
-        self.assertEqual( "7857afa", data.childID)
-        self.assertEqual( "Msrc/java/voldemort/utils/RebalanceUtils.java", data.changedFiles)
+        self.assertEqual( 1, data.mixID)
+        self.assertEqual( "012ba09", data.parentID)
+        self.assertEqual( "b6266cd", data.childID)
+        self.assertEqual( "Msrc/java/voldemort/server/VoldemortConfig.java", data.changedFiles)
         self.assertTrue(data.compilable)
         self.assertFalse( data.aborted)
         self.assertEqual( "voldemort.store.invalidmetadata.InvalidMetadataCheckingStoreTest", data.testName)
@@ -35,7 +35,7 @@ class PreProcessTest(unittest.TestCase):
     def test_read_data(self):    
         infile = open("rev-sample.txt", "r")
         data = pre_process.read_data(infile)
-        self.assertEqual(3, len(data))
+        self.assertEqual(17, len(data))
 
     def test_build_rev_pair(self):
         inputs = [ "16;8378cec;d3867bf;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/fetcher/HdfsFetcher.java;1;0;voldemort.store.slop.strategy.HandoffToAnyStrategyTest;1;1;1", "17;8378cec;d3867bf;~contrib/hadoop-store-builder/test/voldemort/store/readonly/checksum/CheckSumTests.java;1;0;voldemort.store.invalidmetadata.InvalidMetadataCheckingStoreTest;1;1;1" ]
@@ -80,10 +80,10 @@ class PreProcessTest(unittest.TestCase):
         
     def test_rev_pair_is_repaired(self):
         #mix 16 repairs flip in HintedHandoffTest
-        infile = open("rev-sample.txt", "r")
-        data = pre_process.read_data(infile)
-        self.assertFalse(data[0].is_repaired())
-        self.assertTrue(data[2].is_repaired())
+        inputs = [ "16;8378cec;d3867bf;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/fetcher/HdfsFetcher.java;1;0;voldemort.store.routed.HintedHandoffTest;1;1;0", "16;8378cec;d3867bf;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/fetcher/HdfsFetcher.java;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1"] 
+        in_lines = self.make_lines(inputs)
+        data = pre_process.build_rev_pair( "8378ce", "d3867bf", in_lines)
+        self.assertTrue(data.is_repaired())
 
     def test_get_all_files(self):
         inputs = [ "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.store.readonly.ReadOnlyStorageEngineTest;0;0;1", "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.client.rebalance.RebalanceTest;1;0;1", "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0", "19;1ee8246;23c9b28;~test/unit/voldemort/store/readonly/ReadOnlyStorageEngineTestInstance.java;0;0;n;n;n;n" ]
@@ -93,14 +93,14 @@ class PreProcessTest(unittest.TestCase):
         self.assertEqual(2, len(data.get_all_files()) )
 
     def test_rev_pair_get_delta_p_bar(self):
-        inputs = [ "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.store.readonly.ReadOnlyStorageEngineTest;0;0;1", "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.client.rebalance.RebalanceTest;1;0;1", "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0", "19;1ee8246;23c9b28;~test/unit/voldemort/store/readonly/ReadOnlyStorageEngineTestInstance.java;0;0;n;n;n;n" ]
+        inputs = [ "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.store.readonly.ReadOnlyStorageEngineTest;0;1;0", "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.client.rebalance.RebalanceTest;1;1;0", "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0", "19;1ee8246;23c9b28;~test/unit/voldemort/store/readonly/ReadOnlyStorageEngineTestInstance.java;0;0;n;n;n;n" ]
         in_lines = self.make_lines(inputs)
         data = pre_process.build_rev_pair( "23c9b28", "1ee8246", in_lines)
         self.assertTrue( data.is_repaired() )
         self.assertEqual( 1, len(data.get_delta_p_bar()) )
 
     def test_rev_pair_get_delta_p(self):
-        inputs = [ "21;b17f572;5400077;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/MD5CheckSum.java;1;0;voldemort.client.CachingStoreClientFactoryTest;1;1;1", "21;b17f572;5400077;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/MD5CheckSum.java;1;0;voldemort.server.EndToEndTest;1;0;1", "32;b17f572;5400077;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CheckSum.java,~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/Adler32CheckSum.java,~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32CheckSum.java;1;0;voldemort.client.CachingStoreClientFactoryTest;1;1;1", "32;b17f572;5400077;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CheckSum.java,~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/Adler32CheckSum.java,~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32CheckSum.java;1;0;voldemort.server.EndToEndTest;1;0;1" ]
+        inputs = [ "21;b17f572;5400077;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/MD5CheckSum.java;1;0;voldemort.client.CachingStoreClientFactoryTest;1;1;1", "21;b17f572;5400077;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/MD5CheckSum.java;1;0;voldemort.server.EndToEndTest;1;1;0", "32;b17f572;5400077;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CheckSum.java,~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/Adler32CheckSum.java,~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32CheckSum.java;1;0;voldemort.client.CachingStoreClientFactoryTest;1;1;1", "32;b17f572;5400077;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CheckSum.java,~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/Adler32CheckSum.java,~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32CheckSum.java;1;0;voldemort.server.EndToEndTest;1;1;0" ]
         in_lines = self.make_lines(inputs)
         data = pre_process.build_rev_pair( "5400077", "b17f572", in_lines )
         self.assertEqual( 4, len(data.get_all_files()) )

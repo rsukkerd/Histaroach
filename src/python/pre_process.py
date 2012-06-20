@@ -39,9 +39,9 @@ class ChangedFile:
     changeType = "~"
 
     def toString(self, c):
-        if ( c == "~" ): return "MODIFY"
-        if ( c == "+" ): return "ADD"
-        if ( c == "-" ): return "DELETE"
+        if ( c == "M" ): return "MODIFY"
+        if ( c == "A" ): return "ADD"
+        if ( c == "D" ): return "DELETE"
         return "UNDEFINED"
 
 
