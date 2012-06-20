@@ -44,7 +44,7 @@ public class IntermediateRevisionAnalysis {
 			File outputFile1, File outputFile2) throws IOException {
 		this.intermediateRevisions = intermediateRevisions;
 		out1 = new BufferedWriter(new FileWriter(outputFile1));
-		out2 = new BufferedWriter(new FileWriter(outputFile1));
+		out2 = new BufferedWriter(new FileWriter(outputFile2));
 	}
 	
 	/**
@@ -86,9 +86,10 @@ public class IntermediateRevisionAnalysis {
 			
 			if (!pairs.contains(pair)) {
 				pairs.add(pair);
-				out2.write(base.getCommitID() + COLUMN_SEPARATOR + 
-						successor.getCommitID() + COLUMN_SEPARATOR);
-				out2.write(getLineDelta(intermediateRevision.getTotalDelta()) + "\n");
+				String line = base.getCommitID() + COLUMN_SEPARATOR + 
+					successor.getCommitID() + COLUMN_SEPARATOR + 
+					getLineDelta(intermediateRevision.getTotalDelta()) + "\n";
+				out2.write(line);
 				out2.flush();
 			}
 			
