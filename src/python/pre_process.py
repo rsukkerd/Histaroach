@@ -101,9 +101,9 @@ class MixedRevision:
         self.compilable = True
 
     def __str__(self):
-        s = "Mixed Revision: " + str(self.mixID) + "\nReverted files: "  
+        s = "Mixed Revision: " + str(self.mixID) + "\nChanged files (" + str(len(self.revertedFiles)) + "):\n"  
         for  f in self.revertedFiles :
-            s = s + str(f) + ", "
+            s = s + "    " + str(f) + "\n"
         return s
 
     def is_repaired(self):
@@ -145,14 +145,6 @@ class RevisionPair:
         for t in self.mixedRevisions:
             if ( not repairs.__contains__(t) ): broken.append(t)
         return broken
-
-    def get_all_files(self):
-        files = []
-        for m in self.mixedRevisions:
-            if ( m == None): continue
-            for f in m.revertedFiles:
-                if (not files.__contains__(f.fileName) ): files.append(f.fileName)
-        return files
 
     def get_delta(self, mixedRevision):
         '''
@@ -196,8 +188,8 @@ class RevisionPair:
                 delta_p = [r]
         return delta_p
 
-    def get_delta_f(self):
-        shortest = len(self.get_all_files())-1
+    def get_delta_f(self, delta):
+        shortest = len(delta.totalDelta)
         delta_f = []
         for r in self.get_broken_mixes():
             temp = len(r.revertedFiles)
@@ -313,8 +305,8 @@ def print_fix(rev_pair, mixes, deltas):
     Prints summary info about this fixed revision pair and set of deltas
     '''
     s = "\nRevision pair: " + rev_pair.parentID + ":" + rev_pair.childID 
-    s = s + "\tFiles changed: " 
-    s = s + str(len(get_delta(deltas, rev_pair.parentID, rev_pair.childID).totalDelta)) + "\tDelta size: " + str(len(mixes[0].revertedFiles))
+    s = s + "\tTotal delta: " 
+    s = s + str(len(get_delta(deltas, rev_pair.parentID, rev_pair.childID).totalDelta)) + " files\n"
     print s
     for f in mixes:
         print f
@@ -337,7 +329,7 @@ def print_delta_f(data, deltas):
     print "Delta F"
     print "-------"
     for d in data:
-        if d.is_repaired(): print_fix(d, d.get_delta_f(), deltas )
+        if d.is_repaired(): print_fix(d, d.get_delta_f( get_delta(deltas, d.parentID, d.childID) ), deltas )
     print ""
 
 def read_deltas(filename):
