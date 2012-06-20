@@ -2,18 +2,15 @@ package histaroach.util;
 
 import histaroach.model.DiffFile;
 import histaroach.model.DiffFile.DiffType;
-import histaroach.model.Revision;
 import histaroach.model.Revision.Compilable;
 import histaroach.model.TestResult;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -45,8 +42,10 @@ public abstract class XMLReader<T> {
 	 * Reconstructs an instance of type T from the XML file.
 	 * 
 	 * @return an instance of type T.
+	 * @throws InterruptedException 
+	 * @throws IOException 
 	 */
-	public abstract T read();
+	public abstract T read() throws IOException, InterruptedException;
 	
 	public Compilable parseCompilableElement(Element compilableElement) { // <Compilable>
 		String compilableStr = getString(compilableElement);
@@ -62,7 +61,7 @@ public abstract class XMLReader<T> {
 		return Compilable.NO_BUILD_FILE;
 	}
 	
-	public boolean parseTestAbortedElement(Element testAbortedElement) {
+	public boolean parseTestAbortedElement(Element testAbortedElement) { // <testAborted>
 		String testAbortedStr = getString(testAbortedElement);
 		
 		return testAbortedStr.equals(Boolean.TRUE.toString());
@@ -94,26 +93,6 @@ public abstract class XMLReader<T> {
 		
 		return tests;
 	}
-	
-	public Map<Revision, Set<DiffFile>> parseDiffRecordsElement(
-			Element diffRecordsElement) { // <Parents> or <RevertedFileRecords>
-		Map<Revision, Set<DiffFile>> diffRecords = new HashMap<Revision, Set<DiffFile>>();
-		
-		List<Element> diffRecordElements = traverseContainedElements(diffRecordsElement);
-		
-		for (Element diffRecordElement : diffRecordElements) {
-			Pair<Revision, Set<DiffFile>> pair = parseDiffRecordElement(diffRecordElement);
-			Revision otherRevision = pair.getFirst();
-			Set<DiffFile> diffFiles = pair.getSecond();
-			
-			diffRecords.put(otherRevision, diffFiles);
-		}
-		
-		return diffRecords;
-	}
-	
-	public abstract Pair<Revision, Set<DiffFile>> parseDiffRecordElement(
-			Element diffRecordElement); // <Parent> or <RevertedFileRecord>
 	
 	public Set<DiffFile> parseDiffFilesElement(Element diffFilesElement) { // <DiffFiles>
 		Set<DiffFile> diffFiles = new HashSet<DiffFile>();

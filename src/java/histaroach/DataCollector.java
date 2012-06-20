@@ -1,7 +1,7 @@
 package histaroach;
 
-import histaroach.algorithm.MixedRevisionAnalysis;
-import histaroach.algorithm.MixedRevisionGenerator;
+import histaroach.algorithm.IntermediateRevisionAnalysis;
+import histaroach.algorithm.IntermediateRevisionGenerator;
 import histaroach.buildstrategy.IBuildStrategy;
 import histaroach.buildstrategy.JodatimeBuildStrateygy;
 import histaroach.buildstrategy.VoldemortBuildStrategy;
@@ -9,16 +9,17 @@ import histaroach.model.Flip;
 import histaroach.model.GitRepository;
 import histaroach.model.HistoryGraph;
 import histaroach.model.IRepository;
-import histaroach.model.MixedRevision;
+import histaroach.model.IntermediateRevision;
 import histaroach.util.HistoryGraphXMLReader;
 import histaroach.util.HistoryGraphXMLWriter;
-import histaroach.util.MixedRevisionXMLReader;
-import histaroach.util.MixedRevisionXMLWriter;
+import histaroach.util.IntermediateRevisionXMLReader;
+import histaroach.util.IntermediateRevisionXMLWriter;
 import histaroach.util.Util;
 import histaroach.util.XMLReader;
 import histaroach.util.XMLWriter;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -30,7 +31,7 @@ import plume.OptionGroup;
 import plume.Options;
 
 /**
- * DataCollector extracts information (HistoryGraph and MixedRevision) 
+ * DataCollector extracts information (HistoryGraph and IntermediateRevision) 
  * from the project subjects of study.
  */
 public class DataCollector {
@@ -40,8 +41,8 @@ public class DataCollector {
 	// Prefix of files to which HistoryGraph instances are written.
     public static final String HISTORYGRAPH_PREFIX = "historyGraph";
     
-    // Prefix of files to which MixedRevision instances are written.
-    public static final String MIXEDREVISION_PREFIX = "mixedRevision";
+    // Prefix of files to which IntermediateRevision instances are written.
+    public static final String INTERMEDIATE_REVISION_PREFIX = "intermediateRevision";
     
     public static final String XML_EXTENSION = ".xml";
     public static final String TXT_EXTENSION = ".txt";
@@ -62,19 +63,19 @@ public class DataCollector {
      */
     @OptionGroup("Mode Options")
     @Option(value="Collect HistoryGraph data")
-    public static boolean historyGraphMode;
+    public static boolean phaseI;
     
     /**
-     * Create MixedRevision templates.
+     * Create IntermediateRevisions.
      */
-    @Option(value="Create MixedRevision templates")
-    public static boolean mixedRevisionTemplateMode;
+    @Option(value="Create IntermediateRevisions")
+    public static boolean phaseII;
     
     /**
-     * Collect MixedRevision test results.
+     * Run tests on IntermediateRevisions.
      */
-    @Option(value="Collect MixedRevision test results")
-    public static boolean mixedRevisionTestResultMode;
+    @Option(value="Run tests on IntermediateRevisions")
+    public static boolean phaseIII;
     
     /**
 	 * Project name.
@@ -111,7 +112,7 @@ public class DataCollector {
     /**
 	 * Cloned repository directory.
 	 */
-    @OptionGroup("MixedRevision Options")
+    @OptionGroup("IntermediateRevision Options")
 	@Option(value = "-c <filename> Cloned repository directory")
 	public static File clonedRepoDir = null;
     
@@ -122,27 +123,27 @@ public class DataCollector {
     public static File historyGraphXML = null;
     
     /**
-     * MixedRevision xml file.
+     * IntermediateRevision xml file.
      */
-    @OptionGroup("MixedRevision (test results) Options")
-    @Option(value = "-M <filename> MixedRevision xml file")
-    public static File mixedRevisionXML = null;
+    @OptionGroup("IntermediateRevision (run tests) Options")
+    @Option(value = "-I <filename> IntermediateRevision xml file")
+    public static File intermediateRevisionXML = null;
     
     /**
-     * The index of MixedRevision to begin analysis.
+     * The index of IntermediateRevision to begin analysis.
      */
-    @Option(value = "-i Index of MixedRevision to begin analysis (Optional)")
+    @Option(value = "-i Index of IntermediateRevision to begin analysis (Optional)")
     public static int startIndex = 0;
     
     /**
-     * The number of MixedRevisions to analyze.
+     * The number of IntermediateRevisions to analyze.
      */
-    @Option(value = "-n Number of MixedRevisions to analyze (Optional)")
-    public static int numMixedRevisions = 0;
+    @Option(value = "-n Number of IntermediateRevisions to analyze (Optional)")
+    public static int numIntermediateRevisions = 0;
 
 	/** One line synopsis of usage */
 	public static final String usage_string = "DataCollector [mode option] [common options]"
-		+ " [HistoryGraph/MixedRevision options]";
+		+ " [HistoryGraph/IntermediateRevision options]";
     
 
 	/**
@@ -167,7 +168,7 @@ public class DataCollector {
             return;
         }
 	    
-	    if (historyGraphMode) {
+	    if (phaseI) {
 	    	if (startCommitID == null || endCommitID == null) {
 	            plumeOptions.print_usage();
 	            return;
@@ -192,7 +193,7 @@ public class DataCollector {
 	        
 	        saveHistoryGraph(historyGraph, timeStamp);
 	    	
-	    } else if (mixedRevisionTemplateMode || mixedRevisionTestResultMode) {
+	    } else if (phaseII || phaseIII) {
 	    	if (clonedRepoDir == null || historyGraphXML == null) {
 		    	plumeOptions.print_usage();
 		    	return;
@@ -219,15 +220,15 @@ public class DataCollector {
 	        XMLReader<HistoryGraph> reader = new HistoryGraphXMLReader(historyGraphXML);
 		    HistoryGraph historyGraph = reader.read();
 	    	
-		    if (mixedRevisionTemplateMode) {
-		    	generateMixedRevisions(historyGraph, repository, clonedRepository);
+		    if (phaseII) {
+		    	createIntermediateRevisions(historyGraph, repository, clonedRepository);
 	        } else {
-	        	if (mixedRevisionXML == null) {
+	        	if (intermediateRevisionXML == null) {
 			    	plumeOptions.print_usage();
 			    	return;
 			    }
 	        	
-	        	runTestOnMixedRevisions(historyGraph, repository, clonedRepository);
+	        	runTestOnIntermediateRevisions(historyGraph, repository, clonedRepository);
 	        }
 	    } else {
 	    	plumeOptions.print_usage();
@@ -242,73 +243,86 @@ public class DataCollector {
      */
     public static void saveHistoryGraph(HistoryGraph historyGraph, String timeStamp) 
     		throws ParserConfigurationException, TransformerException {
-    	String fileName = HISTORYGRAPH_PREFIX + "_" + startCommitID + "_" + endCommitID 
+    	String fileName = HISTORYGRAPH_PREFIX + "_" + startCommitID + "-" + endCommitID 
     			+ "_" + timeStamp + XML_EXTENSION;
-    	File xmlFile = new File(DATA_PATH + File.separatorChar + fileName);
+    	File dir = new File(DATA_PATH + File.separatorChar + startCommitID 
+    			+ "-" + endCommitID);
+    	
+    	if (!dir.exists()) {
+    		dir.mkdir();
+    	}
+    	
+    	File xmlFile = new File(dir, fileName);
     	
     	XMLWriter writer = new HistoryGraphXMLWriter(xmlFile, historyGraph);
     	writer.buildDocument();
     }
     
     /**
-	 * Generates a list of MixedRevisions from all flips in historyGraph, 
+	 * Creates a list of IntermediateRevisions from all flips in historyGraph, 
 	 * and writes them to an xml file.
 	 * 
 	 * @throws ParserConfigurationException
 	 * @throws TransformerException
+     * @throws InterruptedException 
+     * @throws IOException 
 	 */
-	public static void generateMixedRevisions(HistoryGraph historyGraph, 
+	public static void createIntermediateRevisions(HistoryGraph historyGraph, 
 			IRepository repository, IRepository clonedRepository) 
-			throws ParserConfigurationException, TransformerException {
+			throws ParserConfigurationException, TransformerException, 
+			IOException, InterruptedException {
 		Set<Flip> flips = historyGraph.getAllFlips();
     	
-    	MixedRevisionGenerator generator = new MixedRevisionGenerator(repository, 
-    			clonedRepository);
-    	List<MixedRevision> mixedRevisions = generator.generateMixedRevisionsFromFlips(
-    			flips);
+    	IntermediateRevisionGenerator generator = new IntermediateRevisionGenerator(
+    			repository, clonedRepository);
+    	List<IntermediateRevision> intermediateRevisions = 
+    		generator.generateIntermediateRevisionsFromFlips(flips);
     	
     	String filename = historyGraphXML.getName().replaceFirst(
-    			HISTORYGRAPH_PREFIX, MIXEDREVISION_PREFIX);
-    	File xmlFile = new File(DATA_PATH + File.separatorChar + filename);
+    			HISTORYGRAPH_PREFIX, INTERMEDIATE_REVISION_PREFIX);
+    	File xmlFile = new File(historyGraphXML.getParentFile(), filename);
     	
-    	XMLWriter writer = new MixedRevisionXMLWriter(xmlFile, mixedRevisions);
+    	XMLWriter writer = new IntermediateRevisionXMLWriter(xmlFile, intermediateRevisions);
     	writer.buildDocument();
 	}
 	
 	/**
-	 * For a specified range in mixedRevisions, creates actual mixed revisions 
-	 * on the file system, runs tests on them and records the results to 
+	 * For a specified range of IntermediateRevisions, creates actual intermediate 
+	 * revisions on the file system, runs tests on them and records the results to 
 	 * an output file.
 	 * 
 	 * @throws Exception
 	 */
-	public static void runTestOnMixedRevisions(HistoryGraph historyGraph, 
+	public static void runTestOnIntermediateRevisions(HistoryGraph historyGraph, 
 			IRepository repository, IRepository clonedRepository) 
 			throws Exception {
-		XMLReader<List<MixedRevision>> reader = new MixedRevisionXMLReader(
-    			mixedRevisionXML, repository, clonedRepository, historyGraph);
-    	List<MixedRevision> mixedRevisions = reader.read();
-    	MixedRevisionAnalysis analysis = new MixedRevisionAnalysis(mixedRevisions);
+		XMLReader<List<IntermediateRevision>> reader = new IntermediateRevisionXMLReader(
+    			intermediateRevisionXML, repository, clonedRepository, historyGraph);
+    	List<IntermediateRevision> intermediateRevisions = reader.read();
     	
-    	String xmlFilename = mixedRevisionXML.getName();
-    	String filename;
+    	String xmlFilename = intermediateRevisionXML.getName();
+    	String suffix;
     	
-    	if (numMixedRevisions > 0) {
-    		filename = xmlFilename.substring(0, xmlFilename.indexOf(XML_EXTENSION)) 
-    				+ "_" + startIndex + "_" + (startIndex + numMixedRevisions) 
-    				+ TXT_EXTENSION;
+    	if (numIntermediateRevisions > 0) {
+    		suffix = "_" + startIndex + "-" + (startIndex + 
+    				numIntermediateRevisions) + TXT_EXTENSION;
     	} else {
-    		filename = xmlFilename.substring(0, xmlFilename.indexOf(XML_EXTENSION)) 
-    				+ TXT_EXTENSION;
+    		suffix = TXT_EXTENSION;
     	}
     	
-    	File txtFile = new File(DATA_PATH + File.separatorChar + filename);
+    	String filename1 = xmlFilename.replaceFirst(XML_EXTENSION, suffix);
+		String filename2 = xmlFilename.replaceFirst(XML_EXTENSION, "_totalDelta" + suffix);
+		
+    	File txtFile1 = new File(intermediateRevisionXML.getParentFile(), filename1);
+    	File txtFile2 = new File(intermediateRevisionXML.getParentFile(), filename2);
     	
-    	if (numMixedRevisions > 0) {
-	    	analysis.runTestOnMixedRevisions(startIndex, numMixedRevisions, 
-	    			txtFile);
+    	IntermediateRevisionAnalysis analysis = new IntermediateRevisionAnalysis(
+    			intermediateRevisions, txtFile1, txtFile2);
+    	
+    	if (numIntermediateRevisions > 0) {
+	    	analysis.runTestOnIntermediateRevisions(startIndex, numIntermediateRevisions);
     	} else {
-    		analysis.runTestOnMixedRevisions(txtFile);
+    		analysis.runTestOnIntermediateRevisions();
     	}
 	}
 }

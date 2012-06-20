@@ -104,6 +104,10 @@ public class Revision implements Serializable {
     public Set<Revision> getParents() {
         return parentToDiffFiles.keySet();
     }
+    
+    public boolean isChildOf(Revision revision) {
+    	return parentToDiffFiles.containsKey(revision);
+    }
 
     /**
      * @return a set of DiffFiles corresponding to the parent, 

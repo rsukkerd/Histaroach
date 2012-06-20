@@ -30,12 +30,12 @@ Using the compiled utilities
 
 ### DataCollector
 
-Command line usage: DataCollector [mode option] [common options] [HistoryGraph/MixedRevision options]
+Command line usage: DataCollector [mode option] [common options] [HistoryGraph/IntermediateRevision options]
 
 Mode Options:
- * --historyGraphMode                      - Collect HistoryGraph data
- * --mixedRevisionTemplateMode             - Create MixedRevision templates
- * --mixedRevisionTestResultMode           - Collect MixedRevision test results
+ * --phaseI                                - Collect HistoryGraph data
+ * --phaseII                               - Create IntermediateRevisions
+ * --phaseIII                              - Run tests on IntermediateRevisions
  
 Common Options:
  * -p --projectName                        - Project name
@@ -46,39 +46,40 @@ HistoryGraph Options:
  * -s --startCommitID                      - Starting commit ID for HistoryGraph analysis
  * -e --endCommitID                        - Ending commit ID for HistoryGraph analysis
 
-MixedRevision Options:
+IntermediateRevision Options:
  * -c --clonedRepoDir                      - Cloned repository directory
  * -H --historyGraphXML                    - HistoryGraph xml file
  
-MixedRevision (test results) Options:
- * -M --mixedRevisionXML                   - MixedRevision xml file
- * -i --startIndex                         - Index of MixedRevision to begin analysis (Optional)
- * -n --numMixedRevisions                  - Number of MixedRevisions to analyze (Optional)
+IntermediateRevision (run tests) Options:
+ * -I --intermediateRevisionXML            - IntermediateRevision xml file
+ * -i --startIndex                         - Index of IntermediateRevision to begin analysis (Optional)
+ * -n --numIntermediateRevisions           - Number of IntermediateRevisions to analyze (Optional)
 
 
 Output File Documentation
 --------------------------
 
-### MixedRevision Output
+### IntermediateRevision Output
 
 File Content:
-A MixedRevision output file contains a list of MixedRevisions and their test results. Each MixedRevision 
-in this file is created from a pair of child-parent Revisions, which contains at least 1 test flip. 
-A test flip can be from pass (in parent) to fail (in child) or vice versa.
+An IntermediateRevision output file contains a list of IntermediateRevisions and their test results. 
+Each IntermediateRevision in this file is created from a pair of parent-child Revisions, which contains 
+at least 1 test flip. A test flip can be from pass (in parent) to fail (in child) or vice versa.
 
 File Format:
- * mixedRevisionID : a unique number for a particular MixedRevision
- * baseRevisionID  : a child commit ID
- * otherRevisionID : a parent commit ID
- * revertedFiles   : a set of files that are reverted from child version to parent version
- * (reverted type) : + means the file (from parent) is added to child;
-                     - means the file is removed from child;
-                     ~ means the file in child is replaced with the parent version of itself
- * compilable      : 0 means this MixedRevision is not compilable; 1 means compilable;
-                     if 0, all of the test-related fields are 'n'
- * testAborted     : 0 means the tests terminate OK; 1 means the process that runs the tests has aborted;
-                     if 1, all of the test-related fields are 'n'
- * test            : name of a test
- * mixedTestResult : 0 means this MixedRevision fails this test; 1 means passes
- * baseTestResult  : 0 means the child of this MixedRevision fails this test; 1 means passes
- * otherTestResult : 0 means the parent of this MixedRevision fails this test; 1 means passes
+ * IID              : a unique number for a particular IntermediateRevision
+ * parentCommitID   : a parent commit ID
+ * childCommitID    : a child commit ID
+ * delta            : a set of (file-level) changes that are applied to the parent to create this IntermediateRevision
+ * (change type)    : 'A' means the file is added;
+                      'D' means the file is deleted;
+                      'M' means the file is modified
+ * compilable       : 0 means this IntermediateRevision is not compilable; 1 means compilable;
+                      if 0, all of the test-related fields are 'n'
+ * testAborted      : 0 means the tests terminate OK; 1 means the process that runs the tests has aborted;
+                      if 1, all of the test-related fields are 'n'
+ * test             : name of a test
+ * intermediateTestResult : 0 means this IntermediateRevision fails this test; 1 means passes
+ * parentTestResult : 0 means the parent of this IntermediateRevision fails this test; 1 means passes;
+                      -1 means the parent does not have this test
+ * childTestResult  : 0 means the child of this IntermediateRevision fails this test; 1 means passes

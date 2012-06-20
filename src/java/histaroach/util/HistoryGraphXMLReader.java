@@ -73,7 +73,7 @@ public class HistoryGraphXMLReader extends XMLReader<HistoryGraph> {
 			testResult = parseTestResultElement(testResultElement);
 		}
 		
-		Map<Revision, Set<DiffFile>> parentToDiffFiles = parseDiffRecordsElement(parentsElement);
+		Map<Revision, Set<DiffFile>> parentToDiffFiles = parseParentsElement(parentsElement);
 		
 		Revision revision = new Revision(commitID, parentToDiffFiles, compilable, 
 				testAborted, testResult);
@@ -81,10 +81,24 @@ public class HistoryGraphXMLReader extends XMLReader<HistoryGraph> {
 		return revision;
 	}
 	
-	@Override
-	public Pair<Revision, Set<DiffFile>> parseDiffRecordElement(
-			Element diffRecordElement) { // <Parent>
-		Iterator<Element> iter = traverseContainedElements(diffRecordElement).iterator();
+	public Map<Revision, Set<DiffFile>> parseParentsElement(Element parentsElement) { // <Parents>
+		Map<Revision, Set<DiffFile>> parentToDiffFiles = new HashMap<Revision, Set<DiffFile>>();
+		
+		List<Element> parentElements = traverseContainedElements(parentsElement);
+		
+		for (Element parentElement : parentElements) {
+			Pair<Revision, Set<DiffFile>> pair = parseParentElement(parentElement);
+			Revision parent = pair.getFirst();
+			Set<DiffFile> diffFiles = pair.getSecond();
+			
+			parentToDiffFiles.put(parent, diffFiles);
+		}
+		
+		return parentToDiffFiles;
+	}
+	
+	public Pair<Revision, Set<DiffFile>> parseParentElement(Element parentElement) { // <Parent>
+		Iterator<Element> iter = traverseContainedElements(parentElement).iterator();
 		
 		Element commitIDElement = iter.next();	// <commitID>
 		Element diffFilesElement = iter.next();	// <DiffFiles>

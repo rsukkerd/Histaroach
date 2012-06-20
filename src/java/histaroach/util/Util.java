@@ -183,10 +183,10 @@ public class Util {
 	
 	/**
 	 * 
-	 * @return current time in the format yyyy-MM-dd HH:mm.
+	 * @return current time in the format yyyy-MM-dd_HH-mm-ss.
 	 */
 	public static String getCurrentTimeStamp() {
-	    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+	    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
 	    Date now = new Date();
 	    return dateFormat.format(now);
 	}
