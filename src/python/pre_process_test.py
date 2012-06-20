@@ -68,7 +68,7 @@ class PreProcessTest(unittest.TestCase):
         self.assertEquals(1, data.tests[1].childResult)
 
     def test_mixed_rev_is_repaired(self):
-        inputs = [ "16;8378cec;d3867bf;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/fetcher/HdfsFetcher.java;1;0;voldemort.store.routed.HintedHandoffTest;1;0;1", "16;8378cec;d3867bf;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/fetcher/HdfsFetcher.java;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1"] 
+        inputs = [ "16;8378cec;d3867bf;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/fetcher/HdfsFetcher.java;1;0;voldemort.store.routed.HintedHandoffTest;1;1;0", "16;8378cec;d3867bf;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/fetcher/HdfsFetcher.java;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1"] 
         in_lines = self.make_lines(inputs)
         mix = pre_process.build_mix(16, in_lines)
         self.assertTrue(mix.is_repaired())
