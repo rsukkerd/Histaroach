@@ -15,6 +15,26 @@ class PreProcessTest(unittest.TestCase):
         for line in inputs:
             lines.append(pre_process.InputFileLine(line.split(";")))
         return lines
+
+    def test_delta_class(self):
+        delta = pre_process.Delta("012ba09;b6266cd;Msrc/java/voldemort/store/bdb/BdbStorageConfiguration.java,Msrc/java/voldemort/server/VoldemortConfig.java")
+        self.assertEqual("012ba09", delta.parentID)
+        self.assertEqual("b6266cd", delta.childID)
+        self.assertEqual(2, len(delta.totalDelta))
+        self.assertEqual("src/java/voldemort/server/VoldemortConfig.java", delta.totalDelta[1].fileName)
+
+    def test_read_deltas(self):
+        deltas = pre_process.read_deltas("delta_test.input")
+        self.assertEqual( 3, len(deltas))
+        self.assertEqual( "a37abfb", deltas[1].parentID )
+        self.assertEqual( "67443e6", deltas[2].childID )
+
+    def test_get_delta(self):
+        deltas = pre_process.read_deltas("delta_test.input")
+        delta = pre_process.get_delta(deltas, "a37abfb", "d3867bf")
+        self.assertEqual( "src/java/voldemort/store/readonly/JsonStoreBuilder.java", delta.totalDelta[0].fileName)
+        delta = pre_process.get_delta( deltas, "516bc3a", "xxx")
+        self.assertIsNone( delta )
     
     def test_data_file_format(self):
         infile = open("rev-sample.txt", "r")

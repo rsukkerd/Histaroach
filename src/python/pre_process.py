@@ -17,6 +17,19 @@
 
 import argparse
 
+class Delta:
+    def __init__(self, fieldString):
+        fields = fieldString.split(";")
+        self.parentID = fields[0]
+        self.childID = fields[1]
+        files = []
+        for f in fields[2].split(","):
+            files.append(ChangedFile(f[1:], f[0]))
+        self.totalDelta = files
+
+    def __str__(self):
+        print self.parentID + ":" + self.childID + "\n" + str(self.totalDelta)
+
 class InputFileLine:
     def __init__(self, fields):
         if (len(fields) != 10 ):
@@ -53,11 +66,6 @@ class ChangedFile:
         return self.fileName + ": " + self.toString(self.changeType)
 
 class TestResult:
-    testName = ""
-    parentResult = 1
-    childResult = 1
-    mixResult = 1
-
     def resultToString(self, result):
         if ( result == 1 ):
             return "pass"
@@ -297,37 +305,56 @@ def get_repaired_flips(data):
 def print_summary(data):
     print "\nHistaroach Log file summary\n"
     print "Checked revision pairs: " + str(len(data)) + "\tTotal number of mixed Revisions: " + str(get_num_mixes(data))
-    print "Repaired flips: " + str(get_repaired_flips(data))
+    print "\tRepaired flips: " + str(get_repaired_flips(data))
     print "\n"
 
-def print_fix(rev_pair, deltas):
+def print_fix(rev_pair, mixes, deltas):
     '''
     Prints summary info about this fixed revision pair and set of deltas
     '''
-    print "\nRevision pair: " + rev_pair.parentID + ":" + rev_pair.childID + "\tFiles changed: " + str(len(rev_pair.get_all_files())) + "\tDelta size: " + str(len(deltas[0].revertedFiles))
-    for f in deltas:
+    s = "\nRevision pair: " + rev_pair.parentID + ":" + rev_pair.childID 
+    s = s + "\tFiles changed: " 
+    s = s + str(len(get_delta(deltas, rev_pair.parentID, rev_pair.childID).totalDelta)) + "\tDelta size: " + str(len(mixes[0].revertedFiles))
+    print s
+    for f in mixes:
         print f
 
-def print_delta_p_bar(data):
+def print_delta_p_bar(rev_pairs, deltas):
     print "Delta P bar"
     print "-----------"
-    for d in data:
-        if d.is_repaired(): print_fix(d, d.get_delta_p_bar() )
+    for d in rev_pairs:
+        if d.is_repaired(): print_fix(d, d.get_delta_p_bar(), deltas )
     print ""
 
-def print_delta_p(data):
+def print_delta_p(rev_pairs, deltas):
     print "Delta P"
     print "-------"
-    for d in data:
-        if d.is_repaired(): print_fix(d, d.get_delta_p() )
+    for d in rev_pairs:
+        if d.is_repaired(): print_fix(d, d.get_delta_p(), deltas )
     print ""
 
-def print_delta_f(data):
+def print_delta_f(data, deltas):
     print "Delta F"
     print "-------"
     for d in data:
-        if d.is_repaired(): print_fix(d, d.get_delta_f() )
+        if d.is_repaired(): print_fix(d, d.get_delta_f(), deltas )
     print ""
+
+def read_deltas(filename):
+    df = open(filename, "r")
+    #skip header
+    df.next()
+    deltas = []
+    for line in df:
+        delta = Delta(line)
+        #print delta
+        deltas.append( delta )
+    return deltas
+
+def get_delta(deltas, parent, child):
+    for delta in deltas:
+        if ( delta.parentID == parent and delta.childID == child): return delta
+    return None
 
 def parse_arguments():
     '''
@@ -336,7 +363,7 @@ def parse_arguments():
     '''
     parser = argparse.ArgumentParser()
     parser.add_argument( "-f", dest="INPUT_FILE", required=True, 
-        help="The Histaroach output file to be processed")
+        help="The prefix of the Histaroach output files to be processed")
     parser.add_argument( "--delta-p-bar", dest="DELTA_P_BAR", default=False, action='store_true')
     parser.add_argument( "--delta-p", dest="DELTA_P", default=False, action='store_true')
     parser.add_argument( "--delta-f", dest="DELTA_F", default=False, action='store_true')
@@ -345,17 +372,18 @@ def parse_arguments():
 
 def main():
     args = parse_arguments()
-    infile = open(args.INPUT_FILE, "r")
+    infile = open(args.INPUT_FILE + ".txt", "r")
     data = read_data(infile)
+    deltas = read_deltas( args.INPUT_FILE + "_totalDelta.txt")
     #produce requested output
     if ( args.SUMMARY or args.DELTA_P_BAR or args.DELTA_P):
         print_summary(data)
     if ( args.DELTA_P_BAR ):
-        print_delta_p_bar(data)
+        print_delta_p_bar(data, deltas)
     if ( args.DELTA_P ):
-        print_delta_p(data)
+        print_delta_p(data, deltas)
     if ( args.DELTA_F ):
-        print_delta_f(data)
+        print_delta_f(data, deltas)
     return
 
 if __name__ == "__main__":
