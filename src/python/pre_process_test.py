@@ -64,7 +64,7 @@ class PreProcessTest(unittest.TestCase):
         self.assertEqual("+", data.revertedFiles[1].changeType)
         self.assertEqual( 2, len(data.tests) )
         self.assertEqual( "voldemort.store.routed.NodeValueTest", data.tests[0].testName)
-        self.assertEquals(0, data.tests[0].childResult)
+        self.assertEquals(0, data.tests[0].parentResult)
         self.assertEquals(1, data.tests[1].childResult)
 
     def test_mixed_rev_is_repaired(self):
