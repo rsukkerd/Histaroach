@@ -1,7 +1,5 @@
 package histaroach.util;
 
-import histaroach.model.DiffFile;
-
 import java.io.Serializable;
 
 
