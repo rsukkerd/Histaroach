@@ -1,6 +1,7 @@
 package histaroach.model;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 
@@ -60,6 +61,59 @@ public class TestResult implements Serializable {
     	}
     	
     	return failedTests.contains(test) ? FALSE : TRUE;
+    }
+    
+    /**
+     * Finds difference between this set of tests and other set of tests.
+     * 
+     * @return a set of different tests between this and other.
+     */
+    public Set<String> diff(TestResult other) {
+    	Set<String> diff = new HashSet<String>();
+    	
+    	for (String test : this.allTests) {
+    		if (!other.allTests.contains(test)) {
+    			diff.add(test);
+    		}
+    	}
+    	
+    	for (String test : other.allTests) {
+    		if (!this.allTests.contains(test)) {
+    			diff.add(test);
+    		}
+    	}
+    	
+    	return diff;
+    }
+    
+    /**
+     * Finds nondeterministic tests across the 2 TestResults that 
+     * belong to the same Revision.
+     * 
+     * @return a set of nondeterministic tests across the 2 TestResults.
+     * @throws Exception if other has a different set of tests.
+     */
+    public Set<String> getNondeterministicTests(TestResult other) 
+    		throws Exception {
+    	if (!this.allTests.equals(other.allTests)) {
+    		throw new Exception("other has a different set of tests");
+    	}
+    	
+    	Set<String> nondeterministic = new HashSet<String>();
+    	
+    	for (String test : this.failedTests) {
+    		if (!other.failedTests.contains(test)) {
+    			nondeterministic.add(test);
+    		}
+    	}
+    	
+    	for (String test : other.failedTests) {
+    		if (!this.failedTests.contains(test)) {
+    			nondeterministic.add(test);
+    		}
+    	}
+    	
+    	return nondeterministic;
     }
     
     @Override
