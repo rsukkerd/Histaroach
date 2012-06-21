@@ -17,14 +17,44 @@
 
 import argparse
 
+class Delta:
+    def __init__(self, fieldString):
+        fields = fieldString.split(";")
+        self.parentID = fields[0]
+        self.childID = fields[1]
+        files = []
+        for f in fields[2].split(","):
+            files.append(ChangedFile(f[1:], f[0]))
+        self.totalDelta = files
+
+    def __str__(self):
+        print self.parentID + ":" + self.childID + "\n" + str(self.totalDelta)
+
+class InputFileLine:
+    def __init__(self, fields):
+        if (len(fields) != 10 ):
+            print "Invalid inputs " + fields
+            return
+        self.mixID = int(fields[0])
+        self.parentID = fields[1]
+        self.childID = fields[2]
+        self.changedFiles = fields[3]
+        self.compilable = (int(fields[4]) == 1)
+        self.aborted = (int(fields[5]) == 1)
+        self.testName = fields[6]
+        self.mixResult = fields[7]
+        self.parentResult = fields[8]
+        self.childResult = fields[9].strip()
+
+
 class ChangedFile:
     fileName = ""
     changeType = "~"
 
     def toString(self, c):
-        if ( c == "~" ): return "MODIFY"
-        if ( c == "+" ): return "ADD"
-        if ( c == "-" ): return "DELETE"
+        if ( c == "M" ): return "MODIFY"
+        if ( c == "A" ): return "ADD"
+        if ( c == "D" ): return "DELETE"
         return "UNDEFINED"
 
 
@@ -36,11 +66,6 @@ class ChangedFile:
         return self.fileName + ": " + self.toString(self.changeType)
 
 class TestResult:
-    testName = ""
-    parentResult = 1
-    childResult = 1
-    mixResult = 1
-
     def resultToString(self, result):
         if ( result == 1 ):
             return "pass"
@@ -65,20 +90,20 @@ class TestResult:
 
 class MixedRevision:
     mixID = -1
-    changedFiles = []
+    revertedFiles = []
     tests = []
     compilable = True
 
     def __init__(self, mixID):
         self.mixID = mixID
-        self.changedFiles = []
+        self.revertedFiles = []
         self.tests = []
         self.compilable = True
 
     def __str__(self):
-        s = "Mixed Revision: " + str(self.mixID) + "\nChanged files: "  
-        for  f in self.changedFiles :
-            s = s + str(f) + ", "
+        s = "Mixed Revision: " + str(self.mixID) + "\nChanged files (" + str(len(self.revertedFiles)) + "):\n"  
+        for  f in self.revertedFiles :
+            s = s + "    " + str(f) + "\n"
         return s
 
     def is_repaired(self):
@@ -111,13 +136,28 @@ class RevisionPair:
             if t.is_repaired(): repairs.append(t)
         return repairs
         
-    def get_all_files(self):
-        files = []
-        for m in self.mixedRevisions:
-            if ( m == None): continue
-            for f in m.changedFiles:
-                if (not files.__contains__(f.fileName) ): files.append(f.fileName)
-        return files
+    '''
+    Returns a list of all mixes that don't fix the flip
+    '''
+    def get_broken_mixes(self):
+        broken = []
+        repairs = self.get_repairs()
+        for t in self.mixedRevisions:
+            if ( not repairs.__contains__(t) ): broken.append(t)
+        return broken
+
+    def get_delta(self, mixedRevision):
+        '''
+        Returns all the files that have been changed between parent and child
+        '''
+        all_changes = []
+        for m in mixedRevisions:
+            for f in m.revertedFiles:
+                if ( not all_changes.__contains__(f) ): all_changes.append(f)
+        delta = []
+        for f in all_changes:
+            if ( not m.revertedFiles.__contains__(f) ) : delta.append(f)
+        return delta
     
     def is_repaired(self):
         return len(self.get_repairs()) > 0
@@ -129,7 +169,7 @@ class RevisionPair:
         shortest = len(self.get_all_files()) - 1 
         smallest = []
         for r in self.get_repairs():
-            temp = len(r.changedFiles)
+            temp = len(r.revertedFiles)
             if ( temp == shortest ):
                 smallest.append(r)
             if (temp < shortest):
@@ -141,35 +181,41 @@ class RevisionPair:
         longest = 0
         delta_p = []
         for r in self.get_repairs():
-            temp = len(r.changedFiles)
+            temp = len(r.revertedFiles)
             if ( temp == longest ): delta_p.append(r)
             if ( temp > longest ):
                 longest = temp
                 delta_p = [r]
         return delta_p
 
-    def get_delta_f(self):
-        return []
+    def get_delta_f(self, delta):
+        shortest = len(delta.totalDelta)
+        delta_f = []
+        for r in self.get_broken_mixes():
+            temp = len(r.revertedFiles)
+            if ( temp == shortest ): delta_f.append(r)
+            if ( temp < shortest ):
+                shortest = temp
+                delta_f = [r]
+        return delta_f
 
     def get_delta_f_bar(self):
         return []
             
 def init_mix(mix,line):
-    fields = line.split(';')
-    for f in fields[3].split(','):
-        mix.changedFiles.append( ChangedFile( f[1:], f[0] ))
+    for f in line.changedFiles.split(','):
+        mix.revertedFiles.append( ChangedFile( f[1:], f[0] ))
 
 def build_mix( mixid, lines):
-    if (len(lines) == 0 ): 
-        print "Empty lines for mixid " + str(mixid); 
-        return
+    #if (len(lines) == 0 ): 
+    #    print "Empty lines for mixid " + str(mixid); 
+    #    return
     mix = MixedRevision( mixid )
     init_mix(mix, lines[0])
     for line in lines:
-        fields = line.split(";")
-        if ( int(fields[4]) == 1 ):
+        if ( line.compilable ):
             mix.compilable = True
-            mix.tests.append( TestResult(fields[6], int(fields[9]), int(fields[8]), int(fields[7]) ) )
+            mix.tests.append( TestResult(line.testName, int(line.parentResult), int(line.childResult), int(line.mixResult) ) )
         else:
             mix.compilable = False
     return mix
@@ -177,30 +223,30 @@ def build_mix( mixid, lines):
 def build_rev_pair(parent, child, lines):
     #print "Building rev pair for input string \n" + string
     mixID = -1
-    mixStrings = []
+    mixLines = []
     revPair = RevisionPair(parent, child)
     #print revPair
     for line in lines:
         #print "Processing line " + line
-        fields = line.split(';')
+        #fields = line.split(';')
         #if ( int(fields[0]) == 19 ): print fields
         #print fields
         if (mixID == -1):
-            mixID = int(fields[0])
+            mixID = line.mixID
             #print "Found new mix " + fields[0] + " for revs " + parent + ", " + child
-        if ( mixID == int(fields[0]) ):
+        if ( mixID == line.mixID ):
             #collect data for the same mix
             #if ( mixID == 19 ): print "appending for 19"
-            mixStrings.append(line)
+            mixLines.append(line)
         else:
             #create a new mixed rev
             #print "Building mix rev " + str(mixID) + " with " + str(len(mixStrings)) + " lines"
-            revPair.mixedRevisions.append( build_mix(mixID, mixStrings) )
-            mixID = int(fields[0])
-            mixStrings = [line] 
+            revPair.mixedRevisions.append( build_mix(mixID, mixLines) )
+            mixID = line.mixID
+            mixLines = [line] 
             #print "Found new mix " + fields[0] + " for revs " + parent + ", " + child
     #print "Building mix rev " + str(mixID) + " with " + str(len(mixStrings)) + " lines"
-    revPair.mixedRevisions.append( build_mix(mixID, mixStrings) )
+    revPair.mixedRevisions.append( build_mix(mixID, mixLines) )
     return revPair
 
 def read_data(inputfile):
@@ -209,27 +255,28 @@ def read_data(inputfile):
     #internal tracking data
     parentID = None
     childID = None
-    revPairStrings = []
+    revPairLines = []
     #skip header line
     inputfile.next()
     for line in inputfile:
         items = line.split(';')
+        lineitems = InputFileLine(items)
         if ( parentID == None and childID == None ):
             #this should happen only when we read the first line
-            parentID = items[2]
-            childID = items[1]
+            parentID = lineitems.parentID
+            childID = lineitems.childID
             #print "Found new IDs " + parentID + ", " + childID
-        if ( parentID == items[2] and childID == items[1] ):
+        if ( parentID == lineitems.parentID and childID == lineitems.childID ):
             #collect the line belonging to the same rev pair
-            revPairStrings.append(line)
+            revPairLines.append(lineitems)
         else:
             #create an object from the collected string and start a new collection
-            data.append( build_rev_pair(parentID, childID, revPairStrings) )
-            parentID = items[2]
-            childID = items[1]
-            revPairStrings = []
+            data.append( build_rev_pair(parentID, childID, revPairLines) )
+            parentID = lineitems.parentID
+            childID = lineitems.childID
+            revPairLines = []
             #print "Found new IDs " + parentID + ", " + childID
-    data.append( build_rev_pair(parentID, childID, revPairStrings) )
+    data.append( build_rev_pair(parentID, childID, revPairLines) )
     return data
 
 def get_num_mixes(data):
@@ -250,29 +297,56 @@ def get_repaired_flips(data):
 def print_summary(data):
     print "\nHistaroach Log file summary\n"
     print "Checked revision pairs: " + str(len(data)) + "\tTotal number of mixed Revisions: " + str(get_num_mixes(data))
-    print "Repaired flips: " + str(get_repaired_flips(data))
+    print "\tRepaired flips: " + str(get_repaired_flips(data))
     print "\n"
 
-def print_fix(rev_pair, deltas):
+def print_fix(rev_pair, mixes, deltas):
     '''
     Prints summary info about this fixed revision pair and set of deltas
     '''
-    print "\nRevision pair: " + rev_pair.parentID + ":" + rev_pair.childID + "\tFiles changed: " + str(len(rev_pair.get_all_files())) + "\tDelta size: " + str(len(deltas[0].changedFiles))
-    for f in deltas:
+    s = "\nRevision pair: " + rev_pair.parentID + ":" + rev_pair.childID 
+    s = s + "\tTotal delta: " 
+    s = s + str(len(get_delta(deltas, rev_pair.parentID, rev_pair.childID).totalDelta)) + " files\n"
+    print s
+    for f in mixes:
         print f
 
-def print_delta_p_bar(data):
+def print_delta_p_bar(rev_pairs, deltas):
     print "Delta P bar"
     print "-----------"
-    for d in data:
-        if d.is_repaired(): print_fix(d, d.get_delta_p_bar() )
+    for d in rev_pairs:
+        if d.is_repaired(): print_fix(d, d.get_delta_p_bar(), deltas )
     print ""
 
-def print_delta_p(data):
+def print_delta_p(rev_pairs, deltas):
     print "Delta P"
     print "-------"
+    for d in rev_pairs:
+        if d.is_repaired(): print_fix(d, d.get_delta_p(), deltas )
+    print ""
+
+def print_delta_f(data, deltas):
+    print "Delta F"
+    print "-------"
     for d in data:
-        if d.is_repaired(): print_fix(d, d.get_delta_p() )
+        if d.is_repaired(): print_fix(d, d.get_delta_f( get_delta(deltas, d.parentID, d.childID) ), deltas )
+    print ""
+
+def read_deltas(filename):
+    df = open(filename, "r")
+    #skip header
+    df.next()
+    deltas = []
+    for line in df:
+        delta = Delta(line)
+        #print delta
+        deltas.append( delta )
+    return deltas
+
+def get_delta(deltas, parent, child):
+    for delta in deltas:
+        if ( delta.parentID == parent and delta.childID == child): return delta
+    return None
 
 def parse_arguments():
     '''
@@ -281,23 +355,27 @@ def parse_arguments():
     '''
     parser = argparse.ArgumentParser()
     parser.add_argument( "-f", dest="INPUT_FILE", required=True, 
-        help="The Histaroach output file to be processed")
+        help="The prefix of the Histaroach output files to be processed")
     parser.add_argument( "--delta-p-bar", dest="DELTA_P_BAR", default=False, action='store_true')
     parser.add_argument( "--delta-p", dest="DELTA_P", default=False, action='store_true')
+    parser.add_argument( "--delta-f", dest="DELTA_F", default=False, action='store_true')
     parser.add_argument( "--summary", dest="SUMMARY", default=False, action='store_true')
     return parser.parse_args()
 
 def main():
     args = parse_arguments()
-    infile = open(args.INPUT_FILE, "r")
+    infile = open(args.INPUT_FILE + ".txt", "r")
     data = read_data(infile)
+    deltas = read_deltas( args.INPUT_FILE + "_totalDelta.txt")
     #produce requested output
     if ( args.SUMMARY or args.DELTA_P_BAR or args.DELTA_P):
         print_summary(data)
     if ( args.DELTA_P_BAR ):
-        print_delta_p_bar(data)
+        print_delta_p_bar(data, deltas)
     if ( args.DELTA_P ):
-        print_delta_p(data)
+        print_delta_p(data, deltas)
+    if ( args.DELTA_F ):
+        print_delta_f(data, deltas)
     return
 
 if __name__ == "__main__":

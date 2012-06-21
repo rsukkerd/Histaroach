@@ -1,0 +1,4 @@
+parentCommitID;childCommitID;totalDelta
+012ba09;b6266cd;Msrc/java/voldemort/store/bdb/BdbStorageConfiguration.java,Msrc/java/voldemort/server/VoldemortConfig.java
+a37abfb;d3867bf;Msrc/java/voldemort/store/readonly/JsonStoreBuilder.java,Msrc/java/voldemort/store/readonly/ReadOnlyStorageEngine.java
+516bc3a;67443e6;Mcontrib/hadoop-store-builder/src/java/voldemort/store/readonly/mapreduce/HadoopStoreJobRunner.java,Mcontrib/hadoop-store-builder/src/java/voldemort/store/readonly/mr/HadoopStoreJobRunner.java
