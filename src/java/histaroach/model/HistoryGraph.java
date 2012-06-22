@@ -63,7 +63,8 @@ public class HistoryGraph implements Iterable<Revision> {
 	
 	    for (Revision revision : orderedRevisions) {
 	    	
-	        if (revision.isCompilable() != Compilable.YES) {
+	        if (revision.isCompilable() != Compilable.YES ||
+	        		revision.hasTestAborted()) {
 	        	continue;
 	        }
 	        	
@@ -71,17 +72,18 @@ public class HistoryGraph implements Iterable<Revision> {
 	
 	        for (Revision parent : parents) {
 	            
-	            if (parent.isCompilable() != Compilable.YES) {
+	            if (parent.isCompilable() != Compilable.YES ||
+	            		parent.hasTestAborted()) {
 	            	continue;
 	            }
 	            
 	            Set<String> toPassTests = new HashSet<String>();
 	            Set<String> toFailTests = new HashSet<String>();
 	
-	            findFlippedTests(revision, parent, toPassTests, toFailTests);
+	            findFlippedTests(parent, revision, toPassTests, toFailTests);
 	            
 	            if (!toPassTests.isEmpty() || !toFailTests.isEmpty()) {
-	                Flip flip = new Flip(revision, parent, toPassTests, toFailTests);
+	                Flip flip = new Flip(parent, revision, toPassTests, toFailTests);
 	                flips.add(flip);
 	            }
 	        }
@@ -91,11 +93,11 @@ public class HistoryGraph implements Iterable<Revision> {
 	}
 	
 	/**
-	 * Find all flipped tests between child and parent Revisions.
+	 * Find all flipped tests between parent and child Revisions.
 	 * 
 	 * @modifies toPassTests, toFailTests
 	 */
-	private void findFlippedTests(Revision child, Revision parent, 
+	private void findFlippedTests(Revision parent, Revision child, 
 			Set<String> toPassTests, Set<String> toFailTests) {
 		
 		TestResult childResult = child.getTestResult();

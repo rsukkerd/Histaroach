@@ -4,7 +4,7 @@ import java.util.Set;
 
 
 /**
- * Flip represents a pair of child-parent Revisions that have 
+ * Flip represents a pair of parent-child Revisions that have 
  * at least one test which one Revision passes and the other fails. 
  * 
  * Flip is comparable. A Flip that has fewer DiffFiles is less 
@@ -33,7 +33,7 @@ public class Flip implements Comparable<Flip> {
 	 * 
 	 * @requires !toPassTests.isEmpty() || !toFailTests.isEmpty()
 	 */
-	public Flip(Revision child, Revision parent, Set<String> toPassTests,
+	public Flip(Revision parent, Revision child, Set<String> toPassTests,
 			Set<String> toFailTests) {
 		this.child = child;
 		this.parent = parent;
@@ -92,8 +92,8 @@ public class Flip implements Comparable<Flip> {
 
 	@Override
 	public String toString() {
-		String str = "child commit: " + child.getCommitID() + "\n"
-				+ "parent commit: " + parent.getCommitID() + "\n";
+		String str = "parent commit: " + parent.getCommitID() + "\n"
+				+ "child commit: " + child.getCommitID() + "\n";
 		
 		str += "diff files: \n";
 		Set<DiffFile> diffFiles = getDiffFiles();
