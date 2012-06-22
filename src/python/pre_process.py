@@ -273,7 +273,7 @@ def read_data(inputfile):
             data.append( build_rev_pair(parentID, childID, revPairLines) )
             parentID = lineitems.parentID
             childID = lineitems.childID
-            revPairLines = []
+            revPairLines = [lineitems]
             #print "Found new IDs " + parentID + ", " + childID
     data.append( build_rev_pair(parentID, childID, revPairLines) )
     return data
@@ -283,6 +283,18 @@ def get_num_mixes(data):
     for d in data:
         i = i + len(d.mixedRevisions)
     return i
+
+def get_all_mixes(data):
+    mixes = []
+    for r in data:
+        mixes.extend(r.mixedRevisions)
+    return mixes
+
+def check_all_revs(mixes):
+    last = - 1
+    for m in mixes:
+        if ( m.mixID != last + 1 ): print m.mixID - 1
+        last = m.mixID
 
 def get_repaired_flips(data):
     '''

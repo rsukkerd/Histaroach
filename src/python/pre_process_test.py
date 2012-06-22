@@ -57,6 +57,11 @@ class PreProcessTest(unittest.TestCase):
         data = pre_process.read_data(infile)
         self.assertEqual(17, len(data))
 
+    def test_read_data_long(self):
+        data = pre_process.read_data( open("read_data.txt","r"))
+        pre_process.check_all_revs(pre_process.get_all_mixes(data))
+        #self.assertEqual( 258, pre_process.get_num_mixes(data))
+
     def test_build_rev_pair(self):
         inputs = [ "16;8378cec;d3867bf;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/fetcher/HdfsFetcher.java;1;0;voldemort.store.slop.strategy.HandoffToAnyStrategyTest;1;1;1", "17;8378cec;d3867bf;~contrib/hadoop-store-builder/test/voldemort/store/readonly/checksum/CheckSumTests.java;1;0;voldemort.store.invalidmetadata.InvalidMetadataCheckingStoreTest;1;1;1" ]
         in_lines = self.make_lines(inputs)
