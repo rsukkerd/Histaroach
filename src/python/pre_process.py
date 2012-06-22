@@ -162,11 +162,11 @@ class RevisionPair:
     def is_repaired(self):
         return len(self.get_repairs()) > 0
 
-    def get_delta_p_bar(self):
+    def get_delta_p_bar(self, deltas):
         '''
         Returns the list of fixed mixed revisions with the fewest files
         '''
-        shortest = len(self.get_all_files()) - 1 
+        shortest = len(get_delta(deltas, self.parentID, self.childID).totalDelta) - 1 
         smallest = []
         for r in self.get_repairs():
             temp = len(r.revertedFiles)
@@ -315,7 +315,7 @@ def print_delta_p_bar(rev_pairs, deltas):
     print "Delta P bar"
     print "-----------"
     for d in rev_pairs:
-        if d.is_repaired(): print_fix(d, d.get_delta_p_bar(), deltas )
+        if d.is_repaired(): print_fix(d, d.get_delta_p_bar( deltas ), deltas )
     print ""
 
 def print_delta_p(rev_pairs, deltas):

@@ -105,25 +105,20 @@ class PreProcessTest(unittest.TestCase):
         data = pre_process.build_rev_pair( "8378ce", "d3867bf", in_lines)
         self.assertTrue(data.is_repaired())
 
-    def test_get_all_files(self):
-        inputs = [ "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.store.readonly.ReadOnlyStorageEngineTest;0;0;1", "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.client.rebalance.RebalanceTest;1;0;1", "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0", "19;1ee8246;23c9b28;~test/unit/voldemort/store/readonly/ReadOnlyStorageEngineTestInstance.java;0;0;n;n;n;n" ]
-        in_lines = self.make_lines(inputs)
-        data = pre_process.build_rev_pair( "23c9b28", "1ee8246", in_lines)
-        self.assertEqual(2, len(data.mixedRevisions))
-        self.assertEqual(2, len(data.get_all_files()) )
-
     def test_rev_pair_get_delta_p_bar(self):
         inputs = [ "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.store.readonly.ReadOnlyStorageEngineTest;0;1;0", "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.client.rebalance.RebalanceTest;1;1;0", "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0", "19;1ee8246;23c9b28;~test/unit/voldemort/store/readonly/ReadOnlyStorageEngineTestInstance.java;0;0;n;n;n;n" ]
         in_lines = self.make_lines(inputs)
-        data = pre_process.build_rev_pair( "23c9b28", "1ee8246", in_lines)
+        data = pre_process.build_rev_pair("1ee8246", "23c9b28", in_lines)
         self.assertTrue( data.is_repaired() )
-        self.assertEqual( 1, len(data.get_delta_p_bar()) )
+        deltas = [pre_process.Delta("1ee8246;23c9b28;Msrc/java/voldemort/store/readonly/ReadOnlyStorageEngine.java,Mtest/unit/voldemort/store/readonly/ReadOnlyStorageEngineTestInstance.java")]
+        self.assertEqual( 1, len(data.get_delta_p_bar(deltas)) )
 
     def test_rev_pair_get_delta_p(self):
         inputs = [ "21;b17f572;5400077;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/MD5CheckSum.java;1;0;voldemort.client.CachingStoreClientFactoryTest;1;1;1", "21;b17f572;5400077;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/MD5CheckSum.java;1;0;voldemort.server.EndToEndTest;1;1;0", "32;b17f572;5400077;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CheckSum.java,~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/Adler32CheckSum.java,~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32CheckSum.java;1;0;voldemort.client.CachingStoreClientFactoryTest;1;1;1", "32;b17f572;5400077;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CheckSum.java,~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/Adler32CheckSum.java,~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32CheckSum.java;1;0;voldemort.server.EndToEndTest;1;1;0" ]
         in_lines = self.make_lines(inputs)
         data = pre_process.build_rev_pair( "5400077", "b17f572", in_lines )
-        self.assertEqual( 4, len(data.get_all_files()) )
+        deltas = [pre_process.Delta("5400077;b17f572;Mcontrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/MD5CheckSum.java,Mcontrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CheckSum.java,Mcontrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/Adler32CheckSum.java,Mcontrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32CheckSum.java" )]
+        self.assertEqual( 4, len(pre_process.get_delta( deltas, "5400077", "b17f572").totalDelta ) )
         self.assertEqual( 1, len(data.get_delta_p()) )
         self.assertEqual( 32, data.get_delta_p()[0].mixID )
 
