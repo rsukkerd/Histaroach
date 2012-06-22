@@ -196,7 +196,7 @@ final class ProcessKillTimer implements Runnable {
 
 	private Process proc;
 	int timeout;
-	boolean killed = false;
+	volatile boolean killed = false;
 
 	/**
 	 * @param p the process to be killed after a timeout
