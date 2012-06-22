@@ -222,8 +222,8 @@ final class ProcessKillTimer implements Runnable {
 			return;
 		}
 		//kill the process and set the flag so we know we killed it
-		proc.destroy();
 		killed = true;
+		proc.destroy();
 		
 		Util.killOtherJavaProcesses();
 	}
