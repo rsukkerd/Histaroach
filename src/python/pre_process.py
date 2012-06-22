@@ -87,6 +87,8 @@ class TestResult:
     def breaks(self):
         return self.mixResult == 0 and self.parentResult == 1 and self.childResult == 1
     
+    def is_flip(self):
+        return self.parentResult == 1 and self.childResult == 0
 
 class MixedRevision:
     mixID = -1
@@ -104,6 +106,10 @@ class MixedRevision:
         s = "Mixed Revision: " + str(self.mixID) + "\nChanged files (" + str(len(self.revertedFiles)) + "):\n"  
         for  f in self.revertedFiles :
             s = s + "    " + str(f) + "\n"
+        if ( self.is_repaired() ):
+            s = s + "Fixed flips:\n"
+            for f in self.get_fixed_flips():
+                s = s + f + "\n"
         return s
 
     def is_repaired(self):
@@ -113,6 +119,12 @@ class MixedRevision:
             if t.repairs_flip(): tests_fixed.append(t)
             if t.breaks(): tests_broken.append(t)
         return len(tests_fixed) > 0 and len(tests_broken) == 0
+
+    def get_fixed_flips(self):
+        flips = []
+        for t in self.tests:
+            if ( t.repairs_flip() ): flips.append(t.testName)
+        return flips
 
 class RevisionPair:
     parentID = ""
@@ -146,19 +158,6 @@ class RevisionPair:
             if ( not repairs.__contains__(t) ): broken.append(t)
         return broken
 
-    def get_delta(self, mixedRevision):
-        '''
-        Returns all the files that have been changed between parent and child
-        '''
-        all_changes = []
-        for m in mixedRevisions:
-            for f in m.revertedFiles:
-                if ( not all_changes.__contains__(f) ): all_changes.append(f)
-        delta = []
-        for f in all_changes:
-            if ( not m.revertedFiles.__contains__(f) ) : delta.append(f)
-        return delta
-    
     def is_repaired(self):
         return len(self.get_repairs()) > 0
 
@@ -300,14 +299,22 @@ def print_summary(data):
     print "\tRepaired flips: " + str(get_repaired_flips(data))
     print "\n"
 
+def print_flips(rev_pair):
+    print "Flipped tests:"
+    for t in rev_pair.get_repairs()[0].tests:
+        if ( t.is_flip() ):
+            print t.testName
+
 def print_fix(rev_pair, mixes, deltas):
     '''
     Prints summary info about this fixed revision pair and set of deltas
     '''
     s = "\nRevision pair: " + rev_pair.parentID + ":" + rev_pair.childID 
     s = s + "\tTotal delta: " 
-    s = s + str(len(get_delta(deltas, rev_pair.parentID, rev_pair.childID).totalDelta)) + " files\n"
+    s = s + str(len(get_delta(deltas, rev_pair.parentID, rev_pair.childID).totalDelta)) + " files"
     print s
+    print_flips(rev_pair)
+    print ""
     for f in mixes:
         print f
 
