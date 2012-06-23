@@ -70,4 +70,11 @@ public class JodatimeBuildStrateygy extends AntBuildStrategy {
 		return false;
 	}
 
+	@Override
+	public boolean runSingleTest(String testname) throws IOException,
+			InterruptedException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

@@ -23,7 +23,7 @@ public interface IBuildStrategy {
 	public Compilable build() throws IOException, InterruptedException;
 	
 	/**
-     * Runs tests and parses the test results.
+     * Runs all tests and parses the test results.
      * 
      * @return a TestResult.
 	 * @throws InterruptedException 
@@ -32,8 +32,19 @@ public interface IBuildStrategy {
 	public TestResult runTest() throws IOException, InterruptedException;
 	
 	/**
+	 * Runs a single test.
 	 * 
-	 * @return true if a diffFile is a test file.
+	 * @return true if the Revision passes the test, 
+	 *         false if the Revision fails the test.
+	 * @throws InterruptedException 
+	 * @throws IOException 
+	 */
+	public boolean runSingleTest(String testname) throws IOException, InterruptedException;
+	
+	/**
+	 * Determines if a file is a test file.
+	 * 
+	 * @return true if diffFile is a test file.
 	 */
 	public boolean isTestFile(DiffFile diffFile);
 

@@ -4,6 +4,7 @@ import histaroach.model.DiffFile;
 import histaroach.model.TestResult;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -64,6 +65,13 @@ public class MyBuildStrategy extends AntBuildStrategy {
 	@Override
 	public boolean isTestFile(DiffFile diffFile) {
 		return diffFile.getFileName().endsWith(TEST_FILE_SUFFIX);
+	}
+
+	@Override
+	public boolean runSingleTest(String testname) throws IOException,
+			InterruptedException {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

@@ -2,8 +2,10 @@ package histaroach.buildstrategy;
 
 import histaroach.model.DiffFile;
 import histaroach.model.TestResult;
+import histaroach.util.Util;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,14 +28,31 @@ public class VoldemortBuildStrategy extends AntBuildStrategy {
 	
 	private static final String BUILD_TARGET_NAME = "build buildtest";
 	private static final String TEST_TARGET_NAME = "junit";
+	private static final String SINGLE_TEST_TARGET_NAME = "junit-test -Dtest.name=";
 	
 	private static final String TEST_FILE_SUFFIX = "Test.java";
+	
+	private final String antCommand;
 	
 	/**
 	 * Creates a VoldemortBuildStrategy.
 	 */
 	public VoldemortBuildStrategy(File directory, String antCommand) {
 		super(directory, antCommand, BUILD_TARGET_NAME, TEST_TARGET_NAME);
+		this.antCommand = antCommand;
+	}
+
+	@Override
+	public boolean runSingleTest(String testname) throws IOException, 
+			InterruptedException {
+		TestResult result = runTest(antCommand + Util.SINGLE_SPACE_CHAR + 
+				SINGLE_TEST_TARGET_NAME + testname);
+		return result.pass(testname);
+	}
+
+	@Override
+	public boolean isTestFile(DiffFile diffFile) {
+		return diffFile.getFileName().endsWith(TEST_FILE_SUFFIX);
 	}
 
 	@Override
@@ -62,11 +81,6 @@ public class VoldemortBuildStrategy extends AntBuildStrategy {
 		TestResult testResult = new TestResult(allTests, failedTests);
 		
 		return testResult;
-	}
-
-	@Override
-	public boolean isTestFile(DiffFile diffFile) {
-		return diffFile.getFileName().endsWith(TEST_FILE_SUFFIX);
 	}
 
 }

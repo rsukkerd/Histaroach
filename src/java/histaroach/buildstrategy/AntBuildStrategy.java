@@ -86,6 +86,18 @@ public abstract class AntBuildStrategy implements IBuildStrategy, Serializable {
 	
 	@Override
 	public TestResult runTest() throws IOException, InterruptedException {
+		return runTest(testCommand);
+	}
+	
+	/**
+	 * Runs arbitrary test(s) using testCommand.
+	 * 
+	 * @return a TestResult.
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	protected TestResult runTest(String testCommand) throws IOException, 
+			InterruptedException {
 		Pair<List<String>, List<String>> result = run(testCommand);
 		List<String> outputStreamContent = result.getFirst();
 		List<String> errorStreamContent = result.getSecond();
@@ -93,6 +105,14 @@ public abstract class AntBuildStrategy implements IBuildStrategy, Serializable {
 		return getTestResult(outputStreamContent, errorStreamContent);
 	}
 	
+	/**
+	 * Parses test result(s) from output and error streams.
+	 * 
+	 * @return a TestResult.
+	 */
+	protected abstract TestResult getTestResult(List<String> outputStreamContent, 
+			List<String> errorStreamContent);
+
 	/**
 	 * Runs the command.
 	 * 
@@ -122,15 +142,6 @@ public abstract class AntBuildStrategy implements IBuildStrategy, Serializable {
         		errorStreamContent);
 	}
 	
-	/**
-	 * Parses test results from output and error streams 
-	 * and returns a TestResult.
-	 * 
-	 * @return a TestResult.
-	 */
-	protected abstract TestResult getTestResult(List<String> outputStreamContent, 
-			List<String> errorStreamContent);
-
 	@Override
 	public boolean equals(Object other) {
 		if (other == null || !other.getClass().equals(this.getClass())) {
