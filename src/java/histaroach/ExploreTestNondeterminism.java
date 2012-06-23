@@ -1,94 +1,205 @@
 package histaroach;
 
+import histaroach.buildstrategy.IBuildStrategy;
+import histaroach.buildstrategy.VoldemortBuildStrategy;
+import histaroach.model.Flip;
+import histaroach.model.GitRepository;
 import histaroach.model.HistoryGraph;
+import histaroach.model.IRepository;
 import histaroach.model.Revision;
-import histaroach.model.TestResult;
 import histaroach.util.HistoryGraphXMLReader;
+import histaroach.util.Util;
 import histaroach.util.XMLReader;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import plume.Option;
+import plume.OptionGroup;
+import plume.Options;
 
+
+/**
+ * ExploreTestNondeterminism determines, in a given HistoryGraph, what tests 
+ * that flip from pass->fail are nondeterministic.
+ */
 public class ExploreTestNondeterminism {
 	
-	private final List<HistoryGraph> historyGraphs;
-	// keep track of what tests in what Revision are nondeterministic
-	private final Map<Revision, Set<String>> nondeterministicTests;
+	/**
+     * Print a help message.
+     */
+    @OptionGroup("General Options")
+    @Option(value="-h Print a help message", aliases={"-help"})
+    public static boolean help;
+    
+	/**
+	 * Repository directory.
+	 */
+	@Option(value = "-r <filename> Repository directory")
+	public static File repoDir = null;
+	
+	/**
+     * Build command. Default is 'ant'.
+     */
+    @Option(value = "-b Build command (Optional)")
+    public static String buildCommand = "ant";
+	
+	/**
+     * HistoryGraph xml file.
+     */
+    @Option(value = "-H <filename> HistoryGraph xml file")
+    public static File historyGraphXML = null;
+    
+    /** One line synopsis of usage */
+	public static final String usage_string = "ExploreTestNondeterminism [options]";
+	
+	private static final int REPEAT = 10;
+	
+	private final IRepository repository;
+	private final IBuildStrategy buildStrategy;
+	private final Set<Flip> flips;
+	// keep track of what tests in what Flips are nondeterministic
+	private final Map<Flip, Set<String>> nondeterministicTests;
 
-	public ExploreTestNondeterminism(List<HistoryGraph> historyGraphs) {
-		this.historyGraphs = historyGraphs;
-		nondeterministicTests = new HashMap<Revision, Set<String>>();
+	public ExploreTestNondeterminism(IRepository repository, 
+			HistoryGraph historyGraph) {
+		this.repository = repository;
+		buildStrategy = repository.getBuildStrategy();
+		flips = historyGraph.getAllFlips();
+		nondeterministicTests = new HashMap<Flip, Set<String>>();
 	}
 	
+	/**
+	 * Explores all tests that flip from pass->fail and determines 
+	 * if they are nondeterministic.
+	 * 
+	 * @throws Exception
+	 */
 	public void explore() throws Exception {
-		HistoryGraph hGraphA = historyGraphs.get(0);
-		
-		for (Revision revisionA : hGraphA) {
-			TestResult resultA = revisionA.getTestResult();
-			
-			for (int i = 1; i < historyGraphs.size(); i++) {
-				HistoryGraph hGraphB = historyGraphs.get(i);
-				Revision revisionB = hGraphB.lookUpRevision(revisionA.getCommitID());
-				
-				if (revisionA.isCompilable() != revisionB.isCompilable()) {
-		    		throw new Exception("difference in compilability");
-		    	}
-				
-				if (revisionA.hasTestAborted() || revisionB.hasTestAborted()) {
-					System.err.println("Test aborted at commit " + revisionA.getCommitID());
-		    		continue;
-		    	}
-				
-				TestResult resultB = revisionB.getTestResult();
-				Set<String> tests;
-				try {
-					tests = resultA.getNondeterministicTests(resultB);
-					nondeterministicTests.put(revisionA, tests);
-				} catch (Exception e) {
-					System.err.println("A set of tests of the same Revision " +
-							"differs between the 2 runs.");
-					System.err.println("At Revision " + revisionA.getCommitID());
-					System.err.println("diff tests are " + resultA.diff(resultB));
-				}
+		for (Flip flip : flips) {
+			Revision parent = flip.getParentRevision();
+			Revision child = flip.getChildRevision();
+			Set<String> toFailTests = flip.getToFailTests();
+			if (toFailTests.isEmpty()) {
+				continue;
 			}
-		}
-	}
-	
-	public void printNondeterministicTests() {
-		System.out.println("Nondeterministic tests are:");
-		
-		for (Revision revision : nondeterministicTests.keySet()) {
-			Set<String> tests = nondeterministicTests.get(revision);
-			System.out.println("in Revision " + revision.getCommitID() + 
-					": " + tests);
+			
+			// initially, only nondeterministic tests in parent
+			Set<String> nondeterministicTests = 
+				getNondeterministicTests(parent, toFailTests, true);
+			
+			// do not re-explore nondeterministic tests in parent
+			Set<String> remainingToFailTests = new HashSet<String>(toFailTests);
+			remainingToFailTests.removeAll(nondeterministicTests);
+			
+			// add nondeterministic tests in child
+			nondeterministicTests.addAll(
+					getNondeterministicTests(child, remainingToFailTests, false));
+			
+			if (!nondeterministicTests.isEmpty()) {
+				this.nondeterministicTests.put(flip, nondeterministicTests);
+			}
 		}
 	}
 	
 	/**
-	 * @param args - directory containing HistoryGraph xml files
-	 * @throws Exception 
+	 * From a given set of tests in a given revision, determines 
+	 * which tests are nondeterministic.
+	 * 
+	 * @return a set of nondeterministic tests.
+	 * @throws Exception
 	 */
-	public static void main(String[] args) throws Exception {
-		File dir = new File(args[0]);
-		File[] files = dir.listFiles();
-		List<HistoryGraph> points = new ArrayList<HistoryGraph>();
+	private Set<String> getNondeterministicTests(Revision revision, Set<String> tests, 
+			boolean expectedResult) throws Exception {
+		Set<String> nondeterministicTests = new HashSet<String>();
 		
-		for (File file : files) {
-			if (file.getName().startsWith(DataCollector.HISTORYGRAPH_PREFIX)) {
-				XMLReader<HistoryGraph> reader = new HistoryGraphXMLReader(file);
-			    HistoryGraph hGraph = reader.read();
-			    points.add(hGraph);
+		boolean checkoutSuccessful = repository.checkoutCommit(revision.getCommitID());
+		if (!checkoutSuccessful) {
+			throw new Exception("check out commit " + revision.getCommitID()
+					+ " unsuccessful");
+		}
+		
+		for (String test : tests) {
+			if (isNondeterministic(test, expectedResult)) {
+				nondeterministicTests.add(test);
 			}
 		}
 		
-		ExploreTestNondeterminism explorer = new ExploreTestNondeterminism(points);
+		return nondeterministicTests;
+	}
+	
+	/**
+	 * Determines if a test is nondeterministic.
+	 * 
+	 * @return true if a test is nondeterministic.
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	private boolean isNondeterministic(String test, boolean expectedResult) 
+			throws IOException, InterruptedException {
+		for (int i = 0; i < REPEAT; i++) {
+			// clean up processes from previous run
+			Util.killOtherJavaProcesses();
+			boolean result = buildStrategy.runSingleTest(test);
+			if (result != expectedResult) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Prints the result to standard out.
+	 */
+	public void printResult() {
+		for (Flip flip : flips) {
+			Revision parent = flip.getParentRevision();
+			Revision child = flip.getChildRevision();
+			
+			if (nondeterministicTests.containsKey(flip)) {
+				System.out.println("Flip " +
+						parent.getCommitID() + "-" + child.getCommitID() +
+						" contains at least the following nondeterministic test(s):");
+				System.out.println(nondeterministicTests.get(flip));
+			}
+		}
+	}
+	
+	/**
+	 * Initial program entrance -- executes test nondeterminism explorer.
+	 * 
+	 * @param args - command line arguments.
+	 * @throws Exception 
+	 */
+	public static void main(String[] args) throws Exception {
+		Options plumeOptions = new Options(usage_string, ExploreTestNondeterminism.class);
+	    plumeOptions.parse_or_usage(args);
+	    
+	    // Display the help screen.
+	    if (help) {
+	        plumeOptions.print_usage();
+	        return;
+	    }
+	    
+	    if (repoDir == null || historyGraphXML == null) {
+            plumeOptions.print_usage();
+            return;
+        }
+		
+	    IBuildStrategy buildStrategy = new VoldemortBuildStrategy(repoDir, buildCommand);
+		IRepository repository = new GitRepository(repoDir, buildStrategy);
+		XMLReader<HistoryGraph> reader = new HistoryGraphXMLReader(historyGraphXML);
+	    HistoryGraph historyGraph = reader.read();
+	    
+		ExploreTestNondeterminism explorer = new ExploreTestNondeterminism(
+				repository, historyGraph);
 		explorer.explore();
-		explorer.printNondeterministicTests();
+		explorer.printResult();
 	}
 
 }
