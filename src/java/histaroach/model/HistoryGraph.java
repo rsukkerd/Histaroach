@@ -1,5 +1,6 @@
 package histaroach.model;
 
+import histaroach.model.Flip.FlipType;
 import histaroach.model.Revision.Compilable;
 
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ public class HistoryGraph implements Iterable<Revision> {
 	private final Map<String, Revision> revisions;
 	// for Revisions' topological ordering in iterator() and toString()
 	private final List<Revision> orderedRevisions;
+	private Set<Flip> allFlips;
 	
 	/**
 	 * Creates an empty HistoryGraph.
@@ -34,6 +36,7 @@ public class HistoryGraph implements Iterable<Revision> {
     public HistoryGraph() {
         revisions = new HashMap<String, Revision>();
         orderedRevisions = new ArrayList<Revision>();
+        allFlips = null;
     }
 
     /**
@@ -56,10 +59,17 @@ public class HistoryGraph implements Iterable<Revision> {
     }
     
     /**
-	 * @return a set of all Flips in this HistoryGraph.
+     * Finds Flips of all types.
+     * 
+     * @modifies this
+	 * @return a set of Flips of all types.
 	 */
 	public Set<Flip> getAllFlips() {
-	    Set<Flip> flips = new HashSet<Flip>();
+		if (allFlips != null) {
+			return allFlips;
+		}
+		
+	    allFlips = new HashSet<Flip>();
 	
 	    for (Revision revision : orderedRevisions) {
 	    	
@@ -84,12 +94,35 @@ public class HistoryGraph implements Iterable<Revision> {
 	            
 	            if (!toPassTests.isEmpty() || !toFailTests.isEmpty()) {
 	                Flip flip = new Flip(parent, revision, toPassTests, toFailTests);
-	                flips.add(flip);
+	                allFlips.add(flip);
 	            }
 	        }
 	    }
 	
-	    return flips;
+	    return allFlips;
+	}
+	
+	/**
+	 * Finds only Flips of types TO_FAIL and BOTH.
+	 * 
+	 * @modifies this
+	 * @return a set of Flips of types TO_FAIL and BOTH.
+	 */
+	public Set<Flip> getToFailFlips() {
+		if (allFlips == null) {
+			getAllFlips();
+		}
+		
+		Set<Flip> toFailFlips = new HashSet<Flip>();
+		
+		for (Flip flip : allFlips) {
+			if (flip.getFlipType() == FlipType.TO_FAIL
+					|| flip.getFlipType() == FlipType.BOTH) {
+				toFailFlips.add(flip);
+			}
+		}
+		
+		return toFailFlips;
 	}
 	
 	/**

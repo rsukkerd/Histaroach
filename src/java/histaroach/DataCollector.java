@@ -259,8 +259,8 @@ public class DataCollector {
     }
     
     /**
-	 * Creates a list of IntermediateRevisions from all flips in historyGraph, 
-	 * and writes them to an xml file.
+	 * Creates a list of IntermediateRevisions from all TO_FAIL and BOTH flips 
+	 * in historyGraph, and writes them to an xml file.
 	 * 
 	 * @throws ParserConfigurationException
 	 * @throws TransformerException
@@ -271,7 +271,7 @@ public class DataCollector {
 			IRepository repository, IRepository clonedRepository) 
 			throws ParserConfigurationException, TransformerException, 
 			IOException, InterruptedException {
-		Set<Flip> flips = historyGraph.getAllFlips();
+		Set<Flip> flips = historyGraph.getToFailFlips();
     	
     	IntermediateRevisionGenerator generator = new IntermediateRevisionGenerator(
     			repository, clonedRepository);

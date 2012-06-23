@@ -7,6 +7,11 @@ import java.util.Set;
  * Flip represents a pair of parent-child Revisions that have 
  * at least one test which one Revision passes and the other fails. 
  * 
+ * There are 3 types of Flip:
+ *  1) TO_PASS: contains only tests that flip from fail->pass
+ *  2) TO_FAIL: contains only tests that flip from pass->fail, and
+ *  3) BOTH: contains both tests that flip from fail->pass and from pass->fail.
+ * 
  * Flip is comparable. A Flip that has fewer DiffFiles is less 
  * than a Flip that has more DiffFiles.
  * 
@@ -14,11 +19,21 @@ import java.util.Set;
  */
 public class Flip implements Comparable<Flip> {
 	public enum FlipType {
-		// indicates that a test flipped from failing in the parent to passing in the child.
+		/**
+		 * The Flip contains only tests that flip from fail->pass.
+		 */
 		TO_PASS,
 		
-		// indicates that a test flipped from passing in the parent to failing in the child.
-		TO_FAIL
+		/**
+		 * The Flip contains only tests that flip from pass->fail.
+		 */
+		TO_FAIL,
+		
+		/**
+		 * The Flip contains both tests that flip from fail->pass 
+		 * and from pass->fail.
+		 */
+		BOTH
 	}
 
 	private final Revision child;
@@ -54,6 +69,18 @@ public class Flip implements Comparable<Flip> {
 	 */
 	public Set<DiffFile> getDiffFiles() {
 		return child.getDiffFiles(parent);
+	}
+	
+	public FlipType getFlipType() {
+		if (toFailTests.isEmpty()) {
+			return FlipType.TO_PASS;
+		}
+		
+		if (toPassTests.isEmpty()) {
+			return FlipType.TO_FAIL;
+		}
+		
+		return FlipType.BOTH;
 	}
 	
 	/**
