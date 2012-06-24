@@ -5,7 +5,6 @@ import histaroach.algorithm.IntermediateRevisionGenerator;
 import histaroach.buildstrategy.IBuildStrategy;
 import histaroach.buildstrategy.JodatimeBuildStrateygy;
 import histaroach.buildstrategy.VoldemortBuildStrategy;
-import histaroach.model.Flip;
 import histaroach.model.GitRepository;
 import histaroach.model.HistoryGraph;
 import histaroach.model.IRepository;
@@ -21,7 +20,6 @@ import histaroach.util.XMLWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -271,12 +269,10 @@ public class DataCollector {
 			IRepository repository, IRepository clonedRepository) 
 			throws ParserConfigurationException, TransformerException, 
 			IOException, InterruptedException {
-		Set<Flip> flips = historyGraph.getToFailFlips();
-    	
     	IntermediateRevisionGenerator generator = new IntermediateRevisionGenerator(
-    			repository, clonedRepository);
+    			historyGraph, repository, clonedRepository);
     	List<IntermediateRevision> intermediateRevisions = 
-    		generator.generateIntermediateRevisionsFromFlips(flips);
+    		generator.generateIntermediateRevisions();
     	
     	String filename = historyGraphXML.getName().replaceFirst(
     			HISTORYGRAPH_PREFIX, INTERMEDIATE_REVISION_PREFIX);

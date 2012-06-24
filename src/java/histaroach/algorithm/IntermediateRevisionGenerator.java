@@ -3,6 +3,7 @@ package histaroach.algorithm;
 import histaroach.buildstrategy.IBuildStrategy;
 import histaroach.model.DiffFile;
 import histaroach.model.Flip;
+import histaroach.model.HistoryGraph;
 import histaroach.model.IRepository;
 import histaroach.model.IntermediateRevision;
 import histaroach.util.Pair;
@@ -26,30 +27,46 @@ public class IntermediateRevisionGenerator {
 		
 	private static final int MAX_NUM_DIFF_FILES = 7;
 	
+	private final HistoryGraph historyGraph;
 	private final IRepository repository;
 	private final IRepository clonedRepository;
 	
-	public IntermediateRevisionGenerator(IRepository repository, IRepository clonedRepository) {
+	public IntermediateRevisionGenerator(HistoryGraph historyGraph, 
+			IRepository repository, IRepository clonedRepository) {
+		this.historyGraph = historyGraph;
 		this.repository = repository;
 		this.clonedRepository = clonedRepository;
 	}
 	
 	/**
-	 * @return a list of all possible IntermediateRevisions from all flips. 
+	 * @return a list of all possible IntermediateRevisions from all target Flips 
+	 *         in historyGraph.
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	public List<IntermediateRevision> generateIntermediateRevisions() 
+			throws IOException, InterruptedException {
+		Set<Flip> flips = historyGraph.getToFailFlips();
+		List<Flip> targetFlips = filterAndSort(flips);
+		
+		return generateIntermediateRevisions(targetFlips);
+	}
+	
+	/**
+	 * @return a list of all possible IntermediateRevisions from a list of Flips. 
 	 *         (Note: use the latest tests) 
 	 *         These IntermediateRevisions do not know their Compilable state 
 	 *         nor their TestResult.
 	 * @throws InterruptedException 
 	 * @throws IOException 
 	 */
-	public List<IntermediateRevision> generateIntermediateRevisionsFromFlips(Set<Flip> flips) 
+	public List<IntermediateRevision> generateIntermediateRevisions(List<Flip> flips) 
 			throws IOException, InterruptedException {
-		List<Flip> orderedFlips = sortAndFilter(flips);
 		List<IntermediateRevision> intermediateRevisions = new ArrayList<IntermediateRevision>();
 		
-		for (Flip flip : orderedFlips) {
+		for (Flip flip : flips) {
 			List<IntermediateRevision> intermediateRevisionsOfFlip = 
-				generateIntermediateRevisionsFromFlip(flip);
+				generateIntermediateRevisions(flip);
 			intermediateRevisions.addAll(intermediateRevisionsOfFlip);
 		}
 		
@@ -57,16 +74,16 @@ public class IntermediateRevisionGenerator {
 	}
 	
 	/**
-	 * @return a list of all possible IntermediateRevisions from a single flip. 
+	 * @return a list of all possible IntermediateRevisions from a single Flip. 
 	 *         (Note: use the latest tests) 
 	 *         These IntermediateRevisions do not know their Compilable state 
 	 *         nor their TestResult.
 	 * @throws InterruptedException 
 	 * @throws IOException 
 	 */
-	public List<IntermediateRevision> generateIntermediateRevisionsFromFlip(Flip flip) 
+	public List<IntermediateRevision> generateIntermediateRevisions(Flip flip) 
 			throws IOException, InterruptedException {
-		List<IntermediateRevision> intermediateRevisionsOfFlip = 
+		List<IntermediateRevision> intermediateRevisions = 
 			new ArrayList<IntermediateRevision>();
 		
 		Pair<Set<DiffFile>, Set<DiffFile>> res = separateTestFromNonTest(flip.getDiffFiles());
@@ -84,33 +101,35 @@ public class IntermediateRevisionGenerator {
 						repository, clonedRepository);
 				intermediateRevision.setDelta(combination);
 				
-				intermediateRevisionsOfFlip.add(intermediateRevision);
+				intermediateRevisions.add(intermediateRevision);
 			}
 		}
 		
-		return intermediateRevisionsOfFlip;
+		return intermediateRevisions;
 	}
 	
 	/**
-	 * Encodes sorting and filtering policies for flips.
+	 * Filters out Flips that have non-test delta of size <= 1 or > MAX_NUM_DIFF_FILES, 
+	 * and sorts the remaining Flips into ascending order.
 	 * 
-	 * @return a list of sorted, filtered flips.
+	 * @return a list of target Flips.
 	 */
-	private List<Flip> sortAndFilter(Set<Flip> flips) {
-		List<Flip> sortedFlips = new ArrayList<Flip>();
+	private List<Flip> filterAndSort(Set<Flip> flips) {
+		List<Flip> targetFlips = new ArrayList<Flip>();
 		
 		for (Flip flip : flips) {
 			Set<DiffFile> nonTestDelta = separateTestFromNonTest(
 					flip.getDiffFiles()).getFirst();
 			
-			if (nonTestDelta.size() <= MAX_NUM_DIFF_FILES) {
-				sortedFlips.add(flip);
+			if (nonTestDelta.size() > 1 
+					&& nonTestDelta.size() <= MAX_NUM_DIFF_FILES) {
+				targetFlips.add(flip);
 			}
 		}
 		
-		Collections.sort(sortedFlips);
+		Collections.sort(targetFlips);
 		
-		return sortedFlips;
+		return targetFlips;
 	}
 
 	/**
