@@ -1,0 +1,7 @@
+parentCommitID;childCommitID;totalDelta
+a5ddeb7;d32adc2;Msrc/java/voldemort/store/bdb/BdbStorageEngine.java,Msrc/java/voldemort/store/bdb/BdbStorageConfiguration.java
+d8f6c90;2f32c9a;Mrelease_notes.txt,Mbuild.properties
+1ce9886;2c462ce;Mrelease_notes.txt,Mbuild.properties
+39c3a9c;de9ffd0;Msrc/java/voldemort/server/protocol/admin/AdminServiceRequestHandler.java,Msrc/java/voldemort/VoldemortAdminTool.java,Msrc/java/voldemort/server/VoldemortConfig.java
+3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/voldemort-rb.gemspec,Mclients/ruby/lib/voldemort-serializer.rb
+945f9ac;926a5a6;Asrc/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java,Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java,Msrc/java/voldemort/server/rebalance/async/DonorBasedRebalanceAsyncOperation.java,Msrc/java/voldemort/utils/RebalanceUtils.java
