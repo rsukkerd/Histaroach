@@ -69,7 +69,7 @@ public class HistoryGraphXMLReader extends XMLReader<HistoryGraph> {
 		boolean testAborted = parseTestAbortedElement(testAbortedElement);
 		TestResult testResult = null;
 		
-		if (compilable == Compilable.YES) {
+		if (compilable == Compilable.YES && !testAborted) {
 			testResult = parseTestResultElement(testResultElement);
 		}
 		
