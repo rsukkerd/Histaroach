@@ -16,10 +16,11 @@
 #               any data files
 
 import argparse
+from copy import deepcopy
 
 class Delta:
     def __init__(self, fieldString):
-        fields = fieldString.split(";")
+        fields = fieldString.strip().split(";")
         self.parentID = fields[0]
         self.childID = fields[1]
         files = []
@@ -91,10 +92,6 @@ class TestResult:
         return self.parentResult == 1 and self.childResult == 0
 
 class MixedRevision:
-    mixID = -1
-    revertedFiles = []
-    tests = []
-    compilable = True
 
     def __init__(self, mixID):
         self.mixID = mixID
@@ -162,21 +159,28 @@ class RevisionPair:
         return len(self.get_repairs()) > 0
 
     def get_delta_p_bar(self, deltas):
-        '''
-        Returns the list of fixed mixed revisions with the fewest files
-        '''
-        shortest = len(get_delta(deltas, self.parentID, self.childID).totalDelta) - 1 
-        smallest = []
-        for r in self.get_repairs():
-            temp = len(r.revertedFiles)
-            if ( temp == shortest ):
-                smallest.append(r)
-            if (temp < shortest):
-                shortest = temp
-                smallest = [r]
-        return smallest
+        delta_p = self.get_delta_p()
+        delta = get_delta(deltas, self.parentID, self.childID)
+        delta_p_bar = []
+        for d in delta_p:
+            d_bar = MixedRevision(d.mixID)
+            d_bar.tests = d.tests
+            d_bar.compilable = d.compilable
+            delta_copy = deepcopy(delta.totalDelta) 
+            for i in range(len(d.revertedFiles)):
+                for j in range(len(delta_copy)):
+                    if ( d.revertedFiles[i].fileName == delta_copy[j].fileName): 
+                        delta_copy.remove(delta_copy[j]) 
+                        break
+            d_bar.revertedFiles = delta_copy
+            delta_p_bar.append(d_bar)
+        return delta_p_bar
+                    
 
     def get_delta_p(self):
+        '''
+        Returns a list of all mixed revisions that have the maximum length delta_p
+        '''
         longest = 0
         delta_p = []
         for r in self.get_repairs():

@@ -127,5 +127,14 @@ class PreProcessTest(unittest.TestCase):
         self.assertEqual( 1, len(data.get_delta_p()) )
         self.assertEqual( 32, data.get_delta_p()[0].mixID )
 
+    def test_delta_p_bar_details(self):
+        inputs = [ "8;ca9f374;7857afa;Msrc/java/voldemort/client/protocol/admin/AdminClient.java;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1", "8;ca9f374;7857afa;Msrc/java/voldemort/client/protocol/admin/AdminClient.java;1;0;voldemort.store.routed.HintedHandoffTest;1;1;0", "8;ca9f374;7857afa;Msrc/java/voldemort/client/protocol/admin/AdminClient.java;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1" ]
+        in_lines = self.make_lines(inputs)
+        data = pre_process.build_rev_pair( "ca9f374", "7857afa", in_lines )
+        deltas = [pre_process.Delta( "ca9f374;7857afa;Msrc/java/voldemort/client/protocol/admin/AdminClient.java,Msrc/java/voldemort/utils/RebalanceUtils.java" ) ]
+        d_bar = data.get_delta_p_bar(deltas)
+        self.assertEqual(1, len(d_bar[0].revertedFiles) )
+    
+
 if __name__ == "__main__":
 	unittest.main()
