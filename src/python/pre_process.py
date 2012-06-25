@@ -155,9 +155,8 @@ class RevisionPair:
     def is_repaired(self):
         return len(self.get_repairs()) > 0
 
-    def get_delta_p_bar(self, deltas):
+    def get_delta_p_bar(self, delta):
         delta_p = self.get_delta_p()
-        delta = get_delta(deltas, self.parentID, self.childID)
         delta_p_bar = []
         for d in delta_p:
             d_bar = MixedRevision(d.mixID)
@@ -349,6 +348,16 @@ def print_delta_f(data, deltas):
         if d.is_repaired(): print_fix(d, d.get_delta_f( get_delta(deltas, d.parentID, d.childID) ), deltas )
     print ""
 
+def print_comparison(data, deltas):
+    '''
+    Compares delta_p_bar and delta_f and prints if it finds discrepancies
+    '''
+    for d in data:
+        delta = get_delta(deltas, d.parentID, d.childID)
+        p_bar = d.get_delta_p_bar(delta)
+        f = d.get_delta_f(delta)
+    return
+
 def read_deltas(filename):
     df = open(filename, "r")
     #skip header
@@ -377,6 +386,7 @@ def parse_arguments():
     parser.add_argument( "--delta-p", dest="DELTA_P", default=False, action='store_true')
     parser.add_argument( "--delta-f", dest="DELTA_F", default=False, action='store_true')
     parser.add_argument( "--summary", dest="SUMMARY", default=False, action='store_true')
+    parser.add_argument( "--compare", dest="COMPARE", default=False, action='store_true')
     return parser.parse_args()
 
 def main():
@@ -393,6 +403,8 @@ def main():
         print_delta_p(data, deltas)
     if ( args.DELTA_F ):
         print_delta_f(data, deltas)
+    if ( args.COMPARE ):
+        print_comparison(data, deltas)
     return
 
 if __name__ == "__main__":

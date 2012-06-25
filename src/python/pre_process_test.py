@@ -116,7 +116,7 @@ class PreProcessTest(unittest.TestCase):
         data = pre_process.build_rev_pair("1ee8246", "23c9b28", in_lines)
         self.assertTrue( data.is_repaired() )
         deltas = [pre_process.Delta("1ee8246;23c9b28;Msrc/java/voldemort/store/readonly/ReadOnlyStorageEngine.java,Mtest/unit/voldemort/store/readonly/ReadOnlyStorageEngineTestInstance.java")]
-        self.assertEqual( 1, len(data.get_delta_p_bar(deltas)) )
+        self.assertEqual( 1, len(data.get_delta_p_bar(deltas[0])) )
 
     def test_rev_pair_get_delta_p(self):
         inputs = [ "21;b17f572;5400077;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/MD5CheckSum.java;1;0;voldemort.client.CachingStoreClientFactoryTest;1;1;1", "21;b17f572;5400077;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/MD5CheckSum.java;1;0;voldemort.server.EndToEndTest;1;1;0", "32;b17f572;5400077;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CheckSum.java,~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/Adler32CheckSum.java,~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32CheckSum.java;1;0;voldemort.client.CachingStoreClientFactoryTest;1;1;1", "32;b17f572;5400077;~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CheckSum.java,~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/Adler32CheckSum.java,~contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32CheckSum.java;1;0;voldemort.server.EndToEndTest;1;1;0" ]
@@ -132,7 +132,7 @@ class PreProcessTest(unittest.TestCase):
         in_lines = self.make_lines(inputs)
         data = pre_process.build_rev_pair( "ca9f374", "7857afa", in_lines )
         deltas = [pre_process.Delta( "ca9f374;7857afa;Msrc/java/voldemort/client/protocol/admin/AdminClient.java,Msrc/java/voldemort/utils/RebalanceUtils.java" ) ]
-        d_bar = data.get_delta_p_bar(deltas)
+        d_bar = data.get_delta_p_bar(deltas[0])
         self.assertEqual(1, len(d_bar[0].revertedFiles) )
     
 
