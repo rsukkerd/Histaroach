@@ -56,6 +56,18 @@ IntermediateRevision (run tests) Options:
  * -n --numIntermediateRevisions           - Number of IntermediateRevisions to analyze (Optional)
 
 
+### ExploreTestNondeterminism
+
+Command line usage: ExploreTestNondeterminism [options]
+
+General Options:
+ * -h --help=<boolean>        - Print a help message [default false]
+ * -r --repoDir=<filename>    - Repository directory
+ * -v --version=<string>      - Version (ie. commit ID)
+ * -b --buildCommand=<string> - Build command (Optional) [default ant]
+ * -t --testName=<string>     - Test name
+
+
 Output File Documentation
 --------------------------
 
