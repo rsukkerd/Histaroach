@@ -49,15 +49,12 @@ class InputFileLine:
 
 
 class ChangedFile:
-    fileName = ""
-    changeType = "~"
 
     def toString(self, c):
         if ( c == "M" ): return "MODIFY"
         if ( c == "A" ): return "ADD"
         if ( c == "D" ): return "DELETE"
         return "UNDEFINED"
-
 
     def __init__(self, name, ctype):
         self.fileName = name
@@ -202,9 +199,6 @@ class RevisionPair:
                 delta_f = [r]
         return delta_f
 
-    def get_delta_f_bar(self):
-        return []
-            
 def init_mix(mix,line):
     for f in line.changedFiles.split(','):
         mix.revertedFiles.append( ChangedFile( f[1:], f[0] ))
