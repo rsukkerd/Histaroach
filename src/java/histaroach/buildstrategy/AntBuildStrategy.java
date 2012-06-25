@@ -35,8 +35,9 @@ public abstract class AntBuildStrategy implements IBuildStrategy, Serializable {
 	private static final String BUILD_FAILED_PATTERN = "BUILD FAILED";
 	
 	private static final String RUN_COMMAND_SH = "./run_command.sh";
-	private static final String RUN_COMMAND_STDOUT = "output/run_command_stdout";
-	private static final String RUN_COMMAND_STDERR = "output/run_command_stderr";
+	private static final String OUTPUT_PATH = "output";
+	private static final String RUN_COMMAND_STDOUT = "run_command_stdout";
+	private static final String RUN_COMMAND_STDERR = "run_command_stderr";
 	
 	private final File directory;
 	private final String buildCommand;
@@ -123,17 +124,21 @@ public abstract class AntBuildStrategy implements IBuildStrategy, Serializable {
 	private Pair<List<String>, List<String>> run(String command) 
 			throws IOException, InterruptedException {
     	File workingDir = new File(System.getProperty("user.dir"));
-    	    	
-    	String outputStream = workingDir.getPath() + File.separatorChar + RUN_COMMAND_STDOUT;
-    	String errorStream = workingDir.getPath() + File.separatorChar + RUN_COMMAND_STDERR;
+    	File outputDir = new File(workingDir, OUTPUT_PATH);
+    	outputDir.mkdir();
+    	
+    	File stdOutFile = new File(outputDir, RUN_COMMAND_STDOUT);
+    	File stdErrFile = new File(outputDir, RUN_COMMAND_STDERR);
+    	stdOutFile.createNewFile();
+    	stdErrFile.createNewFile();
     	
     	String[] runScriptCommand = new String[] { RUN_COMMAND_SH, directory.getPath(), 
-    			command, outputStream, errorStream, };
+    			command, stdOutFile.getPath(), stdErrFile.getPath(), };
     	    	
         Util.runProcess(runScriptCommand, workingDir);
         
-        FileInputStream stdOutStream = new FileInputStream(new File(RUN_COMMAND_STDOUT));
-        FileInputStream stdErrStream = new FileInputStream(new File(RUN_COMMAND_STDERR));
+        FileInputStream stdOutStream = new FileInputStream(stdOutFile);
+        FileInputStream stdErrStream = new FileInputStream(stdErrFile);
         
         List<String> outputStreamContent = Util.getInputStreamContent(stdOutStream);
         List<String> errorStreamContent = Util.getInputStreamContent(stdErrStream);
