@@ -135,6 +135,12 @@ class PreProcessTest(unittest.TestCase):
         d_bar = data.get_delta_p_bar(deltas[0])
         self.assertEqual(1, len(d_bar[0].revertedFiles) )
     
+    def test_changed_file_equality(self):
+        ch1 = pre_process.ChangedFile( "someName/wiht/slashes", "M" )
+        ch2 = pre_process.ChangedFile( "someName/wiht/slashes", "M" )
+        self.assertEqual(ch1, ch2)
+        ch3 = pre_process.ChangedFile( "someName/with/slashes", "M" )
+        self.assertNotEqual(ch1, ch3)
 
 if __name__ == "__main__":
 	unittest.main()

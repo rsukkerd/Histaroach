@@ -63,6 +63,12 @@ class ChangedFile:
     def __str__(self):
         return self.fileName + ": " + self.toString(self.changeType)
 
+    def __eq__(self, other):
+        return self.fileName == other.fileName and self.changeType == other.changeType
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
 class TestResult:
     def resultToString(self, result):
         if ( result == 1 ):
@@ -142,10 +148,10 @@ class RevisionPair:
             if t.is_repaired(): repairs.append(t)
         return repairs
         
-    '''
-    Returns a list of all mixes that don't fix the flip
-    '''
     def get_broken_mixes(self):
+        '''
+        Returns a list of all mixes that don't fix the flip
+        '''
         broken = []
         repairs = self.get_repairs()
         for t in self.mixedRevisions:
@@ -156,6 +162,9 @@ class RevisionPair:
         return len(self.get_repairs()) > 0
 
     def get_delta_p_bar(self, delta):
+        '''
+        Returns the list of mixed revisions that are in delta_p, but the list of files is the complement of delta_p
+        '''
         delta_p = self.get_delta_p()
         delta_p_bar = []
         for d in delta_p:
@@ -331,7 +340,7 @@ def print_delta_p_bar(rev_pairs, deltas):
     print "Delta P bar"
     print "-----------"
     for d in rev_pairs:
-        if d.is_repaired(): print_fix(d, d.get_delta_p_bar( deltas ), deltas )
+        if d.is_repaired(): print_fix(d, d.get_delta_p_bar( get_delta(deltas, d.parentID, d.childID ) ), deltas )
     print ""
 
 def print_delta_p(rev_pairs, deltas):
@@ -352,10 +361,37 @@ def print_comparison(data, deltas):
     '''
     Compares delta_p_bar and delta_f and prints if it finds discrepancies
     '''
+    print "\nDelta F - Delta P bar Mismatches"
+    print "--------------------------------\n"
     for d in data:
         delta = get_delta(deltas, d.parentID, d.childID)
         p_bar = d.get_delta_p_bar(delta)
         f = d.get_delta_f(delta)
+        in_f_not_p = []
+        in_p_not_f = []
+        printed_header = False
+        for m_p in p_bar:
+            for m_f in f:
+                for cf in m_f.revertedFiles:
+                    if ( not m_p.revertedFiles.__contains__(cf) ):
+                        in_f_not_p.append(cf)
+                for cf in m_p.revertedFiles:
+                    if( not m_f.revertedFiles.__contains__(cf) ):
+                        in_p_not_f.append(cf)
+                if ( len(in_p_not_f) > 0  or len(in_f_not_p) > 0 ):
+                    if ( not printed_header ):
+                        print ""
+                        print d
+                        print "Mixes (P/F): " + str(m_p.mixID) + "/" + str(m_f.mixID)
+                        printed_header = True
+                    if ( len(in_p_not_f) > 0 ):
+                        print "Files in Delta P bar that are missing in Delta F:"
+                        for f_ in in_p_not_f: print f_
+                    if ( len(in_f_not_p) > 0):
+                        print "Files in Delta F that are missing in Delta P bar:"
+                        for f_ in in_f_not_p: print f_
+                in_f_not_p = []
+                in_p_not_f = []
     return
 
 def read_deltas(filename):
@@ -397,14 +433,14 @@ def main():
     #produce requested output
     if ( args.SUMMARY or args.DELTA_P_BAR or args.DELTA_P):
         print_summary(data)
-    if ( args.DELTA_P_BAR ):
-        print_delta_p_bar(data, deltas)
-    if ( args.DELTA_P ):
-        print_delta_p(data, deltas)
-    if ( args.DELTA_F ):
-        print_delta_f(data, deltas)
     if ( args.COMPARE ):
         print_comparison(data, deltas)
+    if ( args.DELTA_P ):
+        print_delta_p(data, deltas)
+    if ( args.DELTA_P_BAR ):
+        print_delta_p_bar(data, deltas)
+    if ( args.DELTA_F ):
+        print_delta_f(data, deltas)
     return
 
 if __name__ == "__main__":
