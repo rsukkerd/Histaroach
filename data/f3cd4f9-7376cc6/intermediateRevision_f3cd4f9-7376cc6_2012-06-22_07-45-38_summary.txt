@@ -1,0 +1,233 @@
+
+Histaroach Log file summary
+
+Checked revision pairs: 6	Total number of mixed Revisions: 32
+	Repaired flips: 6
+
+
+
+Delta F - Delta P bar Mismatches
+--------------------------------
+
+
+Revision Pair: 39c3a9c, de9ffd0	Mixed Revisions: 6
+Mixes (P/F): 9/11
+Files in Delta F that are missing in Delta P bar:
+src/java/voldemort/VoldemortAdminTool.java: MODIFY
+Files in Delta F that are missing in Delta P bar:
+src/java/voldemort/server/VoldemortConfig.java: MODIFY
+
+Revision Pair: 3fea647, a5ddeb7	Mixed Revisions: 14
+Mixes (P/F): 22/12
+Files in Delta P bar that are missing in Delta F:
+clients/ruby/lib/voldemort-serializer.rb: MODIFY
+Files in Delta F that are missing in Delta P bar:
+clients/ruby/lib/connection/tcp_connection.rb: MODIFY
+Files in Delta P bar that are missing in Delta F:
+clients/ruby/lib/voldemort-serializer.rb: MODIFY
+Files in Delta F that are missing in Delta P bar:
+clients/ruby/voldemort-rb.gemspec: MODIFY
+Files in Delta P bar that are missing in Delta F:
+clients/ruby/voldemort-rb.gemspec: MODIFY
+Files in Delta F that are missing in Delta P bar:
+clients/ruby/lib/connection/tcp_connection.rb: MODIFY
+Files in Delta P bar that are missing in Delta F:
+clients/ruby/lib/connection/connection.rb: MODIFY
+Files in Delta F that are missing in Delta P bar:
+clients/ruby/lib/connection/tcp_connection.rb: MODIFY
+Files in Delta P bar that are missing in Delta F:
+clients/ruby/lib/connection/connection.rb: MODIFY
+Files in Delta F that are missing in Delta P bar:
+clients/ruby/voldemort-rb.gemspec: MODIFY
+Files in Delta P bar that are missing in Delta F:
+clients/ruby/lib/connection/tcp_connection.rb: MODIFY
+Files in Delta F that are missing in Delta P bar:
+clients/ruby/voldemort-rb.gemspec: MODIFY
+
+Revision Pair: 945f9ac, 926a5a6	Mixed Revisions: 6
+Mixes (P/F): 30/26
+Files in Delta P bar that are missing in Delta F:
+src/java/voldemort/utils/RebalanceUtils.java: MODIFY
+Files in Delta F that are missing in Delta P bar:
+src/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java: ADD
+test/unit/voldemort/client/rebalance/AbstractRebalanceTest.java: MODIFY
+Files in Delta P bar that are missing in Delta F:
+src/java/voldemort/utils/RebalanceUtils.java: MODIFY
+Files in Delta F that are missing in Delta P bar:
+test/unit/voldemort/client/rebalance/AbstractRebalanceTest.java: MODIFY
+src/java/voldemort/server/rebalance/async/DonorBasedRebalanceAsyncOperation.java: MODIFY
+Delta P bar
+-----------
+
+Revision pair: a5ddeb7:d32adc2	Total delta: 2 files
+Flipped tests:
+voldemort.cluster.failuredetector.ThresholdFailureDetectorTest
+
+Mixed Revision: 0
+Changed files (1):
+    src/java/voldemort/store/bdb/BdbStorageConfiguration.java: MODIFY
+Fixed flips:
+voldemort.cluster.failuredetector.ThresholdFailureDetectorTest
+
+Mixed Revision: 1
+Changed files (1):
+    src/java/voldemort/store/bdb/BdbStorageEngine.java: MODIFY
+Fixed flips:
+voldemort.cluster.failuredetector.ThresholdFailureDetectorTest
+
+
+Revision pair: d8f6c90:2f32c9a	Total delta: 2 files
+Flipped tests:
+voldemort.store.routed.HintedHandoffTest
+
+Mixed Revision: 2
+Changed files (1):
+    build.properties: MODIFY
+Fixed flips:
+voldemort.store.routed.HintedHandoffTest
+
+Mixed Revision: 3
+Changed files (1):
+    release_notes.txt: MODIFY
+Fixed flips:
+voldemort.store.routed.HintedHandoffTest
+
+
+Revision pair: 1ce9886:2c462ce	Total delta: 2 files
+Flipped tests:
+voldemort.client.rebalance.RebalanceTest
+
+Mixed Revision: 4
+Changed files (1):
+    build.properties: MODIFY
+Fixed flips:
+voldemort.client.rebalance.RebalanceTest
+
+Mixed Revision: 5
+Changed files (1):
+    release_notes.txt: MODIFY
+Fixed flips:
+voldemort.client.rebalance.RebalanceTest
+
+
+Revision pair: 39c3a9c:de9ffd0	Total delta: 3 files
+Flipped tests:
+voldemort.store.rebalancing.RebootstrappingStoreTest
+
+Mixed Revision: 9
+Changed files (1):
+    src/java/voldemort/server/VoldemortConfig.java: MODIFY
+Fixed flips:
+voldemort.store.rebalancing.RebootstrappingStoreTest
+
+Mixed Revision: 10
+Changed files (1):
+    src/java/voldemort/VoldemortAdminTool.java: MODIFY
+Fixed flips:
+voldemort.store.rebalancing.RebootstrappingStoreTest
+
+
+Revision pair: 3fea647:a5ddeb7	Total delta: 4 files
+Flipped tests:
+voldemort.server.protocol.admin.AsyncOperationTest
+voldemort.server.EndToEndTest
+
+Mixed Revision: 22
+Changed files (1):
+    clients/ruby/lib/voldemort-serializer.rb: MODIFY
+Fixed flips:
+voldemort.server.protocol.admin.AsyncOperationTest
+voldemort.server.EndToEndTest
+
+Mixed Revision: 23
+Changed files (1):
+    clients/ruby/voldemort-rb.gemspec: MODIFY
+Fixed flips:
+voldemort.server.protocol.admin.AsyncOperationTest
+voldemort.server.EndToEndTest
+
+Mixed Revision: 24
+Changed files (1):
+    clients/ruby/lib/connection/connection.rb: MODIFY
+Fixed flips:
+voldemort.server.protocol.admin.AsyncOperationTest
+voldemort.server.EndToEndTest
+
+Mixed Revision: 25
+Changed files (1):
+    clients/ruby/lib/connection/tcp_connection.rb: MODIFY
+Fixed flips:
+voldemort.server.protocol.admin.AsyncOperationTest
+voldemort.server.EndToEndTest
+
+
+Revision pair: 945f9ac:926a5a6	Total delta: 4 files
+Flipped tests:
+voldemort.cluster.failuredetector.ThresholdFailureDetectorTest
+voldemort.client.rebalance.RebalanceTest
+
+Mixed Revision: 30
+Changed files (1):
+    src/java/voldemort/utils/RebalanceUtils.java: MODIFY
+Fixed flips:
+voldemort.cluster.failuredetector.ThresholdFailureDetectorTest
+
+
+Delta F
+-------
+
+Revision pair: a5ddeb7:d32adc2	Total delta: 2 files
+Flipped tests:
+voldemort.cluster.failuredetector.ThresholdFailureDetectorTest
+
+
+Revision pair: d8f6c90:2f32c9a	Total delta: 2 files
+Flipped tests:
+voldemort.store.routed.HintedHandoffTest
+
+
+Revision pair: 1ce9886:2c462ce	Total delta: 2 files
+Flipped tests:
+voldemort.client.rebalance.RebalanceTest
+
+
+Revision pair: 39c3a9c:de9ffd0	Total delta: 3 files
+Flipped tests:
+voldemort.store.rebalancing.RebootstrappingStoreTest
+
+Mixed Revision: 11
+Changed files (2):
+    src/java/voldemort/VoldemortAdminTool.java: MODIFY
+    src/java/voldemort/server/VoldemortConfig.java: MODIFY
+
+
+Revision pair: 3fea647:a5ddeb7	Total delta: 4 files
+Flipped tests:
+voldemort.server.protocol.admin.AsyncOperationTest
+voldemort.server.EndToEndTest
+
+Mixed Revision: 12
+Changed files (1):
+    clients/ruby/lib/connection/tcp_connection.rb: MODIFY
+
+Mixed Revision: 14
+Changed files (1):
+    clients/ruby/voldemort-rb.gemspec: MODIFY
+
+
+Revision pair: 945f9ac:926a5a6	Total delta: 4 files
+Flipped tests:
+voldemort.cluster.failuredetector.ThresholdFailureDetectorTest
+voldemort.client.rebalance.RebalanceTest
+
+Mixed Revision: 26
+Changed files (2):
+    src/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java: ADD
+    test/unit/voldemort/client/rebalance/AbstractRebalanceTest.java: MODIFY
+
+Mixed Revision: 28
+Changed files (2):
+    test/unit/voldemort/client/rebalance/AbstractRebalanceTest.java: MODIFY
+    src/java/voldemort/server/rebalance/async/DonorBasedRebalanceAsyncOperation.java: MODIFY
+
+

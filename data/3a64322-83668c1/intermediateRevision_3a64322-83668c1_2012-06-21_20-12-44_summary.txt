@@ -1,0 +1,410 @@
+
+Histaroach Log file summary
+
+Checked revision pairs: 22	Total number of mixed Revisions: 348
+	Repaired flips: 9
+
+
+
+Delta F - Delta P bar Mismatches
+--------------------------------
+
+
+Revision Pair: cbc356d, e5ac4d6	Mixed Revisions: 6
+Mixes (P/F): 19/17
+Files in Delta P bar that are missing in Delta F:
+src/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java: MODIFY
+Files in Delta F that are missing in Delta P bar:
+src/java/voldemort/server/rebalance/async/DonorBasedRebalanceAsyncOperation.java: MODIFY
+Files in Delta P bar that are missing in Delta F:
+test/integration/voldemort/rebalance/StartRebalanceProcess.sh: MODIFY
+Files in Delta F that are missing in Delta P bar:
+src/java/voldemort/server/rebalance/async/DonorBasedRebalanceAsyncOperation.java: MODIFY
+
+Revision Pair: b5f56e5, 81abff6	Mixed Revisions: 6
+Mixes (P/F): 22/23
+Files in Delta P bar that are missing in Delta F:
+test/integration/voldemort/rebalance/metadata/initial-cluster.xml: MODIFY
+Files in Delta P bar that are missing in Delta F:
+test/integration/voldemort/rebalance/metadata/target-cluster.xml: MODIFY
+
+Revision Pair: fe10ef0, a511e3d	Mixed Revisions: 6
+Mixes (P/F): 41/38
+Files in Delta P bar that are missing in Delta F:
+.classpath: MODIFY
+Files in Delta F that are missing in Delta P bar:
+lib/libthrift-0.8.0.jar: ADD
+Files in Delta P bar that are missing in Delta F:
+.classpath: MODIFY
+Files in Delta F that are missing in Delta P bar:
+lib/libthrift-0.5.0.jar: DELETE
+Files in Delta P bar that are missing in Delta F:
+lib/libthrift-0.5.0.jar: DELETE
+Files in Delta F that are missing in Delta P bar:
+lib/libthrift-0.8.0.jar: ADD
+Files in Delta P bar that are missing in Delta F:
+lib/libthrift-0.5.0.jar: DELETE
+Files in Delta F that are missing in Delta P bar:
+.classpath: MODIFY
+
+Revision Pair: 83668c1, 20b8333	Mixed Revisions: 14
+Mixes (P/F): 56/44
+Files in Delta P bar that are missing in Delta F:
+src/java/voldemort/server/storage/StorageService.java: MODIFY
+Files in Delta F that are missing in Delta P bar:
+src/java/voldemort/server/protocol/SocketRequestHandlerFactory.java: MODIFY
+Files in Delta P bar that are missing in Delta F:
+src/java/voldemort/server/storage/StorageService.java: MODIFY
+Files in Delta F that are missing in Delta P bar:
+src/java/voldemort/server/VoldemortConfig.java: MODIFY
+Files in Delta P bar that are missing in Delta F:
+src/java/voldemort/server/storage/StorageService.java: MODIFY
+Files in Delta F that are missing in Delta P bar:
+src/java/voldemort/server/jmx/JmxService.java: MODIFY
+Files in Delta P bar that are missing in Delta F:
+src/java/voldemort/server/protocol/SocketRequestHandlerFactory.java: MODIFY
+Files in Delta F that are missing in Delta P bar:
+src/java/voldemort/server/storage/StorageService.java: MODIFY
+Files in Delta P bar that are missing in Delta F:
+src/java/voldemort/server/protocol/SocketRequestHandlerFactory.java: MODIFY
+Files in Delta F that are missing in Delta P bar:
+src/java/voldemort/server/VoldemortConfig.java: MODIFY
+Files in Delta P bar that are missing in Delta F:
+src/java/voldemort/server/protocol/SocketRequestHandlerFactory.java: MODIFY
+Files in Delta F that are missing in Delta P bar:
+src/java/voldemort/server/jmx/JmxService.java: MODIFY
+
+Revision Pair: acd8a64, 903943f	Mixed Revisions: 30
+Mixes (P/F): 155/132
+Files in Delta P bar that are missing in Delta F:
+src/java/voldemort/server/VoldemortServer.java: MODIFY
+Files in Delta F that are missing in Delta P bar:
+src/java/voldemort/server/VoldemortJsvcDaemon.java: MODIFY
+Files in Delta P bar that are missing in Delta F:
+src/java/voldemort/server/VoldemortServer.java: MODIFY
+Files in Delta F that are missing in Delta P bar:
+test/integration/voldemort/rebalance/metadata/voldemort-server.sh: MODIFY
+Files in Delta P bar that are missing in Delta F:
+test/integration/voldemort/rebalance/metadata/voldemort-server.sh: MODIFY
+Files in Delta F that are missing in Delta P bar:
+src/java/voldemort/server/VoldemortJsvcDaemon.java: MODIFY
+Files in Delta P bar that are missing in Delta F:
+test/integration/voldemort/rebalance/metadata/voldemort-server.sh: MODIFY
+Files in Delta F that are missing in Delta P bar:
+src/java/voldemort/server/VoldemortServer.java: MODIFY
+Files in Delta P bar that are missing in Delta F:
+src/java/voldemort/server/VoldemortJsvcDaemon.java: MODIFY
+Files in Delta F that are missing in Delta P bar:
+test/integration/voldemort/rebalance/metadata/voldemort-server.sh: MODIFY
+Files in Delta P bar that are missing in Delta F:
+src/java/voldemort/server/VoldemortJsvcDaemon.java: MODIFY
+Files in Delta F that are missing in Delta P bar:
+src/java/voldemort/server/VoldemortServer.java: MODIFY
+Files in Delta P bar that are missing in Delta F:
+bin/voldemort-server.sh: MODIFY
+Files in Delta F that are missing in Delta P bar:
+src/java/voldemort/server/VoldemortJsvcDaemon.java: MODIFY
+Files in Delta P bar that are missing in Delta F:
+bin/voldemort-server.sh: MODIFY
+Files in Delta F that are missing in Delta P bar:
+test/integration/voldemort/rebalance/metadata/voldemort-server.sh: MODIFY
+Files in Delta P bar that are missing in Delta F:
+bin/voldemort-server.sh: MODIFY
+Files in Delta F that are missing in Delta P bar:
+src/java/voldemort/server/VoldemortServer.java: MODIFY
+
+Revision Pair: b410087, 30d183a	Mixed Revisions: 62
+Mixes (P/F): 217/165
+Files in Delta P bar that are missing in Delta F:
+src/java/voldemort/VoldemortAdminTool.java: MODIFY
+Files in Delta F that are missing in Delta P bar:
+config/test_config1/config/cluster.xml: MODIFY
+Files in Delta P bar that are missing in Delta F:
+src/java/voldemort/VoldemortClientShell.java: MODIFY
+Files in Delta F that are missing in Delta P bar:
+config/test_config1/config/cluster.xml: MODIFY
+Files in Delta P bar that are missing in Delta F:
+src/java/voldemort/utils/RebalanceUtils.java: MODIFY
+Files in Delta F that are missing in Delta P bar:
+config/test_config1/config/cluster.xml: MODIFY
+Files in Delta P bar that are missing in Delta F:
+src/java/voldemort/utils/Entropy.java: MODIFY
+Files in Delta F that are missing in Delta P bar:
+config/test_config1/config/cluster.xml: MODIFY
+Delta P bar
+-----------
+
+Revision pair: e081a12:4d20385	Total delta: 2 files
+Flipped tests:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+Mixed Revision: 3
+Changed files (1):
+    test/integration/voldemort/rebalance/setup_env.inc: MODIFY
+Fixed flips:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+
+Revision pair: 82fd240:e699144	Total delta: 2 files
+Flipped tests:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+Mixed Revision: 6
+Changed files (1):
+    src/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java: MODIFY
+Fixed flips:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+
+Revision pair: bf93459:d2687eb	Total delta: 2 files
+Flipped tests:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+Mixed Revision: 14
+Changed files (1):
+    build.properties: MODIFY
+Fixed flips:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+
+Revision pair: cbc356d:e5ac4d6	Total delta: 3 files
+Flipped tests:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+Mixed Revision: 19
+Changed files (1):
+    src/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java: MODIFY
+Fixed flips:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+Mixed Revision: 21
+Changed files (1):
+    test/integration/voldemort/rebalance/StartRebalanceProcess.sh: MODIFY
+Fixed flips:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+
+Revision pair: b5f56e5:81abff6	Total delta: 3 files
+Flipped tests:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+Mixed Revision: 22
+Changed files (2):
+    test/integration/voldemort/rebalance/metadata/target-cluster.xml: MODIFY
+    test/integration/voldemort/rebalance/metadata/initial-cluster.xml: MODIFY
+Fixed flips:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+
+Revision pair: fe10ef0:a511e3d	Total delta: 3 files
+Flipped tests:
+voldemort.store.bdb.BdbStorageEngineTest
+voldemort.store.readonly.ReadOnlyUtilsTest
+voldemort.store.configuration.ConfigurationStorageEngineTest
+
+Mixed Revision: 41
+Changed files (1):
+    .classpath: MODIFY
+Fixed flips:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+Mixed Revision: 42
+Changed files (1):
+    lib/libthrift-0.5.0.jar: DELETE
+Fixed flips:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+
+Revision pair: 83668c1:20b8333	Total delta: 4 files
+Flipped tests:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+Mixed Revision: 56
+Changed files (1):
+    src/java/voldemort/server/storage/StorageService.java: MODIFY
+Fixed flips:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+Mixed Revision: 57
+Changed files (1):
+    src/java/voldemort/server/protocol/SocketRequestHandlerFactory.java: MODIFY
+Fixed flips:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+
+Revision pair: acd8a64:903943f	Total delta: 5 files
+Flipped tests:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+Mixed Revision: 155
+Changed files (1):
+    src/java/voldemort/server/VoldemortServer.java: MODIFY
+Fixed flips:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+Mixed Revision: 156
+Changed files (1):
+    test/integration/voldemort/rebalance/metadata/voldemort-server.sh: MODIFY
+Fixed flips:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+Mixed Revision: 157
+Changed files (1):
+    src/java/voldemort/server/VoldemortJsvcDaemon.java: MODIFY
+Fixed flips:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+Mixed Revision: 159
+Changed files (1):
+    bin/voldemort-server.sh: MODIFY
+Fixed flips:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+
+Revision pair: b410087:30d183a	Total delta: 6 files
+Flipped tests:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+Mixed Revision: 217
+Changed files (1):
+    src/java/voldemort/VoldemortAdminTool.java: MODIFY
+Fixed flips:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+Mixed Revision: 218
+Changed files (1):
+    src/java/voldemort/VoldemortClientShell.java: MODIFY
+Fixed flips:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+Mixed Revision: 219
+Changed files (1):
+    src/java/voldemort/utils/RebalanceUtils.java: MODIFY
+Fixed flips:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+Mixed Revision: 220
+Changed files (1):
+    src/java/voldemort/utils/Entropy.java: MODIFY
+Fixed flips:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+
+Delta F
+-------
+
+Revision pair: e081a12:4d20385	Total delta: 2 files
+Flipped tests:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+Mixed Revision: 2
+Changed files (1):
+    test/integration/voldemort/rebalance/setup_env.inc: MODIFY
+
+
+Revision pair: 82fd240:e699144	Total delta: 2 files
+Flipped tests:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+Mixed Revision: 7
+Changed files (1):
+    src/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java: MODIFY
+
+
+Revision pair: bf93459:d2687eb	Total delta: 2 files
+Flipped tests:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+Mixed Revision: 15
+Changed files (1):
+    build.properties: MODIFY
+
+
+Revision pair: cbc356d:e5ac4d6	Total delta: 3 files
+Flipped tests:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+Mixed Revision: 17
+Changed files (1):
+    src/java/voldemort/server/rebalance/async/DonorBasedRebalanceAsyncOperation.java: MODIFY
+
+
+Revision pair: b5f56e5:81abff6	Total delta: 3 files
+Flipped tests:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+Mixed Revision: 23
+Changed files (1):
+    test/integration/voldemort/rebalance/metadata/target-cluster.xml: MODIFY
+
+Mixed Revision: 24
+Changed files (1):
+    test/integration/voldemort/rebalance/metadata/initial-cluster.xml: MODIFY
+
+
+Revision pair: fe10ef0:a511e3d	Total delta: 3 files
+Flipped tests:
+voldemort.store.bdb.BdbStorageEngineTest
+voldemort.store.readonly.ReadOnlyUtilsTest
+voldemort.store.configuration.ConfigurationStorageEngineTest
+
+Mixed Revision: 38
+Changed files (1):
+    lib/libthrift-0.8.0.jar: ADD
+
+Mixed Revision: 39
+Changed files (1):
+    lib/libthrift-0.5.0.jar: DELETE
+
+Mixed Revision: 40
+Changed files (1):
+    .classpath: MODIFY
+
+
+Revision pair: 83668c1:20b8333	Total delta: 4 files
+Flipped tests:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+Mixed Revision: 44
+Changed files (1):
+    src/java/voldemort/server/protocol/SocketRequestHandlerFactory.java: MODIFY
+
+Mixed Revision: 45
+Changed files (1):
+    src/java/voldemort/server/storage/StorageService.java: MODIFY
+
+Mixed Revision: 46
+Changed files (1):
+    src/java/voldemort/server/VoldemortConfig.java: MODIFY
+
+Mixed Revision: 47
+Changed files (1):
+    src/java/voldemort/server/jmx/JmxService.java: MODIFY
+
+
+Revision pair: acd8a64:903943f	Total delta: 5 files
+Flipped tests:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+Mixed Revision: 132
+Changed files (1):
+    src/java/voldemort/server/VoldemortJsvcDaemon.java: MODIFY
+
+Mixed Revision: 133
+Changed files (1):
+    test/integration/voldemort/rebalance/metadata/voldemort-server.sh: MODIFY
+
+Mixed Revision: 134
+Changed files (1):
+    src/java/voldemort/server/VoldemortServer.java: MODIFY
+
+
+Revision pair: b410087:30d183a	Total delta: 6 files
+Flipped tests:
+voldemort.store.readonly.ReadOnlyUtilsTest
+
+Mixed Revision: 165
+Changed files (1):
+    config/test_config1/config/cluster.xml: MODIFY
+
+

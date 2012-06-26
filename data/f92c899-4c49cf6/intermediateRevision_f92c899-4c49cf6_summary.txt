@@ -1,0 +1,166 @@
+
+Histaroach Log file summary
+
+Checked revision pairs: 17	Total number of mixed Revisions: 258
+	Repaired flips: 4
+
+
+
+Delta F - Delta P bar Mismatches
+--------------------------------
+
+
+Revision Pair: d3867bf, 8378cec	Mixed Revisions: 2
+Mixes (P/F): 11/10
+Files in Delta F that are missing in Delta P bar:
+contrib/hadoop-store-builder/test/voldemort/store/readonly/fetcher/HdfsFetcherTest.java: MODIFY
+
+Revision Pair: 23c9b28, 1ee8246	Mixed Revisions: 2
+Mixes (P/F): 18/19
+Files in Delta F that are missing in Delta P bar:
+test/unit/voldemort/store/readonly/ReadOnlyStorageEngineTest.java: MODIFY
+
+Revision Pair: 5400077, b17f572	Mixed Revisions: 14
+Mixes (P/F): 25/24
+Files in Delta P bar that are missing in Delta F:
+contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/MD5CheckSum.java: MODIFY
+Files in Delta F that are missing in Delta P bar:
+contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/Adler32CheckSum.java: MODIFY
+Files in Delta P bar that are missing in Delta F:
+contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/MD5CheckSum.java: MODIFY
+Files in Delta F that are missing in Delta P bar:
+contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32CheckSum.java: MODIFY
+Files in Delta P bar that are missing in Delta F:
+contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32CheckSum.java: MODIFY
+Files in Delta F that are missing in Delta P bar:
+contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/Adler32CheckSum.java: MODIFY
+Files in Delta P bar that are missing in Delta F:
+contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32CheckSum.java: MODIFY
+Files in Delta F that are missing in Delta P bar:
+contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/MD5CheckSum.java: MODIFY
+Files in Delta P bar that are missing in Delta F:
+contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/Adler32CheckSum.java: MODIFY
+Files in Delta F that are missing in Delta P bar:
+contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32CheckSum.java: MODIFY
+Files in Delta P bar that are missing in Delta F:
+contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/Adler32CheckSum.java: MODIFY
+Files in Delta F that are missing in Delta P bar:
+contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/MD5CheckSum.java: MODIFY
+Delta P bar
+-----------
+
+Revision pair: ca9f374:7857afa	Total delta: 2 files
+Flipped tests:
+voldemort.store.routed.HintedHandoffTest
+
+Mixed Revision: 8
+Changed files (1):
+    src/java/voldemort/utils/RebalanceUtils.java: MODIFY
+Fixed flips:
+voldemort.store.routed.HintedHandoffTest
+
+Mixed Revision: 9
+Changed files (1):
+    src/java/voldemort/client/protocol/admin/AdminClient.java: MODIFY
+Fixed flips:
+voldemort.store.routed.HintedHandoffTest
+
+
+Revision pair: d3867bf:8378cec	Total delta: 3 files
+Flipped tests:
+voldemort.store.routed.HintedHandoffTest
+
+Mixed Revision: 11
+Changed files (1):
+    contrib/hadoop-store-builder/src/java/voldemort/store/readonly/fetcher/HdfsFetcher.java: MODIFY
+Fixed flips:
+voldemort.store.routed.HintedHandoffTest
+
+
+Revision pair: 23c9b28:1ee8246	Total delta: 3 files
+Flipped tests:
+voldemort.store.readonly.ReadOnlyStorageEngineTest
+voldemort.client.rebalance.RebalanceTest
+
+Mixed Revision: 18
+Changed files (1):
+    src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java: MODIFY
+Fixed flips:
+voldemort.client.rebalance.RebalanceTest
+
+
+Revision pair: 5400077:b17f572	Total delta: 4 files
+Flipped tests:
+voldemort.server.EndToEndTest
+
+Mixed Revision: 25
+Changed files (2):
+    contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/MD5CheckSum.java: MODIFY
+    contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CheckSum.java: MODIFY
+Fixed flips:
+voldemort.server.EndToEndTest
+
+Mixed Revision: 26
+Changed files (2):
+    contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32CheckSum.java: MODIFY
+    contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CheckSum.java: MODIFY
+Fixed flips:
+voldemort.server.EndToEndTest
+
+Mixed Revision: 29
+Changed files (2):
+    contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/Adler32CheckSum.java: MODIFY
+    contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CheckSum.java: MODIFY
+Fixed flips:
+voldemort.server.EndToEndTest
+
+
+Delta F
+-------
+
+Revision pair: ca9f374:7857afa	Total delta: 2 files
+Flipped tests:
+voldemort.store.routed.HintedHandoffTest
+
+
+Revision pair: d3867bf:8378cec	Total delta: 3 files
+Flipped tests:
+voldemort.store.routed.HintedHandoffTest
+
+Mixed Revision: 10
+Changed files (2):
+    contrib/hadoop-store-builder/src/java/voldemort/store/readonly/fetcher/HdfsFetcher.java: MODIFY
+    contrib/hadoop-store-builder/test/voldemort/store/readonly/fetcher/HdfsFetcherTest.java: MODIFY
+
+
+Revision pair: 23c9b28:1ee8246	Total delta: 3 files
+Flipped tests:
+voldemort.store.readonly.ReadOnlyStorageEngineTest
+voldemort.client.rebalance.RebalanceTest
+
+Mixed Revision: 19
+Changed files (2):
+    src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java: MODIFY
+    test/unit/voldemort/store/readonly/ReadOnlyStorageEngineTest.java: MODIFY
+
+
+Revision pair: 5400077:b17f572	Total delta: 4 files
+Flipped tests:
+voldemort.server.EndToEndTest
+
+Mixed Revision: 24
+Changed files (2):
+    contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/Adler32CheckSum.java: MODIFY
+    contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CheckSum.java: MODIFY
+
+Mixed Revision: 27
+Changed files (2):
+    contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32CheckSum.java: MODIFY
+    contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CheckSum.java: MODIFY
+
+Mixed Revision: 28
+Changed files (2):
+    contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/MD5CheckSum.java: MODIFY
+    contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CheckSum.java: MODIFY
+
+
