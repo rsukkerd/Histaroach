@@ -370,6 +370,7 @@ def print_comparison(data, deltas):
         in_f_not_p = []
         in_p_not_f = []
         printed_header = False
+        printed_mix = False
         for m_p in p_bar:
             for m_f in f:
                 for cf in m_f.revertedFiles:
@@ -382,14 +383,18 @@ def print_comparison(data, deltas):
                     if ( not printed_header ):
                         print ""
                         print d
-                        print "Mixes (P/F): " + str(m_p.mixID) + "/" + str(m_f.mixID)
                         printed_header = True
+                    if ( not printed_mix ):
+                        print "\nMixes (P/F): " + str(m_p.mixID) + "/" + str(m_f.mixID)
+                        printed_mix = True
                     if ( len(in_p_not_f) > 0 ):
                         print "Files in Delta P bar that are missing in Delta F:"
                         for f_ in in_p_not_f: print f_
+                        printed_mix = False
                     if ( len(in_f_not_p) > 0):
                         print "Files in Delta F that are missing in Delta P bar:"
                         for f_ in in_f_not_p: print f_
+                        printed_mix = False
                 in_f_not_p = []
                 in_p_not_f = []
     return
