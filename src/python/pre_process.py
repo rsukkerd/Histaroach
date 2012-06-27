@@ -474,18 +474,25 @@ def get_venn_case( d, d_p, d_f ):
     delta = frozenset(d)
     delta_p = frozenset(d_p)
     delta_f = frozenset(d_f)
-    if ( delta == delta_p.union(delta_f) ):
-    #this covers 4 possible cases (1,3,5,7)
-        if ( len(delta_p.intersection(delta_f)) == 0 ): return 1
-        if ( delta_f.issubset(delta_p) ): return 5
-        if ( delta_p.issubset(delta_f) ): return 7
-        if ( len(delta_p.intersection(delta_f)) > 0): return 3
-    else:
+    if ( len(delta) > len(delta_p.union(delta_f) )):
+        #covers all cases where there are changes in neither set
+        #disjoint deltas
         if ( len(delta_p.intersection(delta_f)) == 0 ): return 2
-        if ( delta_f.issubset(delta_p) ): return 6
-        if ( delta_p.issubset(delta_f) ): return 8
+        #true subsets
+        if ( delta_f.issubset(delta_p) and not delta_f == delta_p ): return 6
+        if ( delta_p.issubset(delta_f) and not delta_f == delta_p ): return 8
+        #equal subsets
+        if ( delta_f == delta_p ): return 1
+        #non-empty intersection
         if ( len(delta_p.intersection(delta_f)) > 0): return 4
-    #this covers (2,4,6,8)
+    else:
+        #true subsets
+        if ( delta_f.issubset(delta_p) and not delta_f == delta_p ): return 5
+        if ( delta_p.issubset(delta_f) and not delta_f == delta_p ): return 7
+        #equal subsets
+        if ( delta_f == delta_p ): return 9
+        #non-empty intersection
+        if ( len(delta_p.intersection(delta_f)) > 0): return 3
     return -1
 
 def parse_arguments():
