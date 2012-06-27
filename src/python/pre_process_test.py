@@ -149,7 +149,7 @@ class PreProcessTest(unittest.TestCase):
 
     def test_get_venn_case1(self):
         p = ["a", "b"]
-        f = ["c","D"]
+        f = ["a","b"]
         D = ["a","c","b","D"]
         self.assertEqual(1, pre_process.get_venn_case(D,p,f))
 

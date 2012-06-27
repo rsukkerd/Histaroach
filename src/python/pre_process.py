@@ -128,6 +128,7 @@ class MixedRevision:
         return True
 
     def is_repaired(self):
+        if ( not self.compilable ): return False
         tests_fixed = []
         tests_broken = []
         for t in self.tests:
@@ -170,6 +171,7 @@ class RevisionPair:
         broken = []
         repairs = self.get_repairs()
         for t in self.mixedRevisions:
+            if ( not t.compilable ): continue
             if ( not repairs.__contains__(t) ): broken.append(t)
         return broken
 
