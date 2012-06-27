@@ -6,14 +6,15 @@ Checked revision pairs: 6	Total number of mixed Revisions: 32
 
 
 Intersection cases: 
-Case 1: 2 (16.6666666667%)
-Case 2: 0 (0.0%)
-Case 3: 2 (16.6666666667%)
+Case 1: 0 (0.0%)
+Case 2: 8 (66.6666666667%)
+Case 3: 0 (0.0%)
 Case 4: 0 (0.0%)
 Case 5: 0 (0.0%)
-Case 6: 8 (66.6666666667%)
+Case 6: 2 (16.6666666667%)
 Case 7: 0 (0.0%)
-Case 8: 0 (0.0%)
+Case 8: 2 (16.6666666667%)
+Case 9: 0 (0.0%)
 --------------------
 Total: 12
 
