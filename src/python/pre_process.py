@@ -489,10 +489,9 @@ def get_venn_case( d, d_p, d_f ):
         #true subsets
         if ( delta_f.issubset(delta_p) and not delta_f == delta_p ): return 5
         if ( delta_p.issubset(delta_f) and not delta_f == delta_p ): return 7
-        #equal subsets
-        if ( delta_f == delta_p ): return 9
         #non-empty intersection
         if ( len(delta_p.intersection(delta_f)) > 0): return 3
+    #case 9 is not covered here, because here we deal only with fixing changes
     return -1
 
 def parse_arguments():
