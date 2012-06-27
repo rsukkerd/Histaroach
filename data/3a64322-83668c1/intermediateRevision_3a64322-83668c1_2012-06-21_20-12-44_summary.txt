@@ -6,17 +6,17 @@ Checked revision pairs: 22	Total number of mixed Revisions: 348
 
 
 Intersection cases: 
-Case 1: 10 (20.0%)
-Case 2: 25 (50.0%)
+Case 1: 5 (17.8571428571%)
+Case 2: 8 (28.5714285714%)
 Case 3: 0 (0.0%)
 Case 4: 0 (0.0%)
 Case 5: 0 (0.0%)
-Case 6: 2 (4.0%)
+Case 6: 2 (7.14285714286%)
 Case 7: 0 (0.0%)
 Case 8: 0 (0.0%)
-Case 9: 13 (26.0%)
+Case 9: 13 (46.4285714286%)
 --------------------
-Total: 50
+Total: 28
 
 
 
@@ -56,117 +56,13 @@ Files in Delta P bar that are missing in Delta F:
 Files in Delta F that are missing in Delta P bar:
 lib/libthrift-0.8.0.jar: ADD
 
-Mixes (P/F): 41/39
-Files in Delta P bar that are missing in Delta F:
-.classpath: MODIFY
-Files in Delta F that are missing in Delta P bar:
-lib/libthrift-0.5.0.jar: DELETE
-
-Mixes (P/F): 42/38
-Files in Delta P bar that are missing in Delta F:
-lib/libthrift-0.5.0.jar: DELETE
-Files in Delta F that are missing in Delta P bar:
-lib/libthrift-0.8.0.jar: ADD
-
-Mixes (P/F): 42/40
-Files in Delta P bar that are missing in Delta F:
-lib/libthrift-0.5.0.jar: DELETE
-Files in Delta F that are missing in Delta P bar:
-.classpath: MODIFY
-
-Revision Pair: 83668c1, 20b8333	Mixed Revisions: 14
-
-Mixes (P/F): 56/44
-Files in Delta P bar that are missing in Delta F:
-src/java/voldemort/server/storage/StorageService.java: MODIFY
-Files in Delta F that are missing in Delta P bar:
-src/java/voldemort/server/protocol/SocketRequestHandlerFactory.java: MODIFY
-
-Mixes (P/F): 56/46
-Files in Delta P bar that are missing in Delta F:
-src/java/voldemort/server/storage/StorageService.java: MODIFY
-Files in Delta F that are missing in Delta P bar:
-src/java/voldemort/server/VoldemortConfig.java: MODIFY
-
-Mixes (P/F): 56/47
-Files in Delta P bar that are missing in Delta F:
-src/java/voldemort/server/storage/StorageService.java: MODIFY
-Files in Delta F that are missing in Delta P bar:
-src/java/voldemort/server/jmx/JmxService.java: MODIFY
-
-Mixes (P/F): 57/45
-Files in Delta P bar that are missing in Delta F:
-src/java/voldemort/server/protocol/SocketRequestHandlerFactory.java: MODIFY
-Files in Delta F that are missing in Delta P bar:
-src/java/voldemort/server/storage/StorageService.java: MODIFY
-
-Mixes (P/F): 57/46
-Files in Delta P bar that are missing in Delta F:
-src/java/voldemort/server/protocol/SocketRequestHandlerFactory.java: MODIFY
-Files in Delta F that are missing in Delta P bar:
-src/java/voldemort/server/VoldemortConfig.java: MODIFY
-
-Mixes (P/F): 57/47
-Files in Delta P bar that are missing in Delta F:
-src/java/voldemort/server/protocol/SocketRequestHandlerFactory.java: MODIFY
-Files in Delta F that are missing in Delta P bar:
-src/java/voldemort/server/jmx/JmxService.java: MODIFY
-
 Revision Pair: acd8a64, 903943f	Mixed Revisions: 30
-
-Mixes (P/F): 155/132
-Files in Delta P bar that are missing in Delta F:
-src/java/voldemort/server/VoldemortServer.java: MODIFY
-Files in Delta F that are missing in Delta P bar:
-src/java/voldemort/server/VoldemortJsvcDaemon.java: MODIFY
-
-Mixes (P/F): 155/133
-Files in Delta P bar that are missing in Delta F:
-src/java/voldemort/server/VoldemortServer.java: MODIFY
-Files in Delta F that are missing in Delta P bar:
-test/integration/voldemort/rebalance/metadata/voldemort-server.sh: MODIFY
-
-Mixes (P/F): 156/132
-Files in Delta P bar that are missing in Delta F:
-test/integration/voldemort/rebalance/metadata/voldemort-server.sh: MODIFY
-Files in Delta F that are missing in Delta P bar:
-src/java/voldemort/server/VoldemortJsvcDaemon.java: MODIFY
-
-Mixes (P/F): 156/134
-Files in Delta P bar that are missing in Delta F:
-test/integration/voldemort/rebalance/metadata/voldemort-server.sh: MODIFY
-Files in Delta F that are missing in Delta P bar:
-src/java/voldemort/server/VoldemortServer.java: MODIFY
-
-Mixes (P/F): 157/133
-Files in Delta P bar that are missing in Delta F:
-src/java/voldemort/server/VoldemortJsvcDaemon.java: MODIFY
-Files in Delta F that are missing in Delta P bar:
-test/integration/voldemort/rebalance/metadata/voldemort-server.sh: MODIFY
-
-Mixes (P/F): 157/134
-Files in Delta P bar that are missing in Delta F:
-src/java/voldemort/server/VoldemortJsvcDaemon.java: MODIFY
-Files in Delta F that are missing in Delta P bar:
-src/java/voldemort/server/VoldemortServer.java: MODIFY
-
-Mixes (P/F): 159/132
-Files in Delta P bar that are missing in Delta F:
-bin/voldemort-server.sh: MODIFY
-Files in Delta F that are missing in Delta P bar:
-src/java/voldemort/server/VoldemortJsvcDaemon.java: MODIFY
 
 Mixes (P/F): 159/133
 Files in Delta P bar that are missing in Delta F:
 bin/voldemort-server.sh: MODIFY
 Files in Delta F that are missing in Delta P bar:
 test/integration/voldemort/rebalance/metadata/voldemort-server.sh: MODIFY
-
-Mixes (P/F): 159/134
-Files in Delta P bar that are missing in Delta F:
-bin/voldemort-server.sh: MODIFY
-Files in Delta F that are missing in Delta P bar:
-src/java/voldemort/server/VoldemortServer.java: MODIFY
 
 Revision Pair: b410087, 30d183a	Mixed Revisions: 62
 
@@ -270,27 +166,9 @@ Changed files (1):
 Fixed flips:
 voldemort.store.readonly.ReadOnlyUtilsTest
 
-Mixed Revision: 42
-Changed files (1):
-    lib/libthrift-0.5.0.jar: DELETE
-Fixed flips:
-voldemort.store.readonly.ReadOnlyUtilsTest
-
 
 Revision pair: 83668c1:20b8333	Total delta: 4 files
 Flipped tests:
-voldemort.store.readonly.ReadOnlyUtilsTest
-
-Mixed Revision: 56
-Changed files (1):
-    src/java/voldemort/server/storage/StorageService.java: MODIFY
-Fixed flips:
-voldemort.store.readonly.ReadOnlyUtilsTest
-
-Mixed Revision: 57
-Changed files (1):
-    src/java/voldemort/server/protocol/SocketRequestHandlerFactory.java: MODIFY
-Fixed flips:
 voldemort.store.readonly.ReadOnlyUtilsTest
 
 
@@ -298,21 +176,9 @@ Revision pair: acd8a64:903943f	Total delta: 5 files
 Flipped tests:
 voldemort.store.readonly.ReadOnlyUtilsTest
 
-Mixed Revision: 155
-Changed files (1):
-    src/java/voldemort/server/VoldemortServer.java: MODIFY
-Fixed flips:
-voldemort.store.readonly.ReadOnlyUtilsTest
-
 Mixed Revision: 156
 Changed files (1):
     test/integration/voldemort/rebalance/metadata/voldemort-server.sh: MODIFY
-Fixed flips:
-voldemort.store.readonly.ReadOnlyUtilsTest
-
-Mixed Revision: 157
-Changed files (1):
-    src/java/voldemort/server/VoldemortJsvcDaemon.java: MODIFY
 Fixed flips:
 voldemort.store.readonly.ReadOnlyUtilsTest
 
@@ -414,10 +280,6 @@ Mixed Revision: 38
 Changed files (1):
     lib/libthrift-0.8.0.jar: ADD
 
-Mixed Revision: 39
-Changed files (1):
-    lib/libthrift-0.5.0.jar: DELETE
-
 Mixed Revision: 40
 Changed files (1):
     .classpath: MODIFY
@@ -427,38 +289,18 @@ Revision pair: 83668c1:20b8333	Total delta: 4 files
 Flipped tests:
 voldemort.store.readonly.ReadOnlyUtilsTest
 
-Mixed Revision: 44
-Changed files (1):
-    src/java/voldemort/server/protocol/SocketRequestHandlerFactory.java: MODIFY
-
-Mixed Revision: 45
-Changed files (1):
-    src/java/voldemort/server/storage/StorageService.java: MODIFY
-
 Mixed Revision: 46
 Changed files (1):
     src/java/voldemort/server/VoldemortConfig.java: MODIFY
-
-Mixed Revision: 47
-Changed files (1):
-    src/java/voldemort/server/jmx/JmxService.java: MODIFY
 
 
 Revision pair: acd8a64:903943f	Total delta: 5 files
 Flipped tests:
 voldemort.store.readonly.ReadOnlyUtilsTest
 
-Mixed Revision: 132
-Changed files (1):
-    src/java/voldemort/server/VoldemortJsvcDaemon.java: MODIFY
-
 Mixed Revision: 133
 Changed files (1):
     test/integration/voldemort/rebalance/metadata/voldemort-server.sh: MODIFY
-
-Mixed Revision: 134
-Changed files (1):
-    src/java/voldemort/server/VoldemortServer.java: MODIFY
 
 
 Revision pair: b410087:30d183a	Total delta: 6 files

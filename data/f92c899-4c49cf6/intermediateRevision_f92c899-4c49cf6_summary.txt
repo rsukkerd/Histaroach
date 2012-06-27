@@ -6,35 +6,23 @@ Checked revision pairs: 17	Total number of mixed Revisions: 258
 
 
 Intersection cases: 
-Case 1: 3 (12.5%)
+Case 1: 3 (13.6363636364%)
 Case 2: 0 (0.0%)
 Case 3: 0 (0.0%)
-Case 4: 6 (25.0%)
+Case 4: 6 (27.2727272727%)
 Case 5: 0 (0.0%)
 Case 6: 0 (0.0%)
 Case 7: 0 (0.0%)
-Case 8: 2 (8.33333333333%)
-Case 9: 13 (54.1666666667%)
+Case 8: 0 (0.0%)
+Case 9: 13 (59.0909090909%)
 --------------------
-Total: 24
+Total: 22
 
 
 
 Delta F - Delta P bar Mismatches
 --------------------------------
 
-
-Revision Pair: d3867bf, 8378cec	Mixed Revisions: 2
-
-Mixes (P/F): 11/10
-Files in Delta F that are missing in Delta P bar:
-contrib/hadoop-store-builder/test/voldemort/store/readonly/fetcher/HdfsFetcherTest.java: MODIFY
-
-Revision Pair: 23c9b28, 1ee8246	Mixed Revisions: 2
-
-Mixes (P/F): 18/19
-Files in Delta F that are missing in Delta P bar:
-test/unit/voldemort/store/readonly/ReadOnlyStorageEngineTest.java: MODIFY
 
 Revision Pair: 5400077, b17f572	Mixed Revisions: 14
 
@@ -97,22 +85,10 @@ Revision pair: d3867bf:8378cec	Total delta: 3 files
 Flipped tests:
 voldemort.store.routed.HintedHandoffTest
 
-Mixed Revision: 11
-Changed files (1):
-    contrib/hadoop-store-builder/src/java/voldemort/store/readonly/fetcher/HdfsFetcher.java: MODIFY
-Fixed flips:
-voldemort.store.routed.HintedHandoffTest
-
 
 Revision pair: 23c9b28:1ee8246	Total delta: 3 files
 Flipped tests:
 voldemort.store.readonly.ReadOnlyStorageEngineTest
-voldemort.client.rebalance.RebalanceTest
-
-Mixed Revision: 18
-Changed files (1):
-    src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java: MODIFY
-Fixed flips:
 voldemort.client.rebalance.RebalanceTest
 
 
@@ -164,11 +140,6 @@ Revision pair: 23c9b28:1ee8246	Total delta: 3 files
 Flipped tests:
 voldemort.store.readonly.ReadOnlyStorageEngineTest
 voldemort.client.rebalance.RebalanceTest
-
-Mixed Revision: 19
-Changed files (2):
-    src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java: MODIFY
-    test/unit/voldemort/store/readonly/ReadOnlyStorageEngineTest.java: MODIFY
 
 
 Revision pair: 5400077:b17f572	Total delta: 4 files

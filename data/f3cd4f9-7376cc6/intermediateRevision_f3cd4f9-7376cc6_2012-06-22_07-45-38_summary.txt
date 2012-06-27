@@ -6,17 +6,17 @@ Checked revision pairs: 6	Total number of mixed Revisions: 32
 
 
 Intersection cases: 
-Case 1: 2 (16.6666666667%)
-Case 2: 8 (66.6666666667%)
+Case 1: 2 (20.0%)
+Case 2: 6 (60.0%)
 Case 3: 0 (0.0%)
 Case 4: 0 (0.0%)
 Case 5: 0 (0.0%)
 Case 6: 0 (0.0%)
 Case 7: 0 (0.0%)
-Case 8: 2 (16.6666666667%)
+Case 8: 2 (20.0%)
 Case 9: 0 (0.0%)
 --------------------
-Total: 12
+Total: 10
 
 
 
@@ -71,22 +71,6 @@ Files in Delta P bar that are missing in Delta F:
 clients/ruby/lib/connection/tcp_connection.rb: MODIFY
 Files in Delta F that are missing in Delta P bar:
 clients/ruby/voldemort-rb.gemspec: MODIFY
-
-Revision Pair: 945f9ac, 926a5a6	Mixed Revisions: 6
-
-Mixes (P/F): 30/26
-Files in Delta P bar that are missing in Delta F:
-src/java/voldemort/utils/RebalanceUtils.java: MODIFY
-Files in Delta F that are missing in Delta P bar:
-src/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java: ADD
-test/unit/voldemort/client/rebalance/AbstractRebalanceTest.java: MODIFY
-
-Mixes (P/F): 30/28
-Files in Delta P bar that are missing in Delta F:
-src/java/voldemort/utils/RebalanceUtils.java: MODIFY
-Files in Delta F that are missing in Delta P bar:
-test/unit/voldemort/client/rebalance/AbstractRebalanceTest.java: MODIFY
-src/java/voldemort/server/rebalance/async/DonorBasedRebalanceAsyncOperation.java: MODIFY
 Delta P bar
 -----------
 
@@ -197,12 +181,6 @@ Flipped tests:
 voldemort.cluster.failuredetector.ThresholdFailureDetectorTest
 voldemort.client.rebalance.RebalanceTest
 
-Mixed Revision: 30
-Changed files (1):
-    src/java/voldemort/utils/RebalanceUtils.java: MODIFY
-Fixed flips:
-voldemort.cluster.failuredetector.ThresholdFailureDetectorTest
-
 
 Delta F
 -------
@@ -255,10 +233,5 @@ Mixed Revision: 26
 Changed files (2):
     src/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java: ADD
     test/unit/voldemort/client/rebalance/AbstractRebalanceTest.java: MODIFY
-
-Mixed Revision: 28
-Changed files (2):
-    test/unit/voldemort/client/rebalance/AbstractRebalanceTest.java: MODIFY
-    src/java/voldemort/server/rebalance/async/DonorBasedRebalanceAsyncOperation.java: MODIFY
 
 
