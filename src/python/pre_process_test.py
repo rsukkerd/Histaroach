@@ -111,7 +111,7 @@ class PreProcessTest(unittest.TestCase):
         self.assertTrue(data.is_repaired())
 
     def test_rev_pair_get_delta_p_bar(self):
-        inputs = [ "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.store.readonly.ReadOnlyStorageEngineTest;0;1;0", "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.client.rebalance.RebalanceTest;1;1;0", "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0", "19;1ee8246;23c9b28;~test/unit/voldemort/store/readonly/ReadOnlyStorageEngineTestInstance.java;0;0;n;n;n;n" ]
+        inputs = [ "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.store.readonly.ReadOnlyStorageEngineTest;0;1;0", "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.client.rebalance.RebalanceTest;1;1;0", "18;1ee8246;23c9b28;~src/java/voldemort/store/readonly/ReadOnlyStorageEngine.java;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0", "19;1ee8246;23c9b28;~test/unit/voldemort/store/readonly/ReadOnlyStorageEngineTestInstance.java;1;0;voldemort.client.rebalance.RebalanceTest;0;1;0" ]
         in_lines = self.make_lines(inputs)
         data = pre_process.build_rev_pair("1ee8246", "23c9b28", in_lines)
         self.assertTrue( data.is_repaired() )
@@ -128,7 +128,7 @@ class PreProcessTest(unittest.TestCase):
         self.assertEqual( 32, data.get_delta_p()[0].mixID )
 
     def test_delta_p_bar_details(self):
-        inputs = [ "8;ca9f374;7857afa;Msrc/java/voldemort/client/protocol/admin/AdminClient.java;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1", "8;ca9f374;7857afa;Msrc/java/voldemort/client/protocol/admin/AdminClient.java;1;0;voldemort.store.routed.HintedHandoffTest;1;1;0", "8;ca9f374;7857afa;Msrc/java/voldemort/client/protocol/admin/AdminClient.java;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1" ]
+        inputs = [ "8;ca9f374;7857afa;Msrc/java/voldemort/client/protocol/admin/AdminClient.java;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1", "8;ca9f374;7857afa;Msrc/java/voldemort/client/protocol/admin/AdminClient.java;1;0;voldemort.store.routed.HintedHandoffTest;1;1;0", "8;ca9f374;7857afa;Msrc/java/voldemort/client/protocol/admin/AdminClient.java;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1", "9;ca9f374;7857afa;Msrc/java/voldemort/utils/RebalanceUtils.java;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;0;1;0" ]
         in_lines = self.make_lines(inputs)
         data = pre_process.build_rev_pair( "ca9f374", "7857afa", in_lines )
         deltas = [pre_process.Delta( "ca9f374;7857afa;Msrc/java/voldemort/client/protocol/admin/AdminClient.java,Msrc/java/voldemort/utils/RebalanceUtils.java" ) ]

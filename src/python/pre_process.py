@@ -64,7 +64,8 @@ class ChangedFile:
         return self.fileName + ": " + self.toString(self.changeType)
 
     def __eq__(self, other):
-        return self.fileName == other.fileName and self.changeType == other.changeType
+        #we don't need to check the change type, because this will always be ok in a single rev-pair
+        return self.fileName == other.fileName 
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -343,8 +344,8 @@ def print_summary(data, deltas):
     print "Checked revision pairs: " + str(len(data)) + "\tTotal number of mixed Revisions: " + str(total_mixes)
     print "\tRepaired flips: " + str(get_repaired_flips(data))
     print "\n"
-    p_is_empty = len(data) - get_repaired_flips(data)
-    total_cases = p_is_empty
+    #p_is_empty = len(data) - get_repaired_flips(data)
+    total_cases = 0
     vc = [ 0,0,0,0,0,0,0,0]
     for d in data:
         if ( d.is_repaired() ) :
@@ -356,11 +357,16 @@ def print_summary(data, deltas):
                     total_cases += 1
                     _case = get_venn_case(delta.totalDelta, mp.revertedFiles, mf.revertedFiles)
                     vc[_case - 1] += 1
-                            
+        else:
+            #d is not repaired (this is case 9)
+            fs = d.get_delta_f(deltas)
+            vc[8] += len(fs)
+            total_cases += len(fs)
+                                
     print "Intersection cases: "
-    for i in range(8):
+    for i in range(9):
         print "Case " + str(i+1) + ": " + value_and_percentage( vc[i], total_cases )
-    print "Case 9: " + value_and_percentage(p_is_empty, total_cases)
+    #print "Case 9: " + value_and_percentage(p_is_empty, total_cases)
     print "--------------------"
     print "Total: " + str(total_cases)
     print "\n"
