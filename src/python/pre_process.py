@@ -195,8 +195,14 @@ class RevisionPair:
                         delta_copy.remove(delta_copy[j]) 
                         break
             d_bar.revertedFiles = delta_copy
-            delta_p_bar.append(d_bar)
+            if ( self.has_matching_mix(d_bar) ): delta_p_bar.append(d_bar)
         return delta_p_bar
+
+    def has_matching_mix(self, other):
+        for m in self.mixedRevisions:
+            if ( not m.compilable ): continue
+            if ( m.revertedFiles == other.revertedFiles ): return True
+        return False 
                     
 
     def get_delta_p(self):
