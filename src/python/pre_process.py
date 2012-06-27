@@ -69,6 +69,9 @@ class ChangedFile:
     def __ne__(self, other):
         return not self.__eq__(other)
 
+    def __hash__(self):
+        return hash(self.fileName) | hash(self.changeType)
+
 class TestResult:
     def resultToString(self, result):
         if ( result == 1 ):
@@ -111,6 +114,18 @@ class MixedRevision:
             for f in self.get_fixed_flips():
                 s = s + f + "\n"
         return s
+
+    def __hash__(self):
+        _hash =  self.mixID * 11 + int(self.compilable) * 17
+        _hash |= hash_all(self.revertedFiles) * 3 + hash_all(self.tests) * 23
+        return _hash
+
+    def __eq__(self, other):
+        if ( self.mixID != other.mixID ): return False
+        if ( self.compilable != other.compilable ): return False
+        if ( self.tests != other.tests ): return False
+        if ( self.revertedFiles != other.revertedFiles): return False
+        return True
 
     def is_repaired(self):
         tests_fixed = []
@@ -311,11 +326,35 @@ def get_repaired_flips(data):
         if d.is_repaired(): i = i + 1
     return i
 
-def print_summary(data):
+def value_and_percentage(val,total):
+    return str(val) + " (" + str(float(val)/total * 100) + "%)"
+
+def print_summary(data, deltas):
+    total_mixes = get_num_mixes(data)
     print "\nHistaroach Log file summary\n"
-    print "Checked revision pairs: " + str(len(data)) + "\tTotal number of mixed Revisions: " + str(get_num_mixes(data))
+    print "Checked revision pairs: " + str(len(data)) + "\tTotal number of mixed Revisions: " + str(total_mixes)
     print "\tRepaired flips: " + str(get_repaired_flips(data))
     print "\n"
+    total_cases = 0
+    vc = [ 0,0,0,0,0,0,0,0]
+    for d in data:
+        if ( d.is_repaired() ) :
+            delta = get_delta(deltas, d.parentID, d.childID)
+            ps = d.get_delta_p()
+            fs = d.get_delta_f(delta)
+            for mp in ps:
+                for mf in fs:
+                    total_cases += 1
+                    _case = get_venn_case(delta.totalDelta, mp.revertedFiles, mf.revertedFiles)
+                    vc[_case - 1] += 1
+                            
+    print "Intersection cases: "
+    for i in range(8):
+        print "Case " + str(i+1) + ": " + value_and_percentage( vc[i], total_cases )
+    print "--------------------"
+    print "Total: " + str(total_cases)
+    print "\n"
+
 
 def print_flips(rev_pair):
     print "Flipped tests:"
@@ -415,6 +454,38 @@ def get_delta(deltas, parent, child):
         if ( delta.parentID == parent and delta.childID == child): return delta
     return None
 
+def hash_all(_list):
+    '''
+    Computes a hash over a list of hashable elements
+    '''
+    _h = 0
+    if ( len(_list) > 0): _h = hash(_list[0]) 
+    for i in _list:
+        _h += (hash(i) % 43) 
+        _h *= 37
+    return _h   
+
+def get_venn_case( d, d_p, d_f ):
+    '''
+    Takes lists of file changes and computes the venn type (see paper)
+    '''
+    delta = frozenset(d)
+    delta_p = frozenset(d_p)
+    delta_f = frozenset(d_f)
+    if ( delta == delta_p.union(delta_f) ):
+    #this covers 4 possible cases (1,3,5,7)
+        if ( len(delta_p.intersection(delta_f)) == 0 ): return 1
+        if ( delta_f.issubset(delta_p) ): return 5
+        if ( delta_p.issubset(delta_f) ): return 7
+        if ( len(delta_p.intersection(delta_f)) > 0): return 3
+    else:
+        if ( len(delta_p.intersection(delta_f)) == 0 ): return 2
+        if ( delta_f.issubset(delta_p) ): return 6
+        if ( delta_p.issubset(delta_f) ): return 8
+        if ( len(delta_p.intersection(delta_f)) > 0): return 4
+    #this covers (2,4,6,8)
+    return -1
+
 def parse_arguments():
     '''
     Parse commandline arguments and return an object containing 
@@ -437,7 +508,7 @@ def main():
     deltas = read_deltas( args.INPUT_FILE + "_totalDelta.txt")
     #produce requested output
     if ( args.SUMMARY or args.DELTA_P_BAR or args.DELTA_P):
-        print_summary(data)
+        print_summary(data,deltas)
     if ( args.COMPARE ):
         print_comparison(data, deltas)
     if ( args.DELTA_P ):

@@ -5,128 +5,189 @@ Checked revision pairs: 22	Total number of mixed Revisions: 348
 	Repaired flips: 9
 
 
+Intersection cases: 
+Case 1: 10 (27.027027027%)
+Case 2: 2 (5.40540540541%)
+Case 3: 0 (0.0%)
+Case 4: 0 (0.0%)
+Case 5: 0 (0.0%)
+Case 6: 25 (67.5675675676%)
+Case 7: 0 (0.0%)
+Case 8: 0 (0.0%)
+--------------------
+Total: 37
+
+
 
 Delta F - Delta P bar Mismatches
 --------------------------------
 
 
 Revision Pair: cbc356d, e5ac4d6	Mixed Revisions: 6
+
 Mixes (P/F): 19/17
 Files in Delta P bar that are missing in Delta F:
 src/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java: MODIFY
 Files in Delta F that are missing in Delta P bar:
 src/java/voldemort/server/rebalance/async/DonorBasedRebalanceAsyncOperation.java: MODIFY
+
+Mixes (P/F): 21/17
 Files in Delta P bar that are missing in Delta F:
 test/integration/voldemort/rebalance/StartRebalanceProcess.sh: MODIFY
 Files in Delta F that are missing in Delta P bar:
 src/java/voldemort/server/rebalance/async/DonorBasedRebalanceAsyncOperation.java: MODIFY
 
 Revision Pair: b5f56e5, 81abff6	Mixed Revisions: 6
+
 Mixes (P/F): 22/23
 Files in Delta P bar that are missing in Delta F:
 test/integration/voldemort/rebalance/metadata/initial-cluster.xml: MODIFY
+
+Mixes (P/F): 22/24
 Files in Delta P bar that are missing in Delta F:
 test/integration/voldemort/rebalance/metadata/target-cluster.xml: MODIFY
 
 Revision Pair: fe10ef0, a511e3d	Mixed Revisions: 6
+
 Mixes (P/F): 41/38
 Files in Delta P bar that are missing in Delta F:
 .classpath: MODIFY
 Files in Delta F that are missing in Delta P bar:
 lib/libthrift-0.8.0.jar: ADD
+
+Mixes (P/F): 41/39
 Files in Delta P bar that are missing in Delta F:
 .classpath: MODIFY
 Files in Delta F that are missing in Delta P bar:
 lib/libthrift-0.5.0.jar: DELETE
+
+Mixes (P/F): 42/38
 Files in Delta P bar that are missing in Delta F:
 lib/libthrift-0.5.0.jar: DELETE
 Files in Delta F that are missing in Delta P bar:
 lib/libthrift-0.8.0.jar: ADD
+
+Mixes (P/F): 42/40
 Files in Delta P bar that are missing in Delta F:
 lib/libthrift-0.5.0.jar: DELETE
 Files in Delta F that are missing in Delta P bar:
 .classpath: MODIFY
 
 Revision Pair: 83668c1, 20b8333	Mixed Revisions: 14
+
 Mixes (P/F): 56/44
 Files in Delta P bar that are missing in Delta F:
 src/java/voldemort/server/storage/StorageService.java: MODIFY
 Files in Delta F that are missing in Delta P bar:
 src/java/voldemort/server/protocol/SocketRequestHandlerFactory.java: MODIFY
+
+Mixes (P/F): 56/46
 Files in Delta P bar that are missing in Delta F:
 src/java/voldemort/server/storage/StorageService.java: MODIFY
 Files in Delta F that are missing in Delta P bar:
 src/java/voldemort/server/VoldemortConfig.java: MODIFY
+
+Mixes (P/F): 56/47
 Files in Delta P bar that are missing in Delta F:
 src/java/voldemort/server/storage/StorageService.java: MODIFY
 Files in Delta F that are missing in Delta P bar:
 src/java/voldemort/server/jmx/JmxService.java: MODIFY
+
+Mixes (P/F): 57/45
 Files in Delta P bar that are missing in Delta F:
 src/java/voldemort/server/protocol/SocketRequestHandlerFactory.java: MODIFY
 Files in Delta F that are missing in Delta P bar:
 src/java/voldemort/server/storage/StorageService.java: MODIFY
+
+Mixes (P/F): 57/46
 Files in Delta P bar that are missing in Delta F:
 src/java/voldemort/server/protocol/SocketRequestHandlerFactory.java: MODIFY
 Files in Delta F that are missing in Delta P bar:
 src/java/voldemort/server/VoldemortConfig.java: MODIFY
+
+Mixes (P/F): 57/47
 Files in Delta P bar that are missing in Delta F:
 src/java/voldemort/server/protocol/SocketRequestHandlerFactory.java: MODIFY
 Files in Delta F that are missing in Delta P bar:
 src/java/voldemort/server/jmx/JmxService.java: MODIFY
 
 Revision Pair: acd8a64, 903943f	Mixed Revisions: 30
+
 Mixes (P/F): 155/132
 Files in Delta P bar that are missing in Delta F:
 src/java/voldemort/server/VoldemortServer.java: MODIFY
 Files in Delta F that are missing in Delta P bar:
 src/java/voldemort/server/VoldemortJsvcDaemon.java: MODIFY
+
+Mixes (P/F): 155/133
 Files in Delta P bar that are missing in Delta F:
 src/java/voldemort/server/VoldemortServer.java: MODIFY
 Files in Delta F that are missing in Delta P bar:
 test/integration/voldemort/rebalance/metadata/voldemort-server.sh: MODIFY
+
+Mixes (P/F): 156/132
 Files in Delta P bar that are missing in Delta F:
 test/integration/voldemort/rebalance/metadata/voldemort-server.sh: MODIFY
 Files in Delta F that are missing in Delta P bar:
 src/java/voldemort/server/VoldemortJsvcDaemon.java: MODIFY
+
+Mixes (P/F): 156/134
 Files in Delta P bar that are missing in Delta F:
 test/integration/voldemort/rebalance/metadata/voldemort-server.sh: MODIFY
 Files in Delta F that are missing in Delta P bar:
 src/java/voldemort/server/VoldemortServer.java: MODIFY
+
+Mixes (P/F): 157/133
 Files in Delta P bar that are missing in Delta F:
 src/java/voldemort/server/VoldemortJsvcDaemon.java: MODIFY
 Files in Delta F that are missing in Delta P bar:
 test/integration/voldemort/rebalance/metadata/voldemort-server.sh: MODIFY
+
+Mixes (P/F): 157/134
 Files in Delta P bar that are missing in Delta F:
 src/java/voldemort/server/VoldemortJsvcDaemon.java: MODIFY
 Files in Delta F that are missing in Delta P bar:
 src/java/voldemort/server/VoldemortServer.java: MODIFY
+
+Mixes (P/F): 159/132
 Files in Delta P bar that are missing in Delta F:
 bin/voldemort-server.sh: MODIFY
 Files in Delta F that are missing in Delta P bar:
 src/java/voldemort/server/VoldemortJsvcDaemon.java: MODIFY
+
+Mixes (P/F): 159/133
 Files in Delta P bar that are missing in Delta F:
 bin/voldemort-server.sh: MODIFY
 Files in Delta F that are missing in Delta P bar:
 test/integration/voldemort/rebalance/metadata/voldemort-server.sh: MODIFY
+
+Mixes (P/F): 159/134
 Files in Delta P bar that are missing in Delta F:
 bin/voldemort-server.sh: MODIFY
 Files in Delta F that are missing in Delta P bar:
 src/java/voldemort/server/VoldemortServer.java: MODIFY
 
 Revision Pair: b410087, 30d183a	Mixed Revisions: 62
+
 Mixes (P/F): 217/165
 Files in Delta P bar that are missing in Delta F:
 src/java/voldemort/VoldemortAdminTool.java: MODIFY
 Files in Delta F that are missing in Delta P bar:
 config/test_config1/config/cluster.xml: MODIFY
+
+Mixes (P/F): 218/165
 Files in Delta P bar that are missing in Delta F:
 src/java/voldemort/VoldemortClientShell.java: MODIFY
 Files in Delta F that are missing in Delta P bar:
 config/test_config1/config/cluster.xml: MODIFY
+
+Mixes (P/F): 219/165
 Files in Delta P bar that are missing in Delta F:
 src/java/voldemort/utils/RebalanceUtils.java: MODIFY
 Files in Delta F that are missing in Delta P bar:
 config/test_config1/config/cluster.xml: MODIFY
+
+Mixes (P/F): 220/165
 Files in Delta P bar that are missing in Delta F:
 src/java/voldemort/utils/Entropy.java: MODIFY
 Files in Delta F that are missing in Delta P bar:

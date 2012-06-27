@@ -142,5 +142,58 @@ class PreProcessTest(unittest.TestCase):
         ch3 = pre_process.ChangedFile( "someName/with/slashes", "M" )
         self.assertNotEqual(ch1, ch3)
 
+    def test_hash_all(self):
+        #this should be ok if it doesn't blow up
+        l = [ "a", "b" ]
+        i = pre_process.hash_all(l)
+
+    def test_get_venn_case1(self):
+        p = ["a", "b"]
+        f = ["c","D"]
+        D = ["a","c","b","D"]
+        self.assertEqual(1, pre_process.get_venn_case(D,p,f))
+
+    def test_get_venn_case2(self):
+        p = ["a", "b"]
+        f = ["c","D"]
+        D = ["a","c","b","D", "e"]
+        self.assertEqual(2, pre_process.get_venn_case(D,p,f))
+
+    def test_get_venn_case3(self):
+        p = ["a", "b", "e"]
+        f = ["c","D", "e"]
+        D = ["a","c","b","D", "e"]
+        self.assertEqual(3, pre_process.get_venn_case(D,p,f))
+
+    def test_get_venn_case4(self):
+        p = ["a", "b", "e"]
+        f = ["c","D", "e"]
+        D = ["a","c","b","D", "e", "f"]
+        self.assertEqual(4, pre_process.get_venn_case(D,p,f))
+
+    def test_get_venn_case5(self):
+        p = ["a", "b", "e"]
+        f = ["b", "e"]
+        D = ["a","b", "e"]
+        self.assertEqual(5, pre_process.get_venn_case(D,p,f))
+
+    def test_get_venn_case6(self):
+        p = ["a", "b", "e"]
+        f = ["b", "e"]
+        D = ["a","b", "e", "f"]
+        self.assertEqual(6, pre_process.get_venn_case(D,p,f))
+
+    def test_get_venn_case7(self):
+        f = ["a", "b", "e"]
+        p = ["b", "e"]
+        D = ["a","b", "e"]
+        self.assertEqual(7, pre_process.get_venn_case(D,p,f))
+
+    def test_get_venn_case8(self):
+        f = ["a", "b", "e"]
+        p = ["b", "e"]
+        D = ["a","b", "e", "f"]
+        self.assertEqual(8, pre_process.get_venn_case(D,p,f))
+
 if __name__ == "__main__":
 	unittest.main()

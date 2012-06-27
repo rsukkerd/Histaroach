@@ -5,43 +5,69 @@ Checked revision pairs: 17	Total number of mixed Revisions: 258
 	Repaired flips: 4
 
 
+Intersection cases: 
+Case 1: 3 (27.2727272727%)
+Case 2: 0 (0.0%)
+Case 3: 2 (18.1818181818%)
+Case 4: 6 (54.5454545455%)
+Case 5: 0 (0.0%)
+Case 6: 0 (0.0%)
+Case 7: 0 (0.0%)
+Case 8: 0 (0.0%)
+--------------------
+Total: 11
+
+
 
 Delta F - Delta P bar Mismatches
 --------------------------------
 
 
 Revision Pair: d3867bf, 8378cec	Mixed Revisions: 2
+
 Mixes (P/F): 11/10
 Files in Delta F that are missing in Delta P bar:
 contrib/hadoop-store-builder/test/voldemort/store/readonly/fetcher/HdfsFetcherTest.java: MODIFY
 
 Revision Pair: 23c9b28, 1ee8246	Mixed Revisions: 2
+
 Mixes (P/F): 18/19
 Files in Delta F that are missing in Delta P bar:
 test/unit/voldemort/store/readonly/ReadOnlyStorageEngineTest.java: MODIFY
 
 Revision Pair: 5400077, b17f572	Mixed Revisions: 14
+
 Mixes (P/F): 25/24
 Files in Delta P bar that are missing in Delta F:
 contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/MD5CheckSum.java: MODIFY
 Files in Delta F that are missing in Delta P bar:
 contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/Adler32CheckSum.java: MODIFY
+
+Mixes (P/F): 25/27
 Files in Delta P bar that are missing in Delta F:
 contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/MD5CheckSum.java: MODIFY
 Files in Delta F that are missing in Delta P bar:
 contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32CheckSum.java: MODIFY
+
+Mixes (P/F): 26/24
 Files in Delta P bar that are missing in Delta F:
 contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32CheckSum.java: MODIFY
 Files in Delta F that are missing in Delta P bar:
 contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/Adler32CheckSum.java: MODIFY
+
+Mixes (P/F): 26/28
 Files in Delta P bar that are missing in Delta F:
 contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32CheckSum.java: MODIFY
 Files in Delta F that are missing in Delta P bar:
 contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/MD5CheckSum.java: MODIFY
+
+Mixes (P/F): 29/27
 Files in Delta P bar that are missing in Delta F:
 contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/Adler32CheckSum.java: MODIFY
 Files in Delta F that are missing in Delta P bar:
 contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32CheckSum.java: MODIFY
+
+Mixes (P/F): 29/28
 Files in Delta P bar that are missing in Delta F:
 contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/Adler32CheckSum.java: MODIFY
 Files in Delta F that are missing in Delta P bar:

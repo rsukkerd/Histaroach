@@ -5,52 +5,82 @@ Checked revision pairs: 6	Total number of mixed Revisions: 32
 	Repaired flips: 6
 
 
+Intersection cases: 
+Case 1: 2 (16.6666666667%)
+Case 2: 0 (0.0%)
+Case 3: 2 (16.6666666667%)
+Case 4: 0 (0.0%)
+Case 5: 0 (0.0%)
+Case 6: 8 (66.6666666667%)
+Case 7: 0 (0.0%)
+Case 8: 0 (0.0%)
+--------------------
+Total: 12
+
+
 
 Delta F - Delta P bar Mismatches
 --------------------------------
 
 
 Revision Pair: 39c3a9c, de9ffd0	Mixed Revisions: 6
+
 Mixes (P/F): 9/11
 Files in Delta F that are missing in Delta P bar:
 src/java/voldemort/VoldemortAdminTool.java: MODIFY
+
+Mixes (P/F): 10/11
 Files in Delta F that are missing in Delta P bar:
 src/java/voldemort/server/VoldemortConfig.java: MODIFY
 
 Revision Pair: 3fea647, a5ddeb7	Mixed Revisions: 14
+
 Mixes (P/F): 22/12
 Files in Delta P bar that are missing in Delta F:
 clients/ruby/lib/voldemort-serializer.rb: MODIFY
 Files in Delta F that are missing in Delta P bar:
 clients/ruby/lib/connection/tcp_connection.rb: MODIFY
+
+Mixes (P/F): 22/14
 Files in Delta P bar that are missing in Delta F:
 clients/ruby/lib/voldemort-serializer.rb: MODIFY
 Files in Delta F that are missing in Delta P bar:
 clients/ruby/voldemort-rb.gemspec: MODIFY
+
+Mixes (P/F): 23/12
 Files in Delta P bar that are missing in Delta F:
 clients/ruby/voldemort-rb.gemspec: MODIFY
 Files in Delta F that are missing in Delta P bar:
 clients/ruby/lib/connection/tcp_connection.rb: MODIFY
+
+Mixes (P/F): 24/12
 Files in Delta P bar that are missing in Delta F:
 clients/ruby/lib/connection/connection.rb: MODIFY
 Files in Delta F that are missing in Delta P bar:
 clients/ruby/lib/connection/tcp_connection.rb: MODIFY
+
+Mixes (P/F): 24/14
 Files in Delta P bar that are missing in Delta F:
 clients/ruby/lib/connection/connection.rb: MODIFY
 Files in Delta F that are missing in Delta P bar:
 clients/ruby/voldemort-rb.gemspec: MODIFY
+
+Mixes (P/F): 25/14
 Files in Delta P bar that are missing in Delta F:
 clients/ruby/lib/connection/tcp_connection.rb: MODIFY
 Files in Delta F that are missing in Delta P bar:
 clients/ruby/voldemort-rb.gemspec: MODIFY
 
 Revision Pair: 945f9ac, 926a5a6	Mixed Revisions: 6
+
 Mixes (P/F): 30/26
 Files in Delta P bar that are missing in Delta F:
 src/java/voldemort/utils/RebalanceUtils.java: MODIFY
 Files in Delta F that are missing in Delta P bar:
 src/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java: ADD
 test/unit/voldemort/client/rebalance/AbstractRebalanceTest.java: MODIFY
+
+Mixes (P/F): 30/28
 Files in Delta P bar that are missing in Delta F:
 src/java/voldemort/utils/RebalanceUtils.java: MODIFY
 Files in Delta F that are missing in Delta P bar:
