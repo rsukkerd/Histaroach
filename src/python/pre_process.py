@@ -346,10 +346,10 @@ def print_summary(data, deltas):
     print "\n"
     #p_is_empty = len(data) - get_repaired_flips(data)
     total_cases = 0
-    vc = [ 0,0,0,0,0,0,0,0]
+    vc = [ 0,0,0,0,0,0,0,0,0]
     for d in data:
+        delta = get_delta(deltas, d.parentID, d.childID)
         if ( d.is_repaired() ) :
-            delta = get_delta(deltas, d.parentID, d.childID)
             ps = d.get_delta_p_bar(delta)
             fs = d.get_delta_f(delta)
             for mp in ps:
@@ -359,7 +359,7 @@ def print_summary(data, deltas):
                     vc[_case - 1] += 1
         else:
             #d is not repaired (this is case 9)
-            fs = d.get_delta_f(deltas)
+            fs = d.get_delta_f(delta)
             vc[8] += len(fs)
             total_cases += len(fs)
                                 
