@@ -335,12 +335,13 @@ def print_summary(data, deltas):
     print "Checked revision pairs: " + str(len(data)) + "\tTotal number of mixed Revisions: " + str(total_mixes)
     print "\tRepaired flips: " + str(get_repaired_flips(data))
     print "\n"
-    total_cases = 0
+    p_is_empty = len(data) - get_repaired_flips(data)
+    total_cases = p_is_empty
     vc = [ 0,0,0,0,0,0,0,0]
     for d in data:
         if ( d.is_repaired() ) :
             delta = get_delta(deltas, d.parentID, d.childID)
-            ps = d.get_delta_p()
+            ps = d.get_delta_p_bar(delta)
             fs = d.get_delta_f(delta)
             for mp in ps:
                 for mf in fs:
@@ -351,6 +352,7 @@ def print_summary(data, deltas):
     print "Intersection cases: "
     for i in range(8):
         print "Case " + str(i+1) + ": " + value_and_percentage( vc[i], total_cases )
+    print "Case 9: " + value_and_percentage(p_is_empty, total_cases)
     print "--------------------"
     print "Total: " + str(total_cases)
     print "\n"
