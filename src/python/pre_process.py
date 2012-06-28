@@ -361,33 +361,34 @@ def print_summary(data, deltas):
         delta = get_delta(deltas, d.parentID, d.childID)
         if ( d.is_repaired() ) :
             ps = d.get_delta_p_bar(delta)
-            fs = d.get_delta_f(delta)
             # it is possible for delta_f and delta_p_bar to be empty, 
             # we have to adjust for these cases
             #print d
             #print "Repaired case: " + str(len(ps)) + ":" + str(len(fs))  
-            if ( len(fs) == 0 ):
-                #delta_f is empty, that means all mixes fix the bug, that means delta_f is delta
-                total_delta_f = MixedRevision(-1)
-                total_delta_f.compilable = True
-                total_delta_f.revertedFiles = delta.totalDelta
-                fs.append(total_delta_f)
             if ( len(ps) == 0):
                 #delta_p_bar is empty, that means delta_p covers all files
                 continue
-            divisor = len(ps)*len(fs)
+        else:
+            total_delta_p = MixedRevision(-1)
+            total_delta_p.compilable = True
+            total_delta_p.revertedFiles = delta.totalDelta
+            ps = [total_delta_p]
+
+        fs = d.get_delta_f(delta)
+        if ( len(fs) == 0 ):
+                #delta_f is empty, that means all mixes fix the bug, that means delta_f is delta
+            total_delta_f = MixedRevision(-1)
+            total_delta_f.compilable = True
+            total_delta_f.revertedFiles = delta.totalDelta
+            fs.append(total_delta_f)
+        divisor = len(ps)*len(fs)
             #print d
             #print "Repaired case: " + str(len(ps)) + ":" + str(len(fs)) + ":" + str(divisor)
-            for mp in ps:
-                for mf in fs:
-                    _case = get_venn_case(delta.totalDelta, mp.revertedFiles, mf.revertedFiles)
-                    vc[_case - 1] += float(1)/float(divisor)
-            total_cases += 1
-        else:
-            #d is not repaired (this is case 9)
-            fs = d.get_delta_f(delta)
-            vc[8] += len(fs)
-            total_cases += len(fs)
+        for mp in ps:
+            for mf in fs:
+                _case = get_venn_case(delta.totalDelta, mp.revertedFiles, mf.revertedFiles)
+                vc[_case - 1] += float(1)/float(divisor)
+        total_cases += 1
                                 
     print "Intersection cases: "
     for i in range(9):
@@ -512,27 +513,27 @@ def get_venn_case( d, d_p, d_f ):
     Takes lists of file changes and computes the venn type (see paper)
     '''
     delta = frozenset(d)
-    delta_p = frozenset(d_p)
+    delta_p_bar = frozenset(d_p)
     delta_f = frozenset(d_f)
-    if ( len(delta) > len(delta_p.union(delta_f) )):
+    if ( len(delta) > len(delta_p_bar.union(delta_f) )):
+        #equal subsets
+        if ( delta_f == delta_p_bar ): return 1
         #covers all cases where there are changes in neither set
         #disjoint deltas
-        if ( len(delta_p.intersection(delta_f)) == 0 ): return 2
+        if ( len(delta_p_bar.intersection(delta_f)) == 0 ): return 2
         #true subsets
-        if ( delta_f.issubset(delta_p) and not delta_f == delta_p ): return 6
-        if ( delta_p.issubset(delta_f) and not delta_f == delta_p ): return 8
-        #equal subsets
-        if ( delta_f == delta_p ): return 1
+        if ( delta_f.issubset(delta_p_bar) ): return 6
+        if ( delta_p_bar.issubset(delta_f) ): return 8
         #non-empty intersection
-        if ( len(delta_p.intersection(delta_f)) > 0): return 4
+        if ( len(delta_p_bar.intersection(delta_f)) > 0): return 4
     else:
+        if ( delta_f == delta_p_bar ): return 9
         #true subsets
-        if ( delta_f.issubset(delta_p) and not delta_f == delta_p ): return 5
-        if ( delta_p.issubset(delta_f) and not delta_f == delta_p ): return 7
+        if ( delta_f.issubset(delta_p_bar) ): return 5
+        if ( delta_p_bar.issubset(delta_f) ): return 7
         #non-empty intersection
-        if ( len(delta_p.intersection(delta_f)) > 0): return 3
-    #case 9 is not covered here, because here we deal only with fixing changes
-    return -1
+        if ( len(delta_p_bar.intersection(delta_f)) > 0): return 3
+    return None
 
 def parse_arguments():
     '''
