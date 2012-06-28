@@ -1,22 +1,22 @@
 
 Histaroach Log file summary
 
-Checked revision pairs: 17	Total number of mixed Revisions: 258
-	Repaired flips: 4
+Checked revision pairs: 17	Total number of mixed Revisions: 257
+	Repaired flips: 3
 
 
 Intersection cases: 
-Case 1: 3 (6.25%)
+Case 1: 0.333333333333 (0.793650793651%)
 Case 2: 0 (0.0%)
 Case 3: 0 (0.0%)
-Case 4: 6 (12.5%)
+Case 4: 0.666666666667 (1.5873015873%)
 Case 5: 0 (0.0%)
 Case 6: 0 (0.0%)
-Case 7: 0 (0.0%)
+Case 7: 1.0 (2.38095238095%)
 Case 8: 0 (0.0%)
-Case 9: 39 (81.25%)
+Case 9: 40 (95.2380952381%)
 --------------------
-Total: 48
+Total: 42
 
 
 
@@ -81,12 +81,7 @@ Fixed flips:
 voldemort.store.routed.HintedHandoffTest
 
 
-Revision pair: d3867bf:8378cec	Total delta: 3 files
-Flipped tests:
-voldemort.store.routed.HintedHandoffTest
-
-
-Revision pair: 23c9b28:1ee8246	Total delta: 3 files
+Revision pair: 23c9b28:1ee8246	Total delta: 2 files
 Flipped tests:
 voldemort.store.readonly.ReadOnlyStorageEngineTest
 voldemort.client.rebalance.RebalanceTest
@@ -126,17 +121,7 @@ Flipped tests:
 voldemort.store.routed.HintedHandoffTest
 
 
-Revision pair: d3867bf:8378cec	Total delta: 3 files
-Flipped tests:
-voldemort.store.routed.HintedHandoffTest
-
-Mixed Revision: 10
-Changed files (2):
-    contrib/hadoop-store-builder/src/java/voldemort/store/readonly/fetcher/HdfsFetcher.java: MODIFY
-    contrib/hadoop-store-builder/test/voldemort/store/readonly/fetcher/HdfsFetcherTest.java: MODIFY
-
-
-Revision pair: 23c9b28:1ee8246	Total delta: 3 files
+Revision pair: 23c9b28:1ee8246	Total delta: 2 files
 Flipped tests:
 voldemort.store.readonly.ReadOnlyStorageEngineTest
 voldemort.client.rebalance.RebalanceTest

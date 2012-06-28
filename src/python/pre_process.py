@@ -18,6 +18,9 @@
 import argparse
 from copy import deepcopy
 
+def is_test_file(f):
+    return ( f.endswith("Test.java") or f.endswith("Tests.java"))
+
 class Delta:
     def __init__(self, fieldString):
         fields = fieldString.strip().split(";")
@@ -25,6 +28,7 @@ class Delta:
         self.childID = fields[1]
         files = []
         for f in fields[2].split(","):
+            if ( is_test_file(f) ): continue
             files.append(ChangedFile(f[1:], f[0]))
         self.totalDelta = files
 
@@ -236,7 +240,7 @@ def init_mix(mix,line):
     Add a ChangedFile for each file in the mix that is not a test
     '''
     for f in line.changedFiles.split(','):
-        if ( f.endswith("Test.java") or f.endswith("Tests.java")):
+        if ( is_test_file(f) ):
             continue
         mix.revertedFiles.append( ChangedFile( f[1:], f[0] ))
 
@@ -360,6 +364,8 @@ def print_summary(data, deltas):
             fs = d.get_delta_f(delta)
             # it is possible for delta_f and delta_p_bar to be empty, 
             # we have to adjust for these cases
+            #print d
+            #print "Repaired case: " + str(len(ps)) + ":" + str(len(fs))  
             if ( len(fs) == 0 ):
                 #delta_f is empty, that means all mixes fix the bug, that means delta_f is delta
                 total_delta_f = MixedRevision(-1)

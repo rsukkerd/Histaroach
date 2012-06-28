@@ -6,17 +6,17 @@ Checked revision pairs: 6	Total number of mixed Revisions: 32
 
 
 Intersection cases: 
-Case 1: 2 (20.0%)
-Case 2: 6 (60.0%)
+Case 1: 0.25 (4.16666666667%)
+Case 2: 1.75 (29.1666666667%)
 Case 3: 0 (0.0%)
 Case 4: 0 (0.0%)
 Case 5: 0 (0.0%)
 Case 6: 0 (0.0%)
-Case 7: 0 (0.0%)
-Case 8: 2 (20.0%)
+Case 7: 3.0 (50.0%)
+Case 8: 1.0 (16.6666666667%)
 Case 9: 0 (0.0%)
 --------------------
-Total: 10
+Total: 6
 
 
 
@@ -71,6 +71,14 @@ Files in Delta P bar that are missing in Delta F:
 clients/ruby/lib/connection/tcp_connection.rb: MODIFY
 Files in Delta F that are missing in Delta P bar:
 clients/ruby/voldemort-rb.gemspec: MODIFY
+
+Revision Pair: 945f9ac, 926a5a6	Mixed Revisions: 6
+
+Mixes (P/F): 30/26
+Files in Delta P bar that are missing in Delta F:
+src/java/voldemort/utils/RebalanceUtils.java: MODIFY
+Files in Delta F that are missing in Delta P bar:
+src/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java: ADD
 Delta P bar
 -----------
 
@@ -176,10 +184,16 @@ voldemort.server.protocol.admin.AsyncOperationTest
 voldemort.server.EndToEndTest
 
 
-Revision pair: 945f9ac:926a5a6	Total delta: 4 files
+Revision pair: 945f9ac:926a5a6	Total delta: 3 files
 Flipped tests:
 voldemort.cluster.failuredetector.ThresholdFailureDetectorTest
 voldemort.client.rebalance.RebalanceTest
+
+Mixed Revision: 30
+Changed files (1):
+    src/java/voldemort/utils/RebalanceUtils.java: MODIFY
+Fixed flips:
+voldemort.cluster.failuredetector.ThresholdFailureDetectorTest
 
 
 Delta F
@@ -224,14 +238,13 @@ Changed files (1):
     clients/ruby/voldemort-rb.gemspec: MODIFY
 
 
-Revision pair: 945f9ac:926a5a6	Total delta: 4 files
+Revision pair: 945f9ac:926a5a6	Total delta: 3 files
 Flipped tests:
 voldemort.cluster.failuredetector.ThresholdFailureDetectorTest
 voldemort.client.rebalance.RebalanceTest
 
 Mixed Revision: 26
-Changed files (2):
+Changed files (1):
     src/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java: ADD
-    test/unit/voldemort/client/rebalance/AbstractRebalanceTest.java: MODIFY
 
 
