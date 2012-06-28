@@ -232,15 +232,18 @@ class RevisionPair:
         return delta_f
 
 def init_mix(mix,line):
+    '''
+    Add a ChangedFile for each file in the mix that is not a test
+    '''
     for f in line.changedFiles.split(','):
+        if ( f.endswith("Test.java") or f.endswith("Tests.java")):
+            continue
         mix.revertedFiles.append( ChangedFile( f[1:], f[0] ))
 
 def build_mix( mixid, lines):
-    #if (len(lines) == 0 ): 
-    #    print "Empty lines for mixid " + str(mixid); 
-    #    return
     mix = MixedRevision( mixid )
     init_mix(mix, lines[0])
+    if ( len(mix.revertedFiles) == 0 ): return None
     for line in lines:
         if ( line.compilable ):
             mix.compilable = True
@@ -270,12 +273,15 @@ def build_rev_pair(parent, child, lines):
         else:
             #create a new mixed rev
             #print "Building mix rev " + str(mixID) + " with " + str(len(mixStrings)) + " lines"
-            revPair.mixedRevisions.append( build_mix(mixID, mixLines) )
+            temp_mix = build_mix(mixID, mixLines)
+            if ( temp_mix is not None ): revPair.mixedRevisions.append( temp_mix )
             mixID = line.mixID
             mixLines = [line] 
             #print "Found new mix " + fields[0] + " for revs " + parent + ", " + child
     #print "Building mix rev " + str(mixID) + " with " + str(len(mixStrings)) + " lines"
-    revPair.mixedRevisions.append( build_mix(mixID, mixLines) )
+    temp_mix = build_mix(mixID, mixLines)
+    if ( temp_mix is not None ): revPair.mixedRevisions.append( temp_mix )
+    #revPair.mixedRevisions.append( build_mix(mixID, mixLines) )
     return revPair
 
 def read_data(inputfile):
@@ -288,7 +294,7 @@ def read_data(inputfile):
     #skip header line
     inputfile.next()
     for line in inputfile:
-        items = line.split(';')
+        items = line.strip().split(';')
         lineitems = InputFileLine(items)
         if ( parentID == None and childID == None ):
             #this should happen only when we read the first line
@@ -352,11 +358,14 @@ def print_summary(data, deltas):
         if ( d.is_repaired() ) :
             ps = d.get_delta_p_bar(delta)
             fs = d.get_delta_f(delta)
+            divisor = len(ps)*len(fs)
+            print d
+            print "Repaired case: " + str(len(ps)) + ":" + str(len(fs)) + ":" + str(divisor)
             for mp in ps:
                 for mf in fs:
-                    total_cases += 1
                     _case = get_venn_case(delta.totalDelta, mp.revertedFiles, mf.revertedFiles)
-                    vc[_case - 1] += 1
+                    vc[_case - 1] += float(1)/float(divisor)
+            total_cases += 1
         else:
             #d is not repaired (this is case 9)
             fs = d.get_delta_f(delta)
