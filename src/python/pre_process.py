@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#i!/usr/bin/python
 #
 # Script: pre-process.py
 # Purpose: Processes a histaroach output file to extract relevant
@@ -358,9 +358,20 @@ def print_summary(data, deltas):
         if ( d.is_repaired() ) :
             ps = d.get_delta_p_bar(delta)
             fs = d.get_delta_f(delta)
+            # it is possible for delta_f and delta_p_bar to be empty, 
+            # we have to adjust for these cases
+            if ( len(fs) == 0 ):
+                #delta_f is empty, that means all mixes fix the bug, that means delta_f is delta
+                total_delta_f = MixedRevision(-1)
+                total_delta_f.compilable = True
+                total_delta_f.revertedFiles = delta.totalDelta
+                fs.append(total_delta_f)
+            if ( len(ps) == 0):
+                #delta_p_bar is empty, that means delta_p covers all files
+                continue
             divisor = len(ps)*len(fs)
-            print d
-            print "Repaired case: " + str(len(ps)) + ":" + str(len(fs)) + ":" + str(divisor)
+            #print d
+            #print "Repaired case: " + str(len(ps)) + ":" + str(len(fs)) + ":" + str(divisor)
             for mp in ps:
                 for mf in fs:
                     _case = get_venn_case(delta.totalDelta, mp.revertedFiles, mf.revertedFiles)
