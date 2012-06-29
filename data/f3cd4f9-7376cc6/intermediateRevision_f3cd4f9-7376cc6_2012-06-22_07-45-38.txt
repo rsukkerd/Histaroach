@@ -49,7 +49,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 0;a5ddeb7;d32adc2;Msrc/java/voldemort/store/bdb/BdbStorageEngine.java;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 0;a5ddeb7;d32adc2;Msrc/java/voldemort/store/bdb/BdbStorageEngine.java;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;0;1
 0;a5ddeb7;d32adc2;Msrc/java/voldemort/store/bdb/BdbStorageEngine.java;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-0;a5ddeb7;d32adc2;Msrc/java/voldemort/store/bdb/BdbStorageEngine.java;1;0;voldemort.store.routed.HintedHandoffTest;1;1;1
 0;a5ddeb7;d32adc2;Msrc/java/voldemort/store/bdb/BdbStorageEngine.java;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 0;a5ddeb7;d32adc2;Msrc/java/voldemort/store/bdb/BdbStorageEngine.java;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 0;a5ddeb7;d32adc2;Msrc/java/voldemort/store/bdb/BdbStorageEngine.java;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -143,7 +142,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 1;a5ddeb7;d32adc2;Msrc/java/voldemort/store/bdb/BdbStorageConfiguration.java;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 1;a5ddeb7;d32adc2;Msrc/java/voldemort/store/bdb/BdbStorageConfiguration.java;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;0;1
 1;a5ddeb7;d32adc2;Msrc/java/voldemort/store/bdb/BdbStorageConfiguration.java;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-1;a5ddeb7;d32adc2;Msrc/java/voldemort/store/bdb/BdbStorageConfiguration.java;1;0;voldemort.store.routed.HintedHandoffTest;1;1;1
 1;a5ddeb7;d32adc2;Msrc/java/voldemort/store/bdb/BdbStorageConfiguration.java;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 1;a5ddeb7;d32adc2;Msrc/java/voldemort/store/bdb/BdbStorageConfiguration.java;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 1;a5ddeb7;d32adc2;Msrc/java/voldemort/store/bdb/BdbStorageConfiguration.java;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -238,7 +236,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 2;d8f6c90;2f32c9a;Mrelease_notes.txt;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;1
 2;d8f6c90;2f32c9a;Mrelease_notes.txt;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 2;d8f6c90;2f32c9a;Mrelease_notes.txt;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-2;d8f6c90;2f32c9a;Mrelease_notes.txt;1;0;voldemort.store.routed.HintedHandoffTest;1;1;0
 2;d8f6c90;2f32c9a;Mrelease_notes.txt;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 2;d8f6c90;2f32c9a;Mrelease_notes.txt;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 2;d8f6c90;2f32c9a;Mrelease_notes.txt;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -333,7 +330,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 3;d8f6c90;2f32c9a;Mbuild.properties;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;1
 3;d8f6c90;2f32c9a;Mbuild.properties;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 3;d8f6c90;2f32c9a;Mbuild.properties;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-3;d8f6c90;2f32c9a;Mbuild.properties;1;0;voldemort.store.routed.HintedHandoffTest;1;1;0
 3;d8f6c90;2f32c9a;Mbuild.properties;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 3;d8f6c90;2f32c9a;Mbuild.properties;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 3;d8f6c90;2f32c9a;Mbuild.properties;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -428,7 +424,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 4;1ce9886;2c462ce;Mrelease_notes.txt;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;1
 4;1ce9886;2c462ce;Mrelease_notes.txt;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 4;1ce9886;2c462ce;Mrelease_notes.txt;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-4;1ce9886;2c462ce;Mrelease_notes.txt;1;0;voldemort.store.routed.HintedHandoffTest;1;1;1
 4;1ce9886;2c462ce;Mrelease_notes.txt;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 4;1ce9886;2c462ce;Mrelease_notes.txt;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 4;1ce9886;2c462ce;Mrelease_notes.txt;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -523,7 +518,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 5;1ce9886;2c462ce;Mbuild.properties;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;1
 5;1ce9886;2c462ce;Mbuild.properties;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 5;1ce9886;2c462ce;Mbuild.properties;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-5;1ce9886;2c462ce;Mbuild.properties;1;0;voldemort.store.routed.HintedHandoffTest;1;1;1
 5;1ce9886;2c462ce;Mbuild.properties;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 5;1ce9886;2c462ce;Mbuild.properties;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 5;1ce9886;2c462ce;Mbuild.properties;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -618,7 +612,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 6;39c3a9c;de9ffd0;Msrc/java/voldemort/server/protocol/admin/AdminServiceRequestHandler.java;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;1
 6;39c3a9c;de9ffd0;Msrc/java/voldemort/server/protocol/admin/AdminServiceRequestHandler.java;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 6;39c3a9c;de9ffd0;Msrc/java/voldemort/server/protocol/admin/AdminServiceRequestHandler.java;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-6;39c3a9c;de9ffd0;Msrc/java/voldemort/server/protocol/admin/AdminServiceRequestHandler.java;1;0;voldemort.store.routed.HintedHandoffTest;1;1;1
 6;39c3a9c;de9ffd0;Msrc/java/voldemort/server/protocol/admin/AdminServiceRequestHandler.java;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 6;39c3a9c;de9ffd0;Msrc/java/voldemort/server/protocol/admin/AdminServiceRequestHandler.java;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 6;39c3a9c;de9ffd0;Msrc/java/voldemort/server/protocol/admin/AdminServiceRequestHandler.java;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -713,7 +706,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 7;39c3a9c;de9ffd0;Msrc/java/voldemort/VoldemortAdminTool.java;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;1
 7;39c3a9c;de9ffd0;Msrc/java/voldemort/VoldemortAdminTool.java;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 7;39c3a9c;de9ffd0;Msrc/java/voldemort/VoldemortAdminTool.java;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-7;39c3a9c;de9ffd0;Msrc/java/voldemort/VoldemortAdminTool.java;1;0;voldemort.store.routed.HintedHandoffTest;1;1;1
 7;39c3a9c;de9ffd0;Msrc/java/voldemort/VoldemortAdminTool.java;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 7;39c3a9c;de9ffd0;Msrc/java/voldemort/VoldemortAdminTool.java;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 7;39c3a9c;de9ffd0;Msrc/java/voldemort/VoldemortAdminTool.java;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -808,7 +800,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 8;39c3a9c;de9ffd0;Msrc/java/voldemort/server/VoldemortConfig.java;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;1
 8;39c3a9c;de9ffd0;Msrc/java/voldemort/server/VoldemortConfig.java;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 8;39c3a9c;de9ffd0;Msrc/java/voldemort/server/VoldemortConfig.java;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-8;39c3a9c;de9ffd0;Msrc/java/voldemort/server/VoldemortConfig.java;1;0;voldemort.store.routed.HintedHandoffTest;1;1;1
 8;39c3a9c;de9ffd0;Msrc/java/voldemort/server/VoldemortConfig.java;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 8;39c3a9c;de9ffd0;Msrc/java/voldemort/server/VoldemortConfig.java;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 8;39c3a9c;de9ffd0;Msrc/java/voldemort/server/VoldemortConfig.java;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -903,7 +894,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 9;39c3a9c;de9ffd0;Msrc/java/voldemort/server/protocol/admin/AdminServiceRequestHandler.java,Msrc/java/voldemort/VoldemortAdminTool.java;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;1
 9;39c3a9c;de9ffd0;Msrc/java/voldemort/server/protocol/admin/AdminServiceRequestHandler.java,Msrc/java/voldemort/VoldemortAdminTool.java;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 9;39c3a9c;de9ffd0;Msrc/java/voldemort/server/protocol/admin/AdminServiceRequestHandler.java,Msrc/java/voldemort/VoldemortAdminTool.java;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-9;39c3a9c;de9ffd0;Msrc/java/voldemort/server/protocol/admin/AdminServiceRequestHandler.java,Msrc/java/voldemort/VoldemortAdminTool.java;1;0;voldemort.store.routed.HintedHandoffTest;1;1;1
 9;39c3a9c;de9ffd0;Msrc/java/voldemort/server/protocol/admin/AdminServiceRequestHandler.java,Msrc/java/voldemort/VoldemortAdminTool.java;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 9;39c3a9c;de9ffd0;Msrc/java/voldemort/server/protocol/admin/AdminServiceRequestHandler.java,Msrc/java/voldemort/VoldemortAdminTool.java;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 9;39c3a9c;de9ffd0;Msrc/java/voldemort/server/protocol/admin/AdminServiceRequestHandler.java,Msrc/java/voldemort/VoldemortAdminTool.java;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -998,7 +988,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 10;39c3a9c;de9ffd0;Msrc/java/voldemort/server/protocol/admin/AdminServiceRequestHandler.java,Msrc/java/voldemort/server/VoldemortConfig.java;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;1
 10;39c3a9c;de9ffd0;Msrc/java/voldemort/server/protocol/admin/AdminServiceRequestHandler.java,Msrc/java/voldemort/server/VoldemortConfig.java;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 10;39c3a9c;de9ffd0;Msrc/java/voldemort/server/protocol/admin/AdminServiceRequestHandler.java,Msrc/java/voldemort/server/VoldemortConfig.java;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-10;39c3a9c;de9ffd0;Msrc/java/voldemort/server/protocol/admin/AdminServiceRequestHandler.java,Msrc/java/voldemort/server/VoldemortConfig.java;1;0;voldemort.store.routed.HintedHandoffTest;1;1;1
 10;39c3a9c;de9ffd0;Msrc/java/voldemort/server/protocol/admin/AdminServiceRequestHandler.java,Msrc/java/voldemort/server/VoldemortConfig.java;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 10;39c3a9c;de9ffd0;Msrc/java/voldemort/server/protocol/admin/AdminServiceRequestHandler.java,Msrc/java/voldemort/server/VoldemortConfig.java;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 10;39c3a9c;de9ffd0;Msrc/java/voldemort/server/protocol/admin/AdminServiceRequestHandler.java,Msrc/java/voldemort/server/VoldemortConfig.java;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -1093,7 +1082,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 11;39c3a9c;de9ffd0;Msrc/java/voldemort/VoldemortAdminTool.java,Msrc/java/voldemort/server/VoldemortConfig.java;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;1
 11;39c3a9c;de9ffd0;Msrc/java/voldemort/VoldemortAdminTool.java,Msrc/java/voldemort/server/VoldemortConfig.java;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 11;39c3a9c;de9ffd0;Msrc/java/voldemort/VoldemortAdminTool.java,Msrc/java/voldemort/server/VoldemortConfig.java;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-11;39c3a9c;de9ffd0;Msrc/java/voldemort/VoldemortAdminTool.java,Msrc/java/voldemort/server/VoldemortConfig.java;1;0;voldemort.store.routed.HintedHandoffTest;0;1;1
 11;39c3a9c;de9ffd0;Msrc/java/voldemort/VoldemortAdminTool.java,Msrc/java/voldemort/server/VoldemortConfig.java;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 11;39c3a9c;de9ffd0;Msrc/java/voldemort/VoldemortAdminTool.java,Msrc/java/voldemort/server/VoldemortConfig.java;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 11;39c3a9c;de9ffd0;Msrc/java/voldemort/VoldemortAdminTool.java,Msrc/java/voldemort/server/VoldemortConfig.java;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -1187,7 +1175,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 12;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 12;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;0
 12;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-12;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb;1;0;voldemort.store.routed.HintedHandoffTest;1;1;1
 12;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 12;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 12;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -1281,7 +1268,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 13;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 13;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;0
 13;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-13;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb;1;0;voldemort.store.routed.HintedHandoffTest;1;1;1
 13;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 13;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 13;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -1375,7 +1361,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 14;3fea647;a5ddeb7;Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 14;3fea647;a5ddeb7;Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;0
 14;3fea647;a5ddeb7;Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-14;3fea647;a5ddeb7;Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.store.routed.HintedHandoffTest;1;1;1
 14;3fea647;a5ddeb7;Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 14;3fea647;a5ddeb7;Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 14;3fea647;a5ddeb7;Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -1469,7 +1454,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 15;3fea647;a5ddeb7;Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 15;3fea647;a5ddeb7;Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;0
 15;3fea647;a5ddeb7;Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-15;3fea647;a5ddeb7;Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.store.routed.HintedHandoffTest;1;1;1
 15;3fea647;a5ddeb7;Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 15;3fea647;a5ddeb7;Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 15;3fea647;a5ddeb7;Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -1563,7 +1547,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 16;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/connection/connection.rb;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 16;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/connection/connection.rb;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;0
 16;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/connection/connection.rb;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-16;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/connection/connection.rb;1;0;voldemort.store.routed.HintedHandoffTest;1;1;1
 16;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/connection/connection.rb;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 16;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/connection/connection.rb;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 16;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/connection/connection.rb;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -1657,7 +1640,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 17;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 17;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;0
 17;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-17;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.store.routed.HintedHandoffTest;1;1;1
 17;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 17;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 17;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -1751,7 +1733,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 18;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 18;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;0
 18;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-18;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.store.routed.HintedHandoffTest;1;1;1
 18;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 18;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 18;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -1845,7 +1826,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 19;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 19;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;0
 19;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-19;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.store.routed.HintedHandoffTest;1;1;1
 19;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 19;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 19;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -1939,7 +1919,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 20;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 20;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;0
 20;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-20;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.store.routed.HintedHandoffTest;1;1;1
 20;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 20;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 20;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -2033,7 +2012,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 21;3fea647;a5ddeb7;Mclients/ruby/voldemort-rb.gemspec,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 21;3fea647;a5ddeb7;Mclients/ruby/voldemort-rb.gemspec,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;0
 21;3fea647;a5ddeb7;Mclients/ruby/voldemort-rb.gemspec,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-21;3fea647;a5ddeb7;Mclients/ruby/voldemort-rb.gemspec,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.store.routed.HintedHandoffTest;1;1;1
 21;3fea647;a5ddeb7;Mclients/ruby/voldemort-rb.gemspec,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 21;3fea647;a5ddeb7;Mclients/ruby/voldemort-rb.gemspec,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 21;3fea647;a5ddeb7;Mclients/ruby/voldemort-rb.gemspec,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -2127,7 +2105,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 22;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 22;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;0
 22;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-22;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.store.routed.HintedHandoffTest;1;1;1
 22;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 22;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 22;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/voldemort-rb.gemspec;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -2221,7 +2198,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 23;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 23;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;0
 23;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-23;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.store.routed.HintedHandoffTest;1;1;1
 23;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 23;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 23;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -2315,7 +2291,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 24;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/voldemort-rb.gemspec,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 24;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/voldemort-rb.gemspec,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;0
 24;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/voldemort-rb.gemspec,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-24;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/voldemort-rb.gemspec,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.store.routed.HintedHandoffTest;1;1;1
 24;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/voldemort-rb.gemspec,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 24;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/voldemort-rb.gemspec,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 24;3fea647;a5ddeb7;Mclients/ruby/lib/connection/tcp_connection.rb,Mclients/ruby/voldemort-rb.gemspec,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -2409,7 +2384,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 25;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/voldemort-rb.gemspec,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 25;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/voldemort-rb.gemspec,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;0
 25;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/voldemort-rb.gemspec,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-25;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/voldemort-rb.gemspec,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.store.routed.HintedHandoffTest;1;1;1
 25;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/voldemort-rb.gemspec,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 25;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/voldemort-rb.gemspec,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 25;3fea647;a5ddeb7;Mclients/ruby/lib/connection/connection.rb,Mclients/ruby/voldemort-rb.gemspec,Mclients/ruby/lib/voldemort-serializer.rb;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -2504,7 +2478,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 26;945f9ac;926a5a6;Asrc/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java,Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;1
 26;945f9ac;926a5a6;Asrc/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java,Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 26;945f9ac;926a5a6;Asrc/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java,Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-26;945f9ac;926a5a6;Asrc/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java,Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java;1;0;voldemort.store.routed.HintedHandoffTest;0;1;1
 26;945f9ac;926a5a6;Asrc/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java,Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 26;945f9ac;926a5a6;Asrc/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java,Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 26;945f9ac;926a5a6;Asrc/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java,Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -2599,7 +2572,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 27;945f9ac;926a5a6;Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java,Msrc/java/voldemort/utils/RebalanceUtils.java;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;1
 27;945f9ac;926a5a6;Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java,Msrc/java/voldemort/utils/RebalanceUtils.java;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 27;945f9ac;926a5a6;Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java,Msrc/java/voldemort/utils/RebalanceUtils.java;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-27;945f9ac;926a5a6;Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java,Msrc/java/voldemort/utils/RebalanceUtils.java;1;0;voldemort.store.routed.HintedHandoffTest;1;1;1
 27;945f9ac;926a5a6;Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java,Msrc/java/voldemort/utils/RebalanceUtils.java;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 27;945f9ac;926a5a6;Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java,Msrc/java/voldemort/utils/RebalanceUtils.java;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 27;945f9ac;926a5a6;Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java,Msrc/java/voldemort/utils/RebalanceUtils.java;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -2695,7 +2667,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 29;945f9ac;926a5a6;Asrc/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java,Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java,Msrc/java/voldemort/utils/RebalanceUtils.java;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;1
 29;945f9ac;926a5a6;Asrc/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java,Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java,Msrc/java/voldemort/utils/RebalanceUtils.java;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 29;945f9ac;926a5a6;Asrc/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java,Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java,Msrc/java/voldemort/utils/RebalanceUtils.java;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-29;945f9ac;926a5a6;Asrc/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java,Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java,Msrc/java/voldemort/utils/RebalanceUtils.java;1;0;voldemort.store.routed.HintedHandoffTest;0;1;1
 29;945f9ac;926a5a6;Asrc/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java,Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java,Msrc/java/voldemort/utils/RebalanceUtils.java;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 29;945f9ac;926a5a6;Asrc/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java,Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java,Msrc/java/voldemort/utils/RebalanceUtils.java;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 29;945f9ac;926a5a6;Asrc/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java,Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java,Msrc/java/voldemort/utils/RebalanceUtils.java;1;0;voldemort.client.LazyStoreClientTest;1;1;1
@@ -2790,7 +2761,6 @@ IID;parentCommitID;childCommitID;delta;compilable;testAborted;test;intermediateT
 30;945f9ac;926a5a6;Asrc/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java,Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java,Msrc/java/voldemort/server/rebalance/async/DonorBasedRebalanceAsyncOperation.java;1;0;voldemort.server.protocol.admin.AsyncOperationTest;1;1;1
 30;945f9ac;926a5a6;Asrc/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java,Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java,Msrc/java/voldemort/server/rebalance/async/DonorBasedRebalanceAsyncOperation.java;1;0;voldemort.utils.ByteUtilsTest;1;1;1
 30;945f9ac;926a5a6;Asrc/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java,Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java,Msrc/java/voldemort/server/rebalance/async/DonorBasedRebalanceAsyncOperation.java;1;0;voldemort.store.metadata.MetadataStoreTest;1;1;1
-30;945f9ac;926a5a6;Asrc/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java,Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java,Msrc/java/voldemort/server/rebalance/async/DonorBasedRebalanceAsyncOperation.java;1;0;voldemort.store.routed.HintedHandoffTest;1;1;1
 30;945f9ac;926a5a6;Asrc/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java,Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java,Msrc/java/voldemort/server/rebalance/async/DonorBasedRebalanceAsyncOperation.java;1;0;voldemort.protocol.pb.ProtocolBuffersRequestFormatTest;1;1;1
 30;945f9ac;926a5a6;Asrc/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java,Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java,Msrc/java/voldemort/server/rebalance/async/DonorBasedRebalanceAsyncOperation.java;1;0;voldemort.store.compress.CompressingStoreTest;0;0;0
 30;945f9ac;926a5a6;Asrc/java/voldemort/server/rebalance/async/DonorBasedRebalancePusherSlave.java,Mtest/unit/voldemort/client/rebalance/AbstractRebalanceTest.java,Msrc/java/voldemort/server/rebalance/async/DonorBasedRebalanceAsyncOperation.java;1;0;voldemort.client.LazyStoreClientTest;1;1;1

@@ -2,17 +2,17 @@
 Histaroach Log file summary
 
 Checked revision pairs: 17	Total number of mixed Revisions: 257
-	Repaired flips: 3
+	Repaired flips: 2
 
 
 Intersection cases: 
-Case 1: 0.333333333333 (2.08333333333%)
+Case 1: 0.25 (1.5625%)
 Case 2: 0 (0.0%)
 Case 3: 0 (0.0%)
-Case 4: 0.666666666667 (4.16666666667%)
-Case 5: 13.0 (81.25%)
+Case 4: 0.75 (4.6875%)
+Case 5: 14.0 (87.5%)
 Case 6: 0 (0.0%)
-Case 7: 1.0 (6.25%)
+Case 7: 0 (0.0%)
 Case 8: 0 (0.0%)
 Case 9: 1.0 (6.25%)
 --------------------
@@ -44,42 +44,25 @@ contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32Che
 Files in Delta F that are missing in Delta P bar:
 contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/Adler32CheckSum.java: MODIFY
 
-Mixes (P/F): 26/28
+Mixes (P/F): 28/24
 Files in Delta P bar that are missing in Delta F:
 contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32CheckSum.java: MODIFY
 Files in Delta F that are missing in Delta P bar:
-contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/MD5CheckSum.java: MODIFY
+contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CheckSum.java: MODIFY
+
+Mixes (P/F): 28/27
+Files in Delta P bar that are missing in Delta F:
+contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/Adler32CheckSum.java: MODIFY
+Files in Delta F that are missing in Delta P bar:
+contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CheckSum.java: MODIFY
 
 Mixes (P/F): 29/27
 Files in Delta P bar that are missing in Delta F:
 contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/Adler32CheckSum.java: MODIFY
 Files in Delta F that are missing in Delta P bar:
 contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32CheckSum.java: MODIFY
-
-Mixes (P/F): 29/28
-Files in Delta P bar that are missing in Delta F:
-contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/Adler32CheckSum.java: MODIFY
-Files in Delta F that are missing in Delta P bar:
-contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/MD5CheckSum.java: MODIFY
 Delta P bar
 -----------
-
-Revision pair: ca9f374:7857afa	Total delta: 2 files
-Flipped tests:
-voldemort.store.routed.HintedHandoffTest
-
-Mixed Revision: 8
-Changed files (1):
-    src/java/voldemort/utils/RebalanceUtils.java: MODIFY
-Fixed flips:
-voldemort.store.routed.HintedHandoffTest
-
-Mixed Revision: 9
-Changed files (1):
-    src/java/voldemort/client/protocol/admin/AdminClient.java: MODIFY
-Fixed flips:
-voldemort.store.routed.HintedHandoffTest
-
 
 Revision pair: 23c9b28:1ee8246	Total delta: 2 files
 Flipped tests:
@@ -105,6 +88,13 @@ Changed files (2):
 Fixed flips:
 voldemort.server.EndToEndTest
 
+Mixed Revision: 28
+Changed files (2):
+    contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32CheckSum.java: MODIFY
+    contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/Adler32CheckSum.java: MODIFY
+Fixed flips:
+voldemort.server.EndToEndTest
+
 Mixed Revision: 29
 Changed files (2):
     contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/Adler32CheckSum.java: MODIFY
@@ -115,11 +105,6 @@ voldemort.server.EndToEndTest
 
 Delta F
 -------
-
-Revision pair: ca9f374:7857afa	Total delta: 2 files
-Flipped tests:
-voldemort.store.routed.HintedHandoffTest
-
 
 Revision pair: 23c9b28:1ee8246	Total delta: 2 files
 Flipped tests:
@@ -139,11 +124,6 @@ Changed files (2):
 Mixed Revision: 27
 Changed files (2):
     contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CRC32CheckSum.java: MODIFY
-    contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CheckSum.java: MODIFY
-
-Mixed Revision: 28
-Changed files (2):
-    contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/MD5CheckSum.java: MODIFY
     contrib/hadoop-store-builder/src/java/voldemort/store/readonly/checksum/CheckSum.java: MODIFY
 
 
